@@ -1,0 +1,1726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>academic_crawler.spiders.people_spider_alternative API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>academic_crawler.spiders.people_spider_alternative</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from scrapy import link
+
+from .academic_spider import AcademicSpider
+from ..config.page_types import PAGE_TYPE
+from scrapy_splash import SplashRequest
+import logging
+from academic_crawler.heuristics.page_features.pipeline import PageFeaturesPipeline
+from ..controllers.people import StatesPeople, PeopleController
+from ..heuristics.links import LinkManager
+from ..scrapers.manager import ScrapingState
+from ..scrapers.people import PeopleScraper
+from academic_crawler.config.predefined import keywords_map
+from ..scrapers.org_structure import OrgStructureScraper
+from ..scrapers.templates import Organization
+
+
+class PeopleSpiderAlt(AcademicSpider):
+    SCRAPING_WORKFLOW_TEMPLATES = (
+        (True, &#39;keywords_org_structure&#39;, [PAGE_TYPE.PAGE_ORGANIZATIONS]),
+        (False, &#39;keywords_people_page&#39;, [PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA])
+    )
+    controller: PeopleController
+    name = &#39;PeopleSpider&#39;
+    custom_settings = {
+        &#39;ITEM_PIPELINES&#39;: {
+            &#34;academic_crawler.pipelines.JsonWriterPipeline&#34;: 300
+        },
+        &#39;CONCURRENT_REQUESTS&#39;: &#39;1&#39;
+    }
+
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self.scraper_people = PeopleScraper()
+        self.scraper_org = OrgStructureScraper(caller=&#39;people&#39;)
+        self.candidates = []
+        self.seen_urls = set()
+        self.priority = 0
+        self.departments = []
+        self.remaining = 0
+        self.base_organization = self.program_state.get_domain(&#39;organization&#39;)
+
+    def setup_state_callback_map(self):
+        self.state_callback_map = {
+            ScrapingState.SCRAPE_ORGS: self.scrape_orgs,
+            ScrapingState.SCRAPE_ORGS_PEOPLE: self.scrape_orgs_people,
+            ScrapingState.SCRAPE_PEOPLE: self.scrape_people,
+            ScrapingState.SCRAPE_PARTIAL_PEOPLE: self.scrape_partial_people,
+            ScrapingState.SCRAPE_OTHER: self.scrape_people,
+
+        }
+
+    def change_scraping_state(self):
+        state = self.scraping_manager.actual
+        new_state = None
+        if state == ScrapingState.SCRAPE_ORGS  or state == ScrapingState.SCRAPE_ORGS_PEOPLE:
+            new_state = ScrapingState.SCRAPE_PEOPLE
+        elif state == ScrapingState.SCRAPE_PEOPLE:
+            new_state = ScrapingState.SCRAPE_OTHER
+        elif state == ScrapingState.SCRAPE_OTHER:
+            new_state = ScrapingState.SCRAPE_FINISHED
+
+        if new_state:
+            logging.info(f&#34;Changing state to {new_state}&#34;)
+            self.scraping_manager.actual = new_state
+
+    def get_page_type(self, response) -&gt; PAGE_TYPE:
+        &#34;&#34;&#34;
+        This method is used to get the page type of the current page
+        :param response:
+        :return:
+        &#34;&#34;&#34;
+        self.generate_page_header(response, prune_tree=False)
+        pipeline = PageFeaturesPipeline(self.program_state)
+        page_type = pipeline.execute()
+        return page_type
+
+    def filter_managers(self, managers : list[LinkManager], keyword_category:str, ):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that contain the keyword category
+        :param managers:
+        :param keyword_category:
+        :return:
+        &#34;&#34;&#34;
+        candidates = []
+        #max_len_keywords = max([len(keyword_category) for keyword_category in keywords_map[keyword_category]])
+        detector = self.detectors.get(&#39;keyword_category&#39;)
+        for manager in managers:
+            if len(manager.get_referer_text_tokens()) &lt;= 5 and manager.contains_keyword(detector, keyword_category):
+                candidates.append(manager)
+        return candidates
+
+    def filter_org_managers(self, managers:list[LinkManager], manager_ref:LinkManager):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that are sublinks of the manager_ref
+        :param managers:
+        :param manager_ref:
+        :return:
+        &#34;&#34;&#34;
+        candidates = []
+        for manager in managers:
+            if manager_ref.is_sub_link(manager):
+                candidates.append(manager)
+        return candidates
+
+    def filter_managers_to_scrape(self, managers: list[LinkManager], candidates_org_structure: list[LinkManager],
+                                  candidates_people_page: list[LinkManager], candidates_negative:list[LinkManager], home_manager: LinkManager):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that are candidates to be scraped
+        &#34;&#34;&#34;
+        candidates = []
+        for manager in managers:
+            if manager not in candidates_negative and  manager not in candidates_org_structure and manager not in candidates_people_page and (
+                    manager.url_rating &gt;= home_manager.url_rating and manager.url_rating &lt;= home_manager.url_rating + 2):
+                candidates.append(manager)
+        return candidates
+
+    def start_requests(self):
+        if len(self.start_urls) == 0:
+            return []
+        url = self.start_urls[0]
+        self.setup_state_callback_map()
+        yield SplashRequest(url, self.parse_home, args={&#39;wait&#39;: 1.5})
+
+    def parse_home(self, response, **kwargs):
+        &#34;&#34;&#34;
+        This method is called when the spider is in the state of parsing the home page of the domain
+        &#34;&#34;&#34;
+        logging.info(f&#34;Starting to scrape home page of domain{self.allowed_domains[0]}&#34;)
+        home_manager = LinkManager(link.Link(response.url, self.program_state.get_domain(&#39;organization&#39;).name), [])
+        managers = self.get_page_links(response, {}, home_manager)
+        candidates_org_structure = self.filter_managers(managers, &#39;org_structure&#39;)
+        # remove org structure candidates from managers
+        candidates_people_page = self.filter_managers(managers, &#39;people_page&#39;)
+
+        candidates_negative = self.filter_managers(managers, &#39;negative_page&#39;)
+        #candidates_negative = []
+        candidates_other = self.filter_managers_to_scrape(managers, candidates_org_structure, candidates_people_page,
+                                                          candidates_negative,home_manager)
+        self.scraping_manager.setup_states(candidates_org_structure, candidates_people_page, candidates_other)
+        self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS
+        yield from self.process_scraping_state()
+
+    def process_scraping_state(self):
+        &#34;&#34;&#34;
+        This method is used to process the current scraping state
+        &#34;&#34;&#34;
+
+        state = self.scraping_manager.actual
+        if state == ScrapingState.SCRAPE_FINISHED:
+            result = self.scraping_manager.build_structure_and_patterns()
+            if self.scraping_manager.count &gt; 0:
+                for instance in result[0]:
+                    yield {&#34;person&#34;: instance}
+                for instance in result[1]:
+                    yield {&#34;person&#34;: instance}
+                for instance in result[2]:
+                    yield {&#34;person&#34;: instance}
+            if state == ScrapingState.SCRAPE_FINISHED:
+                return
+        candidates = self.scraping_manager.get_managers(state)
+        callback = self.get_callback(state)
+        if len(candidates) == 0:
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+        else:
+            self.remaining = len(candidates)
+            organization = self.base_organization
+            for candidate in candidates:
+                logging.info(f&#34;Going to scrape {candidate.link.url}&#34;)
+                yield SplashRequest(candidate.link.url, callback, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization},dont_filter=True)
+
+    def scrape_orgs(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the organizations
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        self.remaining -= 1
+        state = self.scraping_manager.actual
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+        if page_type in self.scraping_manager.get_page_types(state):
+            self.scraping_manager.add_url_to_state(state, manager)
+            instances = self.scraper_org.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No org instances found in {response.url}&#34;)
+            for instance in instances:
+                self.scraping_manager.add_instance_to_state(state, instance)
+        if len(self.crawler.engine.slot.scheduler)==0:
+            organizations = self.scraping_manager.get_instances(state)
+            if len(organizations) == 0:
+                self.change_scraping_state()
+                yield from self.process_scraping_state()
+                return
+            self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS_PEOPLE #change state
+            state = self.scraping_manager.actual
+            self.remaining = len(organizations)
+            for org in organizations:
+                yield SplashRequest(org.url, self.get_callback(state), args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;organization&#34;: org}, dont_filter=True)
+
+    def scrape_orgs_people(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the people of the organizations
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        state = self.scraping_manager.actual
+        organization = response.meta.get(&#39;organization&#39;, None)
+        manager = LinkManager(link.Link(response.url, organization.name), [])
+        managers = self.get_page_links(response, {})
+        candidates = self.filter_org_managers(managers, manager) #TODO better filter
+        candidates_tagged = (candidates,organization)
+        print(f&#34;Found {len(candidates)} candidates for {organization.name}&#34;)
+        self.scraping_manager.add_manager_to_state(state, candidates_tagged)
+        self.remaining -= 1
+        if len(self.crawler.engine.slot.scheduler)==0:
+            yield from self.scrape_people_candidates()
+
+
+    def scrape_people_candidates(self):
+        state = self.scraping_manager.actual
+        candidates_tagged = self.scraping_manager.get_managers(state)
+        if len(candidates_tagged) == 0:
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+        for candidates,organization in candidates_tagged:
+            self.remaining += len(candidates)
+            for candidate in candidates:
+                yield SplashRequest(candidate.link.url, self.scrape_people, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization,&#39;download_timeout&#39;:3600},dont_filter=True)
+
+    def scrape_people(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the people from current page
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        state = self.scraping_manager.actual
+        manager = response.meta.get(&#39;manager&#39;, None)
+        organization = response.meta.get(&#39;organization&#39;, None)
+        if organization:
+            self.program_state.domain_specific[&#39;organization&#39;] = organization
+
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        if page_type in self.scraping_manager.get_page_types(state):
+            self.scraping_manager.add_url_to_state(state, manager)
+            instances, status = self.scraper_people.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No people instances found in {response.url}&#34;)
+            if status == &#39;partial&#39;:
+                instances = self.scrape_partial_people(instances)
+            for instance in instances:
+                self.scraping_manager.add_instance_to_state(state, instance)
+        self.remaining -= 1
+        if len(self.crawler.engine.slot.scheduler)==0:
+            #self.scraping_manager.actual = ScrapingState.SCRAPE_PEOPLE if state == ScrapingState.SCRAPE_ORGS_PEOPLE else ScrapingState.SCRAPE_OTHER
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+
+    def scrape_partial_people(self, instances):
+        &#34;&#34;&#34;
+        This method is used to scrape the affiliations from PAGE_SINGLE_PERSON page.
+        Args:
+            instances:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        result = []
+        for instance in instances:
+            if instance.url is None:
+                continue
+            try:
+                person = self.scrape_single_person(instance)
+                result.append(person)  # TODO not necessary
+            except Exception as e:
+                logging.error(f&#34;Error scraping person {instance.url} {e}&#34;)
+        return result
+
+    def process_candidate(self, response):
+        self.remaining -= 1
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+        if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+            logging.info(f&#34;Adding {response.url} to visited orgs pages&#34;)
+            idx = self.scraping_manager.add_visited_org_page(manager)
+            instances = self.scraper_org.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No org instances found in {response.url}&#34;)
+            for instance in instances:
+                self.scraping_manager.add_org(instance, idx)
+        elif page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
+            logging.info(f&#34;Adding {response.url} to visited people pages&#34;)
+            idx = self.scraping_manager.add_visited_people(manager)
+            instances, status = self.scraper_people.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No people instances found in {response.url}&#34;)
+            if status == &#39;partial&#39;:
+                self.scraping_manager.add_partial_idx(idx, len(instances))
+            for instance in instances:
+                self.scraping_manager.add_person(instance, idx)
+        else:
+            logging.info(f&#34;Page type {page_type} not interesting&#34;)
+        logging.warning(f&#34;Remaining pages to scrape: {self.remaining}&#34;)
+        if self.remaining &lt;= 0:
+            if self.scraping_manager.partial_length &gt; 0:
+                self.remaining = self.scraping_manager.partial_length
+                for idx, partial in self.scraping_manager.get_all_partial_persons():
+                    for person in partial:
+                        yield SplashRequest(person.url, self.scrape_single_person,
+                                            meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                            args={&#39;wait&#39;: 1.5})
+            else:
+                self.scraping_manager.build_structure_and_patterns()
+                return None
+
+    def filter_candidates(self, candidates, needed_types):
+        self.needed_page_types = [PAGE_TYPE.PAGE_ORGANIZATIONS, PAGE_TYPE.PAGE_PEOPLE_DATA,
+                                  PAGE_TYPE.PAGE_PEOPLE_NO_DATA]
+        candidates = list(sorted(candidates, key=lambda x: x.url_rating))
+
+        for i, candidate in enumerate(candidates):
+            response = self.get_scrapy_response(candidate)
+            page_type = self.get_page_type(response)
+            candidate.page_type = page_type
+            candidate.response = response
+            self.page_type_map[page_type].append(candidate)
+            # if page_type != PAGE_TYPE.GENERAL_PAGE or page_type !=  PAGE_TYPE.PAGE_SINGLE_PERSON:
+            if candidate.page_type in needed_types:
+                return candidate
+        return None
+
+    def scrape_organizations(self, response):
+
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        # self.next_state()
+        if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+            internal_instances = self.scraper_org.scrape(candidate)  # TODO DEPARTMENTS&#39;
+            if len(internal_instances) == 0:  # Go back to scrape peoge people 2.
+                self.next_state(False)
+                yield self.continue_or_stop()
+            else:
+                self.next_state(True)  # update organization
+                for i, instance in enumerate(internal_instances):
+                    # manager_department = LinkManager(link.Link(instance.url, instance.name), [])
+                    priority = i * 10000
+                    # response_department = self.get_scrapy_response(manager_department)
+                    logging.info(f&#34;Going to scrape {instance.name} with {instance.url}&#34;)
+                    yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: instance}, priority=priority)
+                pattern = self.scraping_manager.extract_url_pattern(
+                    self.scraping_manager.get_orgs_urls(internal_instances))
+                managers = self.get_page_links(response, {})
+                pattern_instances = self.scraper_org.get_pattern_instances(
+                    managers,
+                    pattern,
+                    self.program_state.get_domain(&#39;organization&#39;))
+                logging.info(f&#34;Found {len(pattern_instances)} pattern instances&#34;)
+                for instance in pattern_instances:
+                    logging.warning(f&#34;Going to scrape pattern instance {instance.name} with {instance.url}&#34;)
+                    yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: instance}, priority=0)
+
+    def update_organization(self, response):
+        department = response.meta.get(&#39;department&#39;, None)
+
+        manager = LinkManager(link.Link(response.url, department.name), [])
+        page_type = self.get_page_type(response)
+        manager.page_type = page_type
+        # manager.page_header = self.program_state.page_header
+        workflow_template = self.SCRAPING_WORKFLOW_TEMPLATES[1]
+        if page_type not in workflow_template[2]:  # IF not page people
+            managers = self.get_page_links(response, {})
+            candidates = self.filter_managers(managers, workflow_template[1], manager_ref=manager)
+            if len(candidates) &gt; 0:
+                candidate = self.filter_candidates(candidates, workflow_template[2])
+                if candidate:
+                    self.next_state(True)
+                    department.url = candidate.link.url
+                    logging.info(
+                        f&#34;Going to scrape page people from candidate {candidate.link.url} for {department.name}&#34;)
+                    yield SplashRequest(department.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: department}, priority=response.request.priority - 1)
+
+                    # self.scrape_page_ppl(response_candidate, manager=candidate)
+        else:
+            # self.next_state(True)
+            logging.info(f&#34;Going to scrape page people {response.url} for {department.name}&#34;)
+            yield SplashRequest(response.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                                meta={&#34;department&#34;: department}, priority=response.request.priority - 1)
+
+    def scrape_page_ppl(self, response):
+        department = response.meta.get(&#39;department&#39;, None)
+        self.program_state.domain_specific[&#39;organization&#39;] = department
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        logging.info(
+            f&#34;Scraping possible page people {response.url} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+        logging.info(f&#34;Page type {page_type} of {response.url}&#34;)
+        if page_type == PAGE_TYPE.PAGE_PEOPLE_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
+            self.next_state(page_type=page_type)
+            person_instances = self.scraper_people.scrape(candidate)
+            logging.info(
+                f&#34;Found {len(person_instances)} people for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+            if len(person_instances) &gt; 0:
+                managers = self.get_page_links(response, {})
+                pattern = self.scraping_manager.extract_url_pattern(
+                    self.scraping_manager.get_people_urls(person_instances))
+                logging.info(f&#34;Found pattern {pattern} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+                pattern_instances = self.scraper_people.get_pattern_instances(
+                    managers,
+                    pattern,
+                    self.program_state.get_domain(&#39;organization&#39;))
+                logging.info(f&#34;Found {len(pattern_instances)} pattern person instances&#34;)
+                self.next_state(True)
+                person_instances += pattern_instances
+                i = 1
+                for person in person_instances:
+                    logging.info(f&#34;Going to scrape person {person.name} with {person.url}&#34;)
+                    yield SplashRequest(person.url, self.scrape_single_person,
+                                        meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                        args={&#39;wait&#39;: 1.5}, priority=response.request.priority - i)
+                    i += 1
+
+    def scrape_single_person(self, person):
+        response = self.get_scrapy_response_from_url(person.url)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+            &#34;person&#34;: person
+        }
+        person = self.scraper_people.scrape_single_person(candidate)
+
+
+        del self.program_state.page_header
+        return person</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt"><code class="flex name class">
+<span>class <span class="ident">PeopleSpiderAlt</span></span>
+<span>(</span><span>*a, **kw)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for all spiders from this component.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PeopleSpiderAlt(AcademicSpider):
+    SCRAPING_WORKFLOW_TEMPLATES = (
+        (True, &#39;keywords_org_structure&#39;, [PAGE_TYPE.PAGE_ORGANIZATIONS]),
+        (False, &#39;keywords_people_page&#39;, [PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA])
+    )
+    controller: PeopleController
+    name = &#39;PeopleSpider&#39;
+    custom_settings = {
+        &#39;ITEM_PIPELINES&#39;: {
+            &#34;academic_crawler.pipelines.JsonWriterPipeline&#34;: 300
+        },
+        &#39;CONCURRENT_REQUESTS&#39;: &#39;1&#39;
+    }
+
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self.scraper_people = PeopleScraper()
+        self.scraper_org = OrgStructureScraper(caller=&#39;people&#39;)
+        self.candidates = []
+        self.seen_urls = set()
+        self.priority = 0
+        self.departments = []
+        self.remaining = 0
+        self.base_organization = self.program_state.get_domain(&#39;organization&#39;)
+
+    def setup_state_callback_map(self):
+        self.state_callback_map = {
+            ScrapingState.SCRAPE_ORGS: self.scrape_orgs,
+            ScrapingState.SCRAPE_ORGS_PEOPLE: self.scrape_orgs_people,
+            ScrapingState.SCRAPE_PEOPLE: self.scrape_people,
+            ScrapingState.SCRAPE_PARTIAL_PEOPLE: self.scrape_partial_people,
+            ScrapingState.SCRAPE_OTHER: self.scrape_people,
+
+        }
+
+    def change_scraping_state(self):
+        state = self.scraping_manager.actual
+        new_state = None
+        if state == ScrapingState.SCRAPE_ORGS  or state == ScrapingState.SCRAPE_ORGS_PEOPLE:
+            new_state = ScrapingState.SCRAPE_PEOPLE
+        elif state == ScrapingState.SCRAPE_PEOPLE:
+            new_state = ScrapingState.SCRAPE_OTHER
+        elif state == ScrapingState.SCRAPE_OTHER:
+            new_state = ScrapingState.SCRAPE_FINISHED
+
+        if new_state:
+            logging.info(f&#34;Changing state to {new_state}&#34;)
+            self.scraping_manager.actual = new_state
+
+    def get_page_type(self, response) -&gt; PAGE_TYPE:
+        &#34;&#34;&#34;
+        This method is used to get the page type of the current page
+        :param response:
+        :return:
+        &#34;&#34;&#34;
+        self.generate_page_header(response, prune_tree=False)
+        pipeline = PageFeaturesPipeline(self.program_state)
+        page_type = pipeline.execute()
+        return page_type
+
+    def filter_managers(self, managers : list[LinkManager], keyword_category:str, ):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that contain the keyword category
+        :param managers:
+        :param keyword_category:
+        :return:
+        &#34;&#34;&#34;
+        candidates = []
+        #max_len_keywords = max([len(keyword_category) for keyword_category in keywords_map[keyword_category]])
+        detector = self.detectors.get(&#39;keyword_category&#39;)
+        for manager in managers:
+            if len(manager.get_referer_text_tokens()) &lt;= 5 and manager.contains_keyword(detector, keyword_category):
+                candidates.append(manager)
+        return candidates
+
+    def filter_org_managers(self, managers:list[LinkManager], manager_ref:LinkManager):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that are sublinks of the manager_ref
+        :param managers:
+        :param manager_ref:
+        :return:
+        &#34;&#34;&#34;
+        candidates = []
+        for manager in managers:
+            if manager_ref.is_sub_link(manager):
+                candidates.append(manager)
+        return candidates
+
+    def filter_managers_to_scrape(self, managers: list[LinkManager], candidates_org_structure: list[LinkManager],
+                                  candidates_people_page: list[LinkManager], candidates_negative:list[LinkManager], home_manager: LinkManager):
+        &#34;&#34;&#34;
+        This method is used to filter the managers that are candidates to be scraped
+        &#34;&#34;&#34;
+        candidates = []
+        for manager in managers:
+            if manager not in candidates_negative and  manager not in candidates_org_structure and manager not in candidates_people_page and (
+                    manager.url_rating &gt;= home_manager.url_rating and manager.url_rating &lt;= home_manager.url_rating + 2):
+                candidates.append(manager)
+        return candidates
+
+    def start_requests(self):
+        if len(self.start_urls) == 0:
+            return []
+        url = self.start_urls[0]
+        self.setup_state_callback_map()
+        yield SplashRequest(url, self.parse_home, args={&#39;wait&#39;: 1.5})
+
+    def parse_home(self, response, **kwargs):
+        &#34;&#34;&#34;
+        This method is called when the spider is in the state of parsing the home page of the domain
+        &#34;&#34;&#34;
+        logging.info(f&#34;Starting to scrape home page of domain{self.allowed_domains[0]}&#34;)
+        home_manager = LinkManager(link.Link(response.url, self.program_state.get_domain(&#39;organization&#39;).name), [])
+        managers = self.get_page_links(response, {}, home_manager)
+        candidates_org_structure = self.filter_managers(managers, &#39;org_structure&#39;)
+        # remove org structure candidates from managers
+        candidates_people_page = self.filter_managers(managers, &#39;people_page&#39;)
+
+        candidates_negative = self.filter_managers(managers, &#39;negative_page&#39;)
+        #candidates_negative = []
+        candidates_other = self.filter_managers_to_scrape(managers, candidates_org_structure, candidates_people_page,
+                                                          candidates_negative,home_manager)
+        self.scraping_manager.setup_states(candidates_org_structure, candidates_people_page, candidates_other)
+        self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS
+        yield from self.process_scraping_state()
+
+    def process_scraping_state(self):
+        &#34;&#34;&#34;
+        This method is used to process the current scraping state
+        &#34;&#34;&#34;
+
+        state = self.scraping_manager.actual
+        if state == ScrapingState.SCRAPE_FINISHED:
+            result = self.scraping_manager.build_structure_and_patterns()
+            if self.scraping_manager.count &gt; 0:
+                for instance in result[0]:
+                    yield {&#34;person&#34;: instance}
+                for instance in result[1]:
+                    yield {&#34;person&#34;: instance}
+                for instance in result[2]:
+                    yield {&#34;person&#34;: instance}
+            if state == ScrapingState.SCRAPE_FINISHED:
+                return
+        candidates = self.scraping_manager.get_managers(state)
+        callback = self.get_callback(state)
+        if len(candidates) == 0:
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+        else:
+            self.remaining = len(candidates)
+            organization = self.base_organization
+            for candidate in candidates:
+                logging.info(f&#34;Going to scrape {candidate.link.url}&#34;)
+                yield SplashRequest(candidate.link.url, callback, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization},dont_filter=True)
+
+    def scrape_orgs(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the organizations
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        self.remaining -= 1
+        state = self.scraping_manager.actual
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+        if page_type in self.scraping_manager.get_page_types(state):
+            self.scraping_manager.add_url_to_state(state, manager)
+            instances = self.scraper_org.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No org instances found in {response.url}&#34;)
+            for instance in instances:
+                self.scraping_manager.add_instance_to_state(state, instance)
+        if len(self.crawler.engine.slot.scheduler)==0:
+            organizations = self.scraping_manager.get_instances(state)
+            if len(organizations) == 0:
+                self.change_scraping_state()
+                yield from self.process_scraping_state()
+                return
+            self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS_PEOPLE #change state
+            state = self.scraping_manager.actual
+            self.remaining = len(organizations)
+            for org in organizations:
+                yield SplashRequest(org.url, self.get_callback(state), args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;organization&#34;: org}, dont_filter=True)
+
+    def scrape_orgs_people(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the people of the organizations
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        state = self.scraping_manager.actual
+        organization = response.meta.get(&#39;organization&#39;, None)
+        manager = LinkManager(link.Link(response.url, organization.name), [])
+        managers = self.get_page_links(response, {})
+        candidates = self.filter_org_managers(managers, manager) #TODO better filter
+        candidates_tagged = (candidates,organization)
+        print(f&#34;Found {len(candidates)} candidates for {organization.name}&#34;)
+        self.scraping_manager.add_manager_to_state(state, candidates_tagged)
+        self.remaining -= 1
+        if len(self.crawler.engine.slot.scheduler)==0:
+            yield from self.scrape_people_candidates()
+
+
+    def scrape_people_candidates(self):
+        state = self.scraping_manager.actual
+        candidates_tagged = self.scraping_manager.get_managers(state)
+        if len(candidates_tagged) == 0:
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+        for candidates,organization in candidates_tagged:
+            self.remaining += len(candidates)
+            for candidate in candidates:
+                yield SplashRequest(candidate.link.url, self.scrape_people, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization,&#39;download_timeout&#39;:3600},dont_filter=True)
+
+    def scrape_people(self, response):
+        &#34;&#34;&#34;
+        This method is used to scrape the people from current page
+        Args:
+            response:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        state = self.scraping_manager.actual
+        manager = response.meta.get(&#39;manager&#39;, None)
+        organization = response.meta.get(&#39;organization&#39;, None)
+        if organization:
+            self.program_state.domain_specific[&#39;organization&#39;] = organization
+
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        if page_type in self.scraping_manager.get_page_types(state):
+            self.scraping_manager.add_url_to_state(state, manager)
+            instances, status = self.scraper_people.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No people instances found in {response.url}&#34;)
+            if status == &#39;partial&#39;:
+                instances = self.scrape_partial_people(instances)
+            for instance in instances:
+                self.scraping_manager.add_instance_to_state(state, instance)
+        self.remaining -= 1
+        if len(self.crawler.engine.slot.scheduler)==0:
+            #self.scraping_manager.actual = ScrapingState.SCRAPE_PEOPLE if state == ScrapingState.SCRAPE_ORGS_PEOPLE else ScrapingState.SCRAPE_OTHER
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+
+    def scrape_partial_people(self, instances):
+        &#34;&#34;&#34;
+        This method is used to scrape the affiliations from PAGE_SINGLE_PERSON page.
+        Args:
+            instances:
+
+        Returns:
+
+        &#34;&#34;&#34;
+        result = []
+        for instance in instances:
+            if instance.url is None:
+                continue
+            try:
+                person = self.scrape_single_person(instance)
+                result.append(person)  # TODO not necessary
+            except Exception as e:
+                logging.error(f&#34;Error scraping person {instance.url} {e}&#34;)
+        return result
+
+    def process_candidate(self, response):
+        self.remaining -= 1
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        manager.page_type = page_type
+        logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+        if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+            logging.info(f&#34;Adding {response.url} to visited orgs pages&#34;)
+            idx = self.scraping_manager.add_visited_org_page(manager)
+            instances = self.scraper_org.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No org instances found in {response.url}&#34;)
+            for instance in instances:
+                self.scraping_manager.add_org(instance, idx)
+        elif page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
+            logging.info(f&#34;Adding {response.url} to visited people pages&#34;)
+            idx = self.scraping_manager.add_visited_people(manager)
+            instances, status = self.scraper_people.scrape(candidate)
+            if len(instances) == 0:
+                logging.info(f&#34;No people instances found in {response.url}&#34;)
+            if status == &#39;partial&#39;:
+                self.scraping_manager.add_partial_idx(idx, len(instances))
+            for instance in instances:
+                self.scraping_manager.add_person(instance, idx)
+        else:
+            logging.info(f&#34;Page type {page_type} not interesting&#34;)
+        logging.warning(f&#34;Remaining pages to scrape: {self.remaining}&#34;)
+        if self.remaining &lt;= 0:
+            if self.scraping_manager.partial_length &gt; 0:
+                self.remaining = self.scraping_manager.partial_length
+                for idx, partial in self.scraping_manager.get_all_partial_persons():
+                    for person in partial:
+                        yield SplashRequest(person.url, self.scrape_single_person,
+                                            meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                            args={&#39;wait&#39;: 1.5})
+            else:
+                self.scraping_manager.build_structure_and_patterns()
+                return None
+
+    def filter_candidates(self, candidates, needed_types):
+        self.needed_page_types = [PAGE_TYPE.PAGE_ORGANIZATIONS, PAGE_TYPE.PAGE_PEOPLE_DATA,
+                                  PAGE_TYPE.PAGE_PEOPLE_NO_DATA]
+        candidates = list(sorted(candidates, key=lambda x: x.url_rating))
+
+        for i, candidate in enumerate(candidates):
+            response = self.get_scrapy_response(candidate)
+            page_type = self.get_page_type(response)
+            candidate.page_type = page_type
+            candidate.response = response
+            self.page_type_map[page_type].append(candidate)
+            # if page_type != PAGE_TYPE.GENERAL_PAGE or page_type !=  PAGE_TYPE.PAGE_SINGLE_PERSON:
+            if candidate.page_type in needed_types:
+                return candidate
+        return None
+
+    def scrape_organizations(self, response):
+
+        manager = response.meta.get(&#39;manager&#39;, None)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        # self.next_state()
+        if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+            internal_instances = self.scraper_org.scrape(candidate)  # TODO DEPARTMENTS&#39;
+            if len(internal_instances) == 0:  # Go back to scrape peoge people 2.
+                self.next_state(False)
+                yield self.continue_or_stop()
+            else:
+                self.next_state(True)  # update organization
+                for i, instance in enumerate(internal_instances):
+                    # manager_department = LinkManager(link.Link(instance.url, instance.name), [])
+                    priority = i * 10000
+                    # response_department = self.get_scrapy_response(manager_department)
+                    logging.info(f&#34;Going to scrape {instance.name} with {instance.url}&#34;)
+                    yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: instance}, priority=priority)
+                pattern = self.scraping_manager.extract_url_pattern(
+                    self.scraping_manager.get_orgs_urls(internal_instances))
+                managers = self.get_page_links(response, {})
+                pattern_instances = self.scraper_org.get_pattern_instances(
+                    managers,
+                    pattern,
+                    self.program_state.get_domain(&#39;organization&#39;))
+                logging.info(f&#34;Found {len(pattern_instances)} pattern instances&#34;)
+                for instance in pattern_instances:
+                    logging.warning(f&#34;Going to scrape pattern instance {instance.name} with {instance.url}&#34;)
+                    yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: instance}, priority=0)
+
+    def update_organization(self, response):
+        department = response.meta.get(&#39;department&#39;, None)
+
+        manager = LinkManager(link.Link(response.url, department.name), [])
+        page_type = self.get_page_type(response)
+        manager.page_type = page_type
+        # manager.page_header = self.program_state.page_header
+        workflow_template = self.SCRAPING_WORKFLOW_TEMPLATES[1]
+        if page_type not in workflow_template[2]:  # IF not page people
+            managers = self.get_page_links(response, {})
+            candidates = self.filter_managers(managers, workflow_template[1], manager_ref=manager)
+            if len(candidates) &gt; 0:
+                candidate = self.filter_candidates(candidates, workflow_template[2])
+                if candidate:
+                    self.next_state(True)
+                    department.url = candidate.link.url
+                    logging.info(
+                        f&#34;Going to scrape page people from candidate {candidate.link.url} for {department.name}&#34;)
+                    yield SplashRequest(department.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                                        meta={&#34;department&#34;: department}, priority=response.request.priority - 1)
+
+                    # self.scrape_page_ppl(response_candidate, manager=candidate)
+        else:
+            # self.next_state(True)
+            logging.info(f&#34;Going to scrape page people {response.url} for {department.name}&#34;)
+            yield SplashRequest(response.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                                meta={&#34;department&#34;: department}, priority=response.request.priority - 1)
+
+    def scrape_page_ppl(self, response):
+        department = response.meta.get(&#39;department&#39;, None)
+        self.program_state.domain_specific[&#39;organization&#39;] = department
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+        }
+        logging.info(
+            f&#34;Scraping possible page people {response.url} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+        logging.info(f&#34;Page type {page_type} of {response.url}&#34;)
+        if page_type == PAGE_TYPE.PAGE_PEOPLE_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
+            self.next_state(page_type=page_type)
+            person_instances = self.scraper_people.scrape(candidate)
+            logging.info(
+                f&#34;Found {len(person_instances)} people for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+            if len(person_instances) &gt; 0:
+                managers = self.get_page_links(response, {})
+                pattern = self.scraping_manager.extract_url_pattern(
+                    self.scraping_manager.get_people_urls(person_instances))
+                logging.info(f&#34;Found pattern {pattern} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+                pattern_instances = self.scraper_people.get_pattern_instances(
+                    managers,
+                    pattern,
+                    self.program_state.get_domain(&#39;organization&#39;))
+                logging.info(f&#34;Found {len(pattern_instances)} pattern person instances&#34;)
+                self.next_state(True)
+                person_instances += pattern_instances
+                i = 1
+                for person in person_instances:
+                    logging.info(f&#34;Going to scrape person {person.name} with {person.url}&#34;)
+                    yield SplashRequest(person.url, self.scrape_single_person,
+                                        meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                        args={&#39;wait&#39;: 1.5}, priority=response.request.priority - i)
+                    i += 1
+
+    def scrape_single_person(self, person):
+        response = self.get_scrapy_response_from_url(person.url)
+        page_type = self.get_page_type(response)
+        candidate = {
+            &#34;page_type&#34;: page_type,
+            &#34;state&#34;: self.program_state,
+            &#34;person&#34;: person
+        }
+        person = self.scraper_people.scrape_single_person(candidate)
+
+
+        del self.program_state.page_header
+        return person</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="academic_crawler.spiders.academic_spider.AcademicSpider" href="academic_spider.html#academic_crawler.spiders.academic_spider.AcademicSpider">AcademicSpider</a></li>
+<li>scrapy.spiders.crawl.CrawlSpider</li>
+<li>scrapy.spiders.Spider</li>
+<li>scrapy.utils.trackref.object_ref</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.SCRAPING_WORKFLOW_TEMPLATES"><code class="name">var <span class="ident">SCRAPING_WORKFLOW_TEMPLATES</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.controller"><code class="name">var <span class="ident">controller</span> : <a title="academic_crawler.controllers.people.PeopleController" href="../controllers/people.html#academic_crawler.controllers.people.PeopleController">PeopleController</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.custom_settings"><code class="name">var <span class="ident">custom_settings</span> : Optional[dict]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.name"><code class="name">var <span class="ident">name</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.change_state_if_error"><code class="name flex">
+<span>def <span class="ident">change_scraping_state</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def change_scraping_state(self):
+    state = self.scraping_manager.actual
+    new_state = None
+    if state == ScrapingState.SCRAPE_ORGS  or state == ScrapingState.SCRAPE_ORGS_PEOPLE:
+        new_state = ScrapingState.SCRAPE_PEOPLE
+    elif state == ScrapingState.SCRAPE_PEOPLE:
+        new_state = ScrapingState.SCRAPE_OTHER
+    elif state == ScrapingState.SCRAPE_OTHER:
+        new_state = ScrapingState.SCRAPE_FINISHED
+
+    if new_state:
+        logging.info(f&#34;Changing state to {new_state}&#34;)
+        self.scraping_manager.actual = new_state</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_candidates"><code class="name flex">
+<span>def <span class="ident">filter_candidates</span></span>(<span>self, candidates, needed_types)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_candidates(self, candidates, needed_types):
+    self.needed_page_types = [PAGE_TYPE.PAGE_ORGANIZATIONS, PAGE_TYPE.PAGE_PEOPLE_DATA,
+                              PAGE_TYPE.PAGE_PEOPLE_NO_DATA]
+    candidates = list(sorted(candidates, key=lambda x: x.url_rating))
+
+    for i, candidate in enumerate(candidates):
+        response = self.get_scrapy_response(candidate)
+        page_type = self.get_page_type(response)
+        candidate.page_type = page_type
+        candidate.response = response
+        self.page_type_map[page_type].append(candidate)
+        # if page_type != PAGE_TYPE.GENERAL_PAGE or page_type !=  PAGE_TYPE.PAGE_SINGLE_PERSON:
+        if candidate.page_type in needed_types:
+            return candidate
+    return None</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers"><code class="name flex">
+<span>def <span class="ident">filter_managers</span></span>(<span>self, managers: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], keyword_category: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to filter the managers that contain the keyword category
+:param managers:
+:param keyword_category:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_managers(self, managers : list[LinkManager], keyword_category:str, ):
+    &#34;&#34;&#34;
+    This method is used to filter the managers that contain the keyword category
+    :param managers:
+    :param keyword_category:
+    :return:
+    &#34;&#34;&#34;
+    candidates = []
+    #max_len_keywords = max([len(keyword_category) for keyword_category in keywords_map[keyword_category]])
+    detector = self.detectors.get(&#39;keyword_category&#39;)
+    for manager in managers:
+        if len(manager.get_referer_text_tokens()) &lt;= 5 and manager.contains_keyword(detector, keyword_category):
+            candidates.append(manager)
+    return candidates</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers_to_scrape"><code class="name flex">
+<span>def <span class="ident">filter_managers_to_scrape</span></span>(<span>self, managers: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], candidates_org_structure: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], candidates_people_page: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], candidates_negative: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], home_manager: <a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to filter the managers that are candidates to be scraped</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_managers_to_scrape(self, managers: list[LinkManager], candidates_org_structure: list[LinkManager],
+                              candidates_people_page: list[LinkManager], candidates_negative:list[LinkManager], home_manager: LinkManager):
+    &#34;&#34;&#34;
+    This method is used to filter the managers that are candidates to be scraped
+    &#34;&#34;&#34;
+    candidates = []
+    for manager in managers:
+        if manager not in candidates_negative and  manager not in candidates_org_structure and manager not in candidates_people_page and (
+                manager.url_rating &gt;= home_manager.url_rating and manager.url_rating &lt;= home_manager.url_rating + 2):
+            candidates.append(manager)
+    return candidates</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_org_managers"><code class="name flex">
+<span>def <span class="ident">filter_org_managers</span></span>(<span>self, managers: list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>], manager_ref: <a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to filter the managers that are sublinks of the manager_ref
+:param managers:
+:param manager_ref:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_org_managers(self, managers:list[LinkManager], manager_ref:LinkManager):
+    &#34;&#34;&#34;
+    This method is used to filter the managers that are sublinks of the manager_ref
+    :param managers:
+    :param manager_ref:
+    :return:
+    &#34;&#34;&#34;
+    candidates = []
+    for manager in managers:
+        if manager_ref.is_sub_link(manager):
+            candidates.append(manager)
+    return candidates</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.get_page_type"><code class="name flex">
+<span>def <span class="ident">get_page_type</span></span>(<span>self, response) ‑> <a title="academic_crawler.config.page_types.PAGE_TYPE" href="../config/page_types.html#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to get the page type of the current page
+:param response:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_page_type(self, response) -&gt; PAGE_TYPE:
+    &#34;&#34;&#34;
+    This method is used to get the page type of the current page
+    :param response:
+    :return:
+    &#34;&#34;&#34;
+    self.generate_page_header(response, prune_tree=False)
+    pipeline = PageFeaturesPipeline(self.program_state)
+    page_type = pipeline.execute()
+    return page_type</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.parse_home"><code class="name flex">
+<span>def <span class="ident">parse_home</span></span>(<span>self, response, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is called when the spider is in the state of parsing the home page of the domain</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_home(self, response, **kwargs):
+    &#34;&#34;&#34;
+    This method is called when the spider is in the state of parsing the home page of the domain
+    &#34;&#34;&#34;
+    logging.info(f&#34;Starting to scrape home page of domain{self.allowed_domains[0]}&#34;)
+    home_manager = LinkManager(link.Link(response.url, self.program_state.get_domain(&#39;organization&#39;).name), [])
+    managers = self.get_page_links(response, {}, home_manager)
+    candidates_org_structure = self.filter_managers(managers, &#39;org_structure&#39;)
+    # remove org structure candidates from managers
+    candidates_people_page = self.filter_managers(managers, &#39;people_page&#39;)
+
+    candidates_negative = self.filter_managers(managers, &#39;negative_page&#39;)
+    #candidates_negative = []
+    candidates_other = self.filter_managers_to_scrape(managers, candidates_org_structure, candidates_people_page,
+                                                      candidates_negative,home_manager)
+    self.scraping_manager.setup_states(candidates_org_structure, candidates_people_page, candidates_other)
+    self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS
+    yield from self.process_scraping_state()</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_candidate"><code class="name flex">
+<span>def <span class="ident">process_candidate</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_candidate(self, response):
+    self.remaining -= 1
+    manager = response.meta.get(&#39;manager&#39;, None)
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+    }
+    manager.page_type = page_type
+    logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+    if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+        logging.info(f&#34;Adding {response.url} to visited orgs pages&#34;)
+        idx = self.scraping_manager.add_visited_org_page(manager)
+        instances = self.scraper_org.scrape(candidate)
+        if len(instances) == 0:
+            logging.info(f&#34;No org instances found in {response.url}&#34;)
+        for instance in instances:
+            self.scraping_manager.add_org(instance, idx)
+    elif page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
+        logging.info(f&#34;Adding {response.url} to visited people pages&#34;)
+        idx = self.scraping_manager.add_visited_people(manager)
+        instances, status = self.scraper_people.scrape(candidate)
+        if len(instances) == 0:
+            logging.info(f&#34;No people instances found in {response.url}&#34;)
+        if status == &#39;partial&#39;:
+            self.scraping_manager.add_partial_idx(idx, len(instances))
+        for instance in instances:
+            self.scraping_manager.add_person(instance, idx)
+    else:
+        logging.info(f&#34;Page type {page_type} not interesting&#34;)
+    logging.warning(f&#34;Remaining pages to scrape: {self.remaining}&#34;)
+    if self.remaining &lt;= 0:
+        if self.scraping_manager.partial_length &gt; 0:
+            self.remaining = self.scraping_manager.partial_length
+            for idx, partial in self.scraping_manager.get_all_partial_persons():
+                for person in partial:
+                    yield SplashRequest(person.url, self.scrape_single_person,
+                                        meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                        args={&#39;wait&#39;: 1.5})
+        else:
+            self.scraping_manager.build_structure_and_patterns()
+            return None</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_scraping_state"><code class="name flex">
+<span>def <span class="ident">process_scraping_state</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to process the current scraping state</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_scraping_state(self):
+    &#34;&#34;&#34;
+    This method is used to process the current scraping state
+    &#34;&#34;&#34;
+
+    state = self.scraping_manager.actual
+    if state == ScrapingState.SCRAPE_FINISHED:
+        result = self.scraping_manager.build_structure_and_patterns()
+        if self.scraping_manager.count &gt; 0:
+            for instance in result[0]:
+                yield {&#34;person&#34;: instance}
+            for instance in result[1]:
+                yield {&#34;person&#34;: instance}
+            for instance in result[2]:
+                yield {&#34;person&#34;: instance}
+        if state == ScrapingState.SCRAPE_FINISHED:
+            return
+    candidates = self.scraping_manager.get_managers(state)
+    callback = self.get_callback(state)
+    if len(candidates) == 0:
+        self.change_scraping_state()
+        yield from self.process_scraping_state()
+    else:
+        self.remaining = len(candidates)
+        organization = self.base_organization
+        for candidate in candidates:
+            logging.info(f&#34;Going to scrape {candidate.link.url}&#34;)
+            yield SplashRequest(candidate.link.url, callback, args={&#39;wait&#39;: 1.5},
+                                meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization},dont_filter=True)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_organizations"><code class="name flex">
+<span>def <span class="ident">scrape_organizations</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_organizations(self, response):
+
+    manager = response.meta.get(&#39;manager&#39;, None)
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+    }
+    # self.next_state()
+    if page_type == PAGE_TYPE.PAGE_ORGANIZATIONS:
+        internal_instances = self.scraper_org.scrape(candidate)  # TODO DEPARTMENTS&#39;
+        if len(internal_instances) == 0:  # Go back to scrape peoge people 2.
+            self.next_state(False)
+            yield self.continue_or_stop()
+        else:
+            self.next_state(True)  # update organization
+            for i, instance in enumerate(internal_instances):
+                # manager_department = LinkManager(link.Link(instance.url, instance.name), [])
+                priority = i * 10000
+                # response_department = self.get_scrapy_response(manager_department)
+                logging.info(f&#34;Going to scrape {instance.name} with {instance.url}&#34;)
+                yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;department&#34;: instance}, priority=priority)
+            pattern = self.scraping_manager.extract_url_pattern(
+                self.scraping_manager.get_orgs_urls(internal_instances))
+            managers = self.get_page_links(response, {})
+            pattern_instances = self.scraper_org.get_pattern_instances(
+                managers,
+                pattern,
+                self.program_state.get_domain(&#39;organization&#39;))
+            logging.info(f&#34;Found {len(pattern_instances)} pattern instances&#34;)
+            for instance in pattern_instances:
+                logging.warning(f&#34;Going to scrape pattern instance {instance.name} with {instance.url}&#34;)
+                yield SplashRequest(instance.url, self.update_organization, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;department&#34;: instance}, priority=0)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs"><code class="name flex">
+<span>def <span class="ident">scrape_orgs</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to scrape the organizations</p>
+<h2 id="args">Args</h2>
+<p>response:
+Returns:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_orgs(self, response):
+    &#34;&#34;&#34;
+    This method is used to scrape the organizations
+    Args:
+        response:
+
+    Returns:
+
+    &#34;&#34;&#34;
+    self.remaining -= 1
+    state = self.scraping_manager.actual
+    manager = response.meta.get(&#39;manager&#39;, None)
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+    }
+    manager.page_type = page_type
+    logging.info(f&#34;Processing candidate {response.url} with page type {page_type}&#34;)
+    if page_type in self.scraping_manager.get_page_types(state):
+        self.scraping_manager.add_url_to_state(state, manager)
+        instances = self.scraper_org.scrape(candidate)
+        if len(instances) == 0:
+            logging.info(f&#34;No org instances found in {response.url}&#34;)
+        for instance in instances:
+            self.scraping_manager.add_instance_to_state(state, instance)
+    if len(self.crawler.engine.slot.scheduler)==0:
+        organizations = self.scraping_manager.get_instances(state)
+        if len(organizations) == 0:
+            self.change_scraping_state()
+            yield from self.process_scraping_state()
+            return
+        self.scraping_manager.actual = ScrapingState.SCRAPE_ORGS_PEOPLE #change state
+        state = self.scraping_manager.actual
+        self.remaining = len(organizations)
+        for org in organizations:
+            yield SplashRequest(org.url, self.get_callback(state), args={&#39;wait&#39;: 1.5},
+                                meta={&#34;organization&#34;: org}, dont_filter=True)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs_people"><code class="name flex">
+<span>def <span class="ident">scrape_orgs_people</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to scrape the people of the organizations</p>
+<h2 id="args">Args</h2>
+<p>response:
+Returns:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_orgs_people(self, response):
+    &#34;&#34;&#34;
+    This method is used to scrape the people of the organizations
+    Args:
+        response:
+
+    Returns:
+
+    &#34;&#34;&#34;
+    state = self.scraping_manager.actual
+    organization = response.meta.get(&#39;organization&#39;, None)
+    manager = LinkManager(link.Link(response.url, organization.name), [])
+    managers = self.get_page_links(response, {})
+    candidates = self.filter_org_managers(managers, manager) #TODO better filter
+    candidates_tagged = (candidates,organization)
+    print(f&#34;Found {len(candidates)} candidates for {organization.name}&#34;)
+    self.scraping_manager.add_manager_to_state(state, candidates_tagged)
+    self.remaining -= 1
+    if len(self.crawler.engine.slot.scheduler)==0:
+        yield from self.scrape_people_candidates()</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_page_ppl"><code class="name flex">
+<span>def <span class="ident">scrape_page_ppl</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_page_ppl(self, response):
+    department = response.meta.get(&#39;department&#39;, None)
+    self.program_state.domain_specific[&#39;organization&#39;] = department
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+    }
+    logging.info(
+        f&#34;Scraping possible page people {response.url} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+    logging.info(f&#34;Page type {page_type} of {response.url}&#34;)
+    if page_type == PAGE_TYPE.PAGE_PEOPLE_DATA or page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
+        self.next_state(page_type=page_type)
+        person_instances = self.scraper_people.scrape(candidate)
+        logging.info(
+            f&#34;Found {len(person_instances)} people for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+        if len(person_instances) &gt; 0:
+            managers = self.get_page_links(response, {})
+            pattern = self.scraping_manager.extract_url_pattern(
+                self.scraping_manager.get_people_urls(person_instances))
+            logging.info(f&#34;Found pattern {pattern} for {self.program_state.domain_specific[&#39;organization&#39;].name}&#34;)
+            pattern_instances = self.scraper_people.get_pattern_instances(
+                managers,
+                pattern,
+                self.program_state.get_domain(&#39;organization&#39;))
+            logging.info(f&#34;Found {len(pattern_instances)} pattern person instances&#34;)
+            self.next_state(True)
+            person_instances += pattern_instances
+            i = 1
+            for person in person_instances:
+                logging.info(f&#34;Going to scrape person {person.name} with {person.url}&#34;)
+                yield SplashRequest(person.url, self.scrape_single_person,
+                                    meta={&#34;person&#34;: person, &#39;last&#39;: False},
+                                    args={&#39;wait&#39;: 1.5}, priority=response.request.priority - i)
+                i += 1</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_partial_people"><code class="name flex">
+<span>def <span class="ident">scrape_partial_people</span></span>(<span>self, instances)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to scrape the affiliations from PAGE_SINGLE_PERSON page.</p>
+<h2 id="args">Args</h2>
+<p>instances:
+Returns:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_partial_people(self, instances):
+    &#34;&#34;&#34;
+    This method is used to scrape the affiliations from PAGE_SINGLE_PERSON page.
+    Args:
+        instances:
+
+    Returns:
+
+    &#34;&#34;&#34;
+    result = []
+    for instance in instances:
+        if instance.url is None:
+            continue
+        try:
+            person = self.scrape_single_person(instance)
+            result.append(person)  # TODO not necessary
+        except Exception as e:
+            logging.error(f&#34;Error scraping person {instance.url} {e}&#34;)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people"><code class="name flex">
+<span>def <span class="ident">scrape_people</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is used to scrape the people from current page</p>
+<h2 id="args">Args</h2>
+<p>response:
+Returns:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_people(self, response):
+    &#34;&#34;&#34;
+    This method is used to scrape the people from current page
+    Args:
+        response:
+
+    Returns:
+
+    &#34;&#34;&#34;
+    state = self.scraping_manager.actual
+    manager = response.meta.get(&#39;manager&#39;, None)
+    organization = response.meta.get(&#39;organization&#39;, None)
+    if organization:
+        self.program_state.domain_specific[&#39;organization&#39;] = organization
+
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+    }
+    manager.page_type = page_type
+    if page_type in self.scraping_manager.get_page_types(state):
+        self.scraping_manager.add_url_to_state(state, manager)
+        instances, status = self.scraper_people.scrape(candidate)
+        if len(instances) == 0:
+            logging.info(f&#34;No people instances found in {response.url}&#34;)
+        if status == &#39;partial&#39;:
+            instances = self.scrape_partial_people(instances)
+        for instance in instances:
+            self.scraping_manager.add_instance_to_state(state, instance)
+    self.remaining -= 1
+    if len(self.crawler.engine.slot.scheduler)==0:
+        #self.scraping_manager.actual = ScrapingState.SCRAPE_PEOPLE if state == ScrapingState.SCRAPE_ORGS_PEOPLE else ScrapingState.SCRAPE_OTHER
+        self.change_scraping_state()
+        yield from self.process_scraping_state()</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people_page"><code class="name flex">
+<span>def <span class="ident">scrape_people_candidates</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_people_candidates(self):
+    state = self.scraping_manager.actual
+    candidates_tagged = self.scraping_manager.get_managers(state)
+    if len(candidates_tagged) == 0:
+        self.change_scraping_state()
+        yield from self.process_scraping_state()
+    for candidates,organization in candidates_tagged:
+        self.remaining += len(candidates)
+        for candidate in candidates:
+            yield SplashRequest(candidate.link.url, self.scrape_people, args={&#39;wait&#39;: 1.5},
+                                meta={&#34;manager&#34;: candidate,&#39;organization&#39;:organization,&#39;download_timeout&#39;:3600},dont_filter=True)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_single_person"><code class="name flex">
+<span>def <span class="ident">scrape_single_person</span></span>(<span>self, person)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scrape_single_person(self, person):
+    response = self.get_scrapy_response_from_url(person.url)
+    page_type = self.get_page_type(response)
+    candidate = {
+        &#34;page_type&#34;: page_type,
+        &#34;state&#34;: self.program_state,
+        &#34;person&#34;: person
+    }
+    person = self.scraper_people.scrape_single_person(candidate)
+
+
+    del self.program_state.page_header
+    return person</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.setup_state_callback_map"><code class="name flex">
+<span>def <span class="ident">setup_state_callback_map</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setup_state_callback_map(self):
+    self.state_callback_map = {
+        ScrapingState.SCRAPE_ORGS: self.scrape_orgs,
+        ScrapingState.SCRAPE_ORGS_PEOPLE: self.scrape_orgs_people,
+        ScrapingState.SCRAPE_PEOPLE: self.scrape_people,
+        ScrapingState.SCRAPE_PARTIAL_PEOPLE: self.scrape_partial_people,
+        ScrapingState.SCRAPE_OTHER: self.scrape_people,
+
+    }</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.start_requests"><code class="name flex">
+<span>def <span class="ident">start_requests</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def start_requests(self):
+    if len(self.start_urls) == 0:
+        return []
+    url = self.start_urls[0]
+    self.setup_state_callback_map()
+    yield SplashRequest(url, self.parse_home, args={&#39;wait&#39;: 1.5})</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.update_organization"><code class="name flex">
+<span>def <span class="ident">update_organization</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_organization(self, response):
+    department = response.meta.get(&#39;department&#39;, None)
+
+    manager = LinkManager(link.Link(response.url, department.name), [])
+    page_type = self.get_page_type(response)
+    manager.page_type = page_type
+    # manager.page_header = self.program_state.page_header
+    workflow_template = self.SCRAPING_WORKFLOW_TEMPLATES[1]
+    if page_type not in workflow_template[2]:  # IF not page people
+        managers = self.get_page_links(response, {})
+        candidates = self.filter_managers(managers, workflow_template[1], manager_ref=manager)
+        if len(candidates) &gt; 0:
+            candidate = self.filter_candidates(candidates, workflow_template[2])
+            if candidate:
+                self.next_state(True)
+                department.url = candidate.link.url
+                logging.info(
+                    f&#34;Going to scrape page people from candidate {candidate.link.url} for {department.name}&#34;)
+                yield SplashRequest(department.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                                    meta={&#34;department&#34;: department}, priority=response.request.priority - 1)
+
+                # self.scrape_page_ppl(response_candidate, manager=candidate)
+    else:
+        # self.next_state(True)
+        logging.info(f&#34;Going to scrape page people {response.url} for {department.name}&#34;)
+        yield SplashRequest(response.url, self.scrape_page_ppl, args={&#39;wait&#39;: 1.5},
+                            meta={&#34;department&#34;: department}, priority=response.request.priority - 1)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="academic_crawler.spiders.academic_spider.AcademicSpider" href="academic_spider.html#academic_crawler.spiders.academic_spider.AcademicSpider">AcademicSpider</a></b></code>:
+<ul class="hlist">
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.generate_page_header" href="academic_spider.html#academic_crawler.spiders.academic_spider.AcademicSpider.generate_page_header">generate_page_header</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links" href="academic_spider.html#academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links">get_page_links</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="academic_crawler.spiders" href="index.html">academic_crawler.spiders</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt">PeopleSpiderAlt</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.SCRAPING_WORKFLOW_TEMPLATES" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.SCRAPING_WORKFLOW_TEMPLATES">SCRAPING_WORKFLOW_TEMPLATES</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.change_scraping_state" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.change_state_if_error">change_scraping_state</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.controller" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.controller">controller</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.custom_settings" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.custom_settings">custom_settings</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_candidates" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_candidates">filter_candidates</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers">filter_managers</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers_to_scrape" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_managers_to_scrape">filter_managers_to_scrape</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_org_managers" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.filter_org_managers">filter_org_managers</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.get_page_type" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.get_page_type">get_page_type</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.name" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.name">name</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.parse_home" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.parse_home">parse_home</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_candidate" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_candidate">process_candidate</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_scraping_state" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.process_scraping_state">process_scraping_state</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_organizations" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_organizations">scrape_organizations</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs">scrape_orgs</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs_people" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_orgs_people">scrape_orgs_people</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_page_ppl" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_page_ppl">scrape_page_ppl</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_partial_people" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_partial_people">scrape_partial_people</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people">scrape_people</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people_candidates" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_people_page">scrape_people_candidates</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_single_person" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.scrape_single_person">scrape_single_person</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.setup_state_callback_map" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.setup_state_callback_map">setup_state_callback_map</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.start_requests" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.start_requests">start_requests</a></code></li>
+<li><code><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.update_organization" href="#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt.update_organization">update_organization</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

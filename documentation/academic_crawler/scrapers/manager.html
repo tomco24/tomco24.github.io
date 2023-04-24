@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>academic_crawler.scrapers.manager API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>academic_crawler.scrapers.manager</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from collections import Counter, defaultdict
+from difflib import SequenceMatcher
+from urlmatch import urlmatch
+
+from furl import furl
+
+from academic_crawler.config.page_types import PAGE_TYPE
+from academic_crawler.heuristics.links import LinkManager
+from academic_crawler.scrapers.templates import Organization
+from enum import Enum
+
+class ScrapingState(Enum):
+    PARSE_HOME = 1
+    SCRAPE_ORGS = 2
+    SCRAPE_ORGS_PEOPLE = 3
+    SCRAPE_PEOPLE = 4
+    SCRAPE_PARTIAL_PEOPLE = 5
+    SCRAPE_OTHER = 6
+    SCRAPE_FINISHED = 7
+
+
+class ScrapingManager:
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.patterns = {
+            &#34;org&#34;:None,
+            &#34;people_page&#34;:None,
+            &#34;person&#34;:None,
+        }
+        self.count = 0
+        self.results = {
+            &#34;orgs&#34;:defaultdict(list),
+            &#34;people&#34;:defaultdict(list),
+        }
+        self.visited = {
+            &#34;orgs&#34;:[],
+            &#34;people&#34;:[],
+        }
+        self.states = {state: {&#34;managers&#34;: [], &#34;callback&#34;: None, &#34;instances&#34;: [], &#34;page_types&#34;:{},&#34;urls&#34;:set(),&#34;instance_urls&#34;:set()}
+                         for state in ScrapingState if state.name.startswith(&#34;SCRAPE&#34;)}
+        self.actual = ScrapingState.PARSE_HOME
+        self.partial_people = []
+        self.partial_length = 0
+
+    def setup_states(self, orgs_managers,people_managers,other_managers):
+        self.states[ScrapingState.SCRAPE_ORGS][&#34;managers&#34;] = orgs_managers
+        self.states[ScrapingState.SCRAPE_ORGS][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_ORGANIZATIONS}
+        self.states[ScrapingState.SCRAPE_ORGS_PEOPLE][&#34;page_types&#34;] = { PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+        self.states[ScrapingState.SCRAPE_PEOPLE][&#34;managers&#34;] = people_managers
+        self.states[ScrapingState.SCRAPE_PEOPLE][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+        self.states[ScrapingState.SCRAPE_OTHER][&#34;managers&#34;] = other_managers
+        self.states[ScrapingState.SCRAPE_OTHER][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+
+
+
+    def add_org(self,org:Organization,idx):
+        self.results[&#34;orgs&#34;][idx].append(org)
+    def add_person(self,person,idx):
+        self.results[&#34;people&#34;][idx].append(person)
+
+    def add_partial_idx(self,idx,length):
+        self.partial_people.append(idx)
+        self.partial_length += length
+    def add_visited_org_page(self, manager:LinkManager):
+        self.visited[&#34;orgs&#34;].append(manager)
+        return len(self.visited[&#34;orgs&#34;]) -1
+    def add_visited_people(self, manager:LinkManager):
+        self.visited[&#34;people&#34;].append(manager)
+        return len(self.visited[&#34;people&#34;]) -1
+
+    def get_all_partial_persons(self):
+        return [(idx,self.results[&#34;people&#34;][idx]) for idx in self.partial_people]
+    def get_orgs_urls(self,orgs):
+        urls = []
+        for org in orgs:
+            urls.append(org.url)
+        return urls
+
+    def get_people_urls(self,people):
+        urls = []
+        for person in people:
+            urls.append(person.url)
+        return urls
+
+
+    def extract_url_pattern(self,urls):
+        matches = []
+        for i in range(len(urls)):
+            for j in range(i+1,len(urls)):
+                url_a = urls[i]
+                url_b = urls[j]
+                seqMatch = SequenceMatcher(None, url_a, url_b)
+                match = seqMatch.find_longest_match(0, len(url_a), 0, len(url_b))
+                if match.size &gt; 0:
+                    matches.append(url_a[match.a: match.a + match.size])
+        counter = Counter(matches)
+        most_common = counter.most_common(1)
+        pattern = f&#34;{most_common[0][0]}*&#34;
+        return pattern
+
+    def build_structure_and_patterns(self):
+        orgs = self.get_instances(ScrapingState.SCRAPE_ORGS)
+        orgs_people = self.get_instances(ScrapingState.SCRAPE_ORGS_PEOPLE)
+        people = self.get_instances(ScrapingState.SCRAPE_PEOPLE)
+        other_people = self.get_instances(ScrapingState.SCRAPE_OTHER)
+        self.count = len(orgs_people) + len(people) + len(other_people)
+        return people,orgs_people,other_people
+        #return orgs,orgs_people,people
+
+
+    def get_managers(self, state):
+        return self.states[state][&#34;managers&#34;]
+
+    def get_callback(self, state):
+        return self.states[state][&#34;callback&#34;]
+
+    def get_page_types(self, state):
+        return self.states[state][&#34;page_types&#34;]
+
+    def add_url_to_state(self, state, url):
+        self.states[state][&#34;urls&#34;].add(url)
+
+    def add_instance_to_state(self,state,instance):
+        if isinstance(instance,Organization) and instance.url in self.states[state][&#34;instance_urls&#34;]:
+            return
+        self.states[state][&#34;instance_urls&#34;].add(instance.url)
+        self.states[state][&#34;instances&#34;].append(instance)
+
+    def add_manager_to_state(self,state,manager):
+        if isinstance(manager,tuple) and len(manager[0]) == 0:
+            return
+        self.states[state][&#34;managers&#34;].append(manager)
+
+    def get_instances(self, state):
+        return self.states[state][&#34;instances&#34;]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager"><code class="flex name class">
+<span>class <span class="ident">ScrapingManager</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ScrapingManager:
+
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.patterns = {
+            &#34;org&#34;:None,
+            &#34;people_page&#34;:None,
+            &#34;person&#34;:None,
+        }
+        self.count = 0
+        self.results = {
+            &#34;orgs&#34;:defaultdict(list),
+            &#34;people&#34;:defaultdict(list),
+        }
+        self.visited = {
+            &#34;orgs&#34;:[],
+            &#34;people&#34;:[],
+        }
+        self.states = {state: {&#34;managers&#34;: [], &#34;callback&#34;: None, &#34;instances&#34;: [], &#34;page_types&#34;:{},&#34;urls&#34;:set(),&#34;instance_urls&#34;:set()}
+                         for state in ScrapingState if state.name.startswith(&#34;SCRAPE&#34;)}
+        self.actual = ScrapingState.PARSE_HOME
+        self.partial_people = []
+        self.partial_length = 0
+
+    def setup_states(self, orgs_managers,people_managers,other_managers):
+        self.states[ScrapingState.SCRAPE_ORGS][&#34;managers&#34;] = orgs_managers
+        self.states[ScrapingState.SCRAPE_ORGS][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_ORGANIZATIONS}
+        self.states[ScrapingState.SCRAPE_ORGS_PEOPLE][&#34;page_types&#34;] = { PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+        self.states[ScrapingState.SCRAPE_PEOPLE][&#34;managers&#34;] = people_managers
+        self.states[ScrapingState.SCRAPE_PEOPLE][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+        self.states[ScrapingState.SCRAPE_OTHER][&#34;managers&#34;] = other_managers
+        self.states[ScrapingState.SCRAPE_OTHER][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+
+
+
+    def add_org(self,org:Organization,idx):
+        self.results[&#34;orgs&#34;][idx].append(org)
+    def add_person(self,person,idx):
+        self.results[&#34;people&#34;][idx].append(person)
+
+    def add_partial_idx(self,idx,length):
+        self.partial_people.append(idx)
+        self.partial_length += length
+    def add_visited_org_page(self, manager:LinkManager):
+        self.visited[&#34;orgs&#34;].append(manager)
+        return len(self.visited[&#34;orgs&#34;]) -1
+    def add_visited_people(self, manager:LinkManager):
+        self.visited[&#34;people&#34;].append(manager)
+        return len(self.visited[&#34;people&#34;]) -1
+
+    def get_all_partial_persons(self):
+        return [(idx,self.results[&#34;people&#34;][idx]) for idx in self.partial_people]
+    def get_orgs_urls(self,orgs):
+        urls = []
+        for org in orgs:
+            urls.append(org.url)
+        return urls
+
+    def get_people_urls(self,people):
+        urls = []
+        for person in people:
+            urls.append(person.url)
+        return urls
+
+
+    def extract_url_pattern(self,urls):
+        matches = []
+        for i in range(len(urls)):
+            for j in range(i+1,len(urls)):
+                url_a = urls[i]
+                url_b = urls[j]
+                seqMatch = SequenceMatcher(None, url_a, url_b)
+                match = seqMatch.find_longest_match(0, len(url_a), 0, len(url_b))
+                if match.size &gt; 0:
+                    matches.append(url_a[match.a: match.a + match.size])
+        counter = Counter(matches)
+        most_common = counter.most_common(1)
+        pattern = f&#34;{most_common[0][0]}*&#34;
+        return pattern
+
+    def build_structure_and_patterns(self):
+        orgs = self.get_instances(ScrapingState.SCRAPE_ORGS)
+        orgs_people = self.get_instances(ScrapingState.SCRAPE_ORGS_PEOPLE)
+        people = self.get_instances(ScrapingState.SCRAPE_PEOPLE)
+        other_people = self.get_instances(ScrapingState.SCRAPE_OTHER)
+        self.count = len(orgs_people) + len(people) + len(other_people)
+        return people,orgs_people,other_people
+        #return orgs,orgs_people,people
+
+
+    def get_managers(self, state):
+        return self.states[state][&#34;managers&#34;]
+
+    def get_callback(self, state):
+        return self.states[state][&#34;callback&#34;]
+
+    def get_page_types(self, state):
+        return self.states[state][&#34;page_types&#34;]
+
+    def add_url_to_state(self, state, url):
+        self.states[state][&#34;urls&#34;].add(url)
+
+    def add_instance_to_state(self,state,instance):
+        if isinstance(instance,Organization) and instance.url in self.states[state][&#34;instance_urls&#34;]:
+            return
+        self.states[state][&#34;instance_urls&#34;].add(instance.url)
+        self.states[state][&#34;instances&#34;].append(instance)
+
+    def add_manager_to_state(self,state,manager):
+        if isinstance(manager,tuple) and len(manager[0]) == 0:
+            return
+        self.states[state][&#34;managers&#34;].append(manager)
+
+    def get_instances(self, state):
+        return self.states[state][&#34;instances&#34;]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_instance_to_state"><code class="name flex">
+<span>def <span class="ident">add_instance_to_state</span></span>(<span>self, state, instance)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_instance_to_state(self,state,instance):
+    if isinstance(instance,Organization) and instance.url in self.states[state][&#34;instance_urls&#34;]:
+        return
+    self.states[state][&#34;instance_urls&#34;].add(instance.url)
+    self.states[state][&#34;instances&#34;].append(instance)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_manager_to_state"><code class="name flex">
+<span>def <span class="ident">add_manager_to_state</span></span>(<span>self, state, manager)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_manager_to_state(self,state,manager):
+    if isinstance(manager,tuple) and len(manager[0]) == 0:
+        return
+    self.states[state][&#34;managers&#34;].append(manager)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_org"><code class="name flex">
+<span>def <span class="ident">add_org</span></span>(<span>self, org: <a title="academic_crawler.scrapers.templates.Organization" href="templates/index.html#academic_crawler.scrapers.templates.Organization">Organization</a>, idx)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_org(self,org:Organization,idx):
+    self.results[&#34;orgs&#34;][idx].append(org)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_partial_idx"><code class="name flex">
+<span>def <span class="ident">add_partial_idx</span></span>(<span>self, idx, length)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_partial_idx(self,idx,length):
+    self.partial_people.append(idx)
+    self.partial_length += length</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_person"><code class="name flex">
+<span>def <span class="ident">add_person</span></span>(<span>self, person, idx)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_person(self,person,idx):
+    self.results[&#34;people&#34;][idx].append(person)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_url_to_state"><code class="name flex">
+<span>def <span class="ident">add_url_to_state</span></span>(<span>self, state, url)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_url_to_state(self, state, url):
+    self.states[state][&#34;urls&#34;].add(url)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_visited_org_page"><code class="name flex">
+<span>def <span class="ident">add_visited_org_page</span></span>(<span>self, manager: <a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_visited_org_page(self, manager:LinkManager):
+    self.visited[&#34;orgs&#34;].append(manager)
+    return len(self.visited[&#34;orgs&#34;]) -1</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.add_visited_people"><code class="name flex">
+<span>def <span class="ident">add_visited_people</span></span>(<span>self, manager: <a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_visited_people(self, manager:LinkManager):
+    self.visited[&#34;people&#34;].append(manager)
+    return len(self.visited[&#34;people&#34;]) -1</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.build_structure_and_patterns"><code class="name flex">
+<span>def <span class="ident">build_structure_and_patterns</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_structure_and_patterns(self):
+    orgs = self.get_instances(ScrapingState.SCRAPE_ORGS)
+    orgs_people = self.get_instances(ScrapingState.SCRAPE_ORGS_PEOPLE)
+    people = self.get_instances(ScrapingState.SCRAPE_PEOPLE)
+    other_people = self.get_instances(ScrapingState.SCRAPE_OTHER)
+    self.count = len(orgs_people) + len(people) + len(other_people)
+    return people,orgs_people,other_people
+    #return orgs,orgs_people,people</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.extract_url_pattern"><code class="name flex">
+<span>def <span class="ident">extract_url_pattern</span></span>(<span>self, urls)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_url_pattern(self,urls):
+    matches = []
+    for i in range(len(urls)):
+        for j in range(i+1,len(urls)):
+            url_a = urls[i]
+            url_b = urls[j]
+            seqMatch = SequenceMatcher(None, url_a, url_b)
+            match = seqMatch.find_longest_match(0, len(url_a), 0, len(url_b))
+            if match.size &gt; 0:
+                matches.append(url_a[match.a: match.a + match.size])
+    counter = Counter(matches)
+    most_common = counter.most_common(1)
+    pattern = f&#34;{most_common[0][0]}*&#34;
+    return pattern</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_all_partial_persons"><code class="name flex">
+<span>def <span class="ident">get_all_partial_persons</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_partial_persons(self):
+    return [(idx,self.results[&#34;people&#34;][idx]) for idx in self.partial_people]</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_callback"><code class="name flex">
+<span>def <span class="ident">get_callback</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_callback(self, state):
+    return self.states[state][&#34;callback&#34;]</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_instances"><code class="name flex">
+<span>def <span class="ident">get_instances</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_instances(self, state):
+    return self.states[state][&#34;instances&#34;]</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_managers"><code class="name flex">
+<span>def <span class="ident">get_managers</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_managers(self, state):
+    return self.states[state][&#34;managers&#34;]</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_orgs_urls"><code class="name flex">
+<span>def <span class="ident">get_orgs_urls</span></span>(<span>self, orgs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_orgs_urls(self,orgs):
+    urls = []
+    for org in orgs:
+        urls.append(org.url)
+    return urls</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_page_types"><code class="name flex">
+<span>def <span class="ident">get_page_types</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_page_types(self, state):
+    return self.states[state][&#34;page_types&#34;]</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.get_people_urls"><code class="name flex">
+<span>def <span class="ident">get_people_urls</span></span>(<span>self, people)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_people_urls(self,people):
+    urls = []
+    for person in people:
+        urls.append(person.url)
+    return urls</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingManager.setup_states"><code class="name flex">
+<span>def <span class="ident">setup_states</span></span>(<span>self, orgs_managers, people_managers, other_managers)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setup_states(self, orgs_managers,people_managers,other_managers):
+    self.states[ScrapingState.SCRAPE_ORGS][&#34;managers&#34;] = orgs_managers
+    self.states[ScrapingState.SCRAPE_ORGS][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_ORGANIZATIONS}
+    self.states[ScrapingState.SCRAPE_ORGS_PEOPLE][&#34;page_types&#34;] = { PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+    self.states[ScrapingState.SCRAPE_PEOPLE][&#34;managers&#34;] = people_managers
+    self.states[ScrapingState.SCRAPE_PEOPLE][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}
+    self.states[ScrapingState.SCRAPE_OTHER][&#34;managers&#34;] = other_managers
+    self.states[ScrapingState.SCRAPE_OTHER][&#34;page_types&#34;] = {PAGE_TYPE.PAGE_PEOPLE_NO_DATA, PAGE_TYPE.PAGE_PEOPLE_DATA}</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState"><code class="flex name class">
+<span>class <span class="ident">ScrapingState</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ScrapingState(Enum):
+    PARSE_HOME = 1
+    SCRAPE_ORGS = 2
+    SCRAPE_ORGS_PEOPLE = 3
+    SCRAPE_PEOPLE = 4
+    SCRAPE_PARTIAL_PEOPLE = 5
+    SCRAPE_OTHER = 6
+    SCRAPE_FINISHED = 7</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.PARSE_HOME"><code class="name">var <span class="ident">PARSE_HOME</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_FINISHED"><code class="name">var <span class="ident">SCRAPE_FINISHED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS"><code class="name">var <span class="ident">SCRAPE_ORGS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS_PEOPLE"><code class="name">var <span class="ident">SCRAPE_ORGS_PEOPLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_OTHER"><code class="name">var <span class="ident">SCRAPE_OTHER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PARTIAL_PEOPLE"><code class="name">var <span class="ident">SCRAPE_PARTIAL_PEOPLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PEOPLE"><code class="name">var <span class="ident">SCRAPE_PEOPLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="academic_crawler.scrapers" href="index.html">academic_crawler.scrapers</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="academic_crawler.scrapers.manager.ScrapingManager" href="#academic_crawler.scrapers.manager.ScrapingManager">ScrapingManager</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_instance_to_state" href="#academic_crawler.scrapers.manager.ScrapingManager.add_instance_to_state">add_instance_to_state</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_manager_to_state" href="#academic_crawler.scrapers.manager.ScrapingManager.add_manager_to_state">add_manager_to_state</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_org" href="#academic_crawler.scrapers.manager.ScrapingManager.add_org">add_org</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_partial_idx" href="#academic_crawler.scrapers.manager.ScrapingManager.add_partial_idx">add_partial_idx</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_person" href="#academic_crawler.scrapers.manager.ScrapingManager.add_person">add_person</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_url_to_state" href="#academic_crawler.scrapers.manager.ScrapingManager.add_url_to_state">add_url_to_state</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_visited_org_page" href="#academic_crawler.scrapers.manager.ScrapingManager.add_visited_org_page">add_visited_org_page</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.add_visited_people" href="#academic_crawler.scrapers.manager.ScrapingManager.add_visited_people">add_visited_people</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.build_structure_and_patterns" href="#academic_crawler.scrapers.manager.ScrapingManager.build_structure_and_patterns">build_structure_and_patterns</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.extract_url_pattern" href="#academic_crawler.scrapers.manager.ScrapingManager.extract_url_pattern">extract_url_pattern</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_all_partial_persons" href="#academic_crawler.scrapers.manager.ScrapingManager.get_all_partial_persons">get_all_partial_persons</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_callback" href="#academic_crawler.scrapers.manager.ScrapingManager.get_callback">get_callback</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_instances" href="#academic_crawler.scrapers.manager.ScrapingManager.get_instances">get_instances</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_managers" href="#academic_crawler.scrapers.manager.ScrapingManager.get_managers">get_managers</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_orgs_urls" href="#academic_crawler.scrapers.manager.ScrapingManager.get_orgs_urls">get_orgs_urls</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_page_types" href="#academic_crawler.scrapers.manager.ScrapingManager.get_page_types">get_page_types</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.get_people_urls" href="#academic_crawler.scrapers.manager.ScrapingManager.get_people_urls">get_people_urls</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingManager.setup_states" href="#academic_crawler.scrapers.manager.ScrapingManager.setup_states">setup_states</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="academic_crawler.scrapers.manager.ScrapingState" href="#academic_crawler.scrapers.manager.ScrapingState">ScrapingState</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.PARSE_HOME" href="#academic_crawler.scrapers.manager.ScrapingState.PARSE_HOME">PARSE_HOME</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_FINISHED" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_FINISHED">SCRAPE_FINISHED</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS">SCRAPE_ORGS</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS_PEOPLE" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_ORGS_PEOPLE">SCRAPE_ORGS_PEOPLE</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_OTHER" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_OTHER">SCRAPE_OTHER</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PARTIAL_PEOPLE" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PARTIAL_PEOPLE">SCRAPE_PARTIAL_PEOPLE</a></code></li>
+<li><code><a title="academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PEOPLE" href="#academic_crawler.scrapers.manager.ScrapingState.SCRAPE_PEOPLE">SCRAPE_PEOPLE</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

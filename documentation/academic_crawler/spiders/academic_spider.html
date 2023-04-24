@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>academic_crawler.spiders.academic_spider API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>academic_crawler.spiders.academic_spider</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from collections import defaultdict
+
+import bs4
+from scrapy.spiders import Rule, CrawlSpider
+from scrapy.linkextractors import LinkExtractor
+from abc import abstractmethod
+import requests
+from academic_crawler.config.state import ProgramState
+from academic_crawler.heuristics.detectors import KeywordDetector
+from academic_crawler.heuristics.links import LinkManager
+from academic_crawler.heuristics.tree import HTMLTreeGenerator, HTMLSematicTreeGenerator
+from scrapy.http.response.html import HtmlResponse
+
+from academic_crawler.scrapers.manager import ScrapingManager
+
+
+class AcademicSpider(CrawlSpider):
+    &#34;&#34;&#34;
+    Base class for all spiders from this component.
+    &#34;&#34;&#34;
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+
+        if kw.get(&#39;program_state&#39;,None) is None:
+            self.program_state = ProgramState.build_state(ProgramState.States.DISCOVERY,kw.get(&#39;organization&#39;))
+            self.controller = self.program_state.controller
+            self.controller.spider = self
+        else:
+            self.program_state:ProgramState = kw.get(&#34;program_state&#34;,None)
+            self.controller = kw.get(&#34;controller&#34;, None)
+            self.controller.spider = self
+        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
+        self.state_callback_map = {}
+        self.detectors = {
+            &#34;keyword_category&#34;:KeywordDetector(self.program_state.get(&#34;vocab_manager&#34;))
+        }
+        self.scraper = None
+        self.scraping_manager:&#34;ScrapingManager&#34; = ScrapingManager()
+        self.page_type_map = defaultdict(list)
+
+    @abstractmethod
+    def setup_state_callback_map(self):
+        pass
+
+    def get_state_callback(self):
+        return self.state_callback_map.get(self.controller.state)
+
+    def get_callback(self, state):
+        return self.state_callback_map.get(state)
+
+    def next_state(self,approval=True,page_type=None):
+        self.controller.approval = approval
+        self.controller.page_type = page_type
+        if self.controller.may_move():
+            self.controller.move()
+            self.controller.approval = False
+
+    def generate_page_header(self,response):
+        &#34;&#34;&#34;
+        Generates a page header from a response object.
+        :param response:
+        :param prune_tree:
+        :return:
+        &#34;&#34;&#34;
+        #TODO ADD control
+        soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
+        generator = HTMLSematicTreeGenerator()
+        tree = generator.build_page_tree(soup)
+        page_header = {
+            &#34;title&#34;: soup.find(&#39;title&#39;).text,
+            &#34;soup&#34;: soup,
+            &#34;tree&#34;: tree,
+            &#34;url&#34;:response.url,
+            &#34;response&#34;:response,
+        }
+        self.program_state.page_header = page_header
+        return page_header
+
+    def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
+        &#34;&#34;&#34;
+        Returns a list of LinkManager objects from a response object.
+        :param response:
+        :param previous_history:
+        :param home_manager:
+        :return:
+        &#34;&#34;&#34;
+        managers = []
+        for link in self.link_extractor.extract_links(response):
+            if link.url == response.url:
+                continue
+            manager = LinkManager(link, previous_history, )
+            if home_manager and not home_manager.is_sub_link(manager):
+                continue
+            managers += manager,
+        return managers
+    def get_scrapy_response_from_manager(self,manager):
+        request_object = requests.get(manager.link.url)
+        response = HtmlResponse(url=manager.link.url, body=request_object.content)
+        return response
+
+    def get_scrapy_response_from_url(self,url):
+        request_object = requests.get(url)
+        response = HtmlResponse(url=url, body=request_object.content)
+        return response</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider"><code class="flex name class">
+<span>class <span class="ident">AcademicSpider</span></span>
+<span>(</span><span>*a, **kw)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for all spiders from this component.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AcademicSpider(CrawlSpider):
+    &#34;&#34;&#34;
+    Base class for all spiders from this component.
+    &#34;&#34;&#34;
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+
+        if kw.get(&#39;program_state&#39;,None) is None:
+            self.program_state = ProgramState.build_state(ProgramState.States.DISCOVERY,kw.get(&#39;organization&#39;))
+            self.controller = self.program_state.controller
+            self.controller.spider = self
+        else:
+            self.program_state:ProgramState = kw.get(&#34;program_state&#34;,None)
+            self.controller = kw.get(&#34;controller&#34;, None)
+            self.controller.spider = self
+        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
+        self.state_callback_map = {}
+        self.detectors = {
+            &#34;keyword_category&#34;:KeywordDetector(self.program_state.get(&#34;vocab_manager&#34;))
+        }
+        self.scraper = None
+        self.scraping_manager:&#34;ScrapingManager&#34; = ScrapingManager()
+        self.page_type_map = defaultdict(list)
+
+    @abstractmethod
+    def setup_state_callback_map(self):
+        pass
+
+    def get_state_callback(self):
+        return self.state_callback_map.get(self.controller.state)
+
+    def get_callback(self, state):
+        return self.state_callback_map.get(state)
+
+    def next_state(self,approval=True,page_type=None):
+        self.controller.approval = approval
+        self.controller.page_type = page_type
+        if self.controller.may_move():
+            self.controller.move()
+            self.controller.approval = False
+
+    def generate_page_header(self,response):
+        &#34;&#34;&#34;
+        Generates a page header from a response object.
+        :param response:
+        :param prune_tree:
+        :return:
+        &#34;&#34;&#34;
+        #TODO ADD control
+        soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
+        generator = HTMLSematicTreeGenerator()
+        tree = generator.build_page_tree(soup)
+        page_header = {
+            &#34;title&#34;: soup.find(&#39;title&#39;).text,
+            &#34;soup&#34;: soup,
+            &#34;tree&#34;: tree,
+            &#34;url&#34;:response.url,
+            &#34;response&#34;:response,
+        }
+        self.program_state.page_header = page_header
+        return page_header
+
+    def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
+        &#34;&#34;&#34;
+        Returns a list of LinkManager objects from a response object.
+        :param response:
+        :param previous_history:
+        :param home_manager:
+        :return:
+        &#34;&#34;&#34;
+        managers = []
+        for link in self.link_extractor.extract_links(response):
+            if link.url == response.url:
+                continue
+            manager = LinkManager(link, previous_history, )
+            if home_manager and not home_manager.is_sub_link(manager):
+                continue
+            managers += manager,
+        return managers
+    def get_scrapy_response_from_manager(self,manager):
+        request_object = requests.get(manager.link.url)
+        response = HtmlResponse(url=manager.link.url, body=request_object.content)
+        return response
+
+    def get_scrapy_response_from_url(self,url):
+        request_object = requests.get(url)
+        response = HtmlResponse(url=url, body=request_object.content)
+        return response</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scrapy.spiders.crawl.CrawlSpider</li>
+<li>scrapy.spiders.Spider</li>
+<li>scrapy.utils.trackref.object_ref</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="academic_crawler.spiders.organization_spider.OrganizationSpider" href="organization_spider.html#academic_crawler.spiders.organization_spider.OrganizationSpider">OrganizationSpider</a></li>
+<li><a title="academic_crawler.spiders.people_spider.PeopleSpider" href="people_spider.html#academic_crawler.spiders.people_spider.PeopleSpider">PeopleSpider</a></li>
+<li><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt" href="people_spider_alternative.html#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt">PeopleSpiderAlt</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.rules"><code class="name">var <span class="ident">rules</span> : Sequence[scrapy.spiders.crawl.Rule]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.generate_page_header"><code class="name flex">
+<span>def <span class="ident">generate_page_header</span></span>(<span>self, response)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates a page header from a response object.
+:param response:
+:param prune_tree:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_page_header(self,response):
+    &#34;&#34;&#34;
+    Generates a page header from a response object.
+    :param response:
+    :param prune_tree:
+    :return:
+    &#34;&#34;&#34;
+    #TODO ADD control
+    soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
+    generator = HTMLSematicTreeGenerator()
+    tree = generator.build_page_tree(soup)
+    page_header = {
+        &#34;title&#34;: soup.find(&#39;title&#39;).text,
+        &#34;soup&#34;: soup,
+        &#34;tree&#34;: tree,
+        &#34;url&#34;:response.url,
+        &#34;response&#34;:response,
+    }
+    self.program_state.page_header = page_header
+    return page_header</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_callback"><code class="name flex">
+<span>def <span class="ident">get_callback</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_callback(self, state):
+    return self.state_callback_map.get(state)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links"><code class="name flex">
+<span>def <span class="ident">get_page_links</span></span>(<span>self, response, previous_history, home_manager=None) ‑> list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a list of LinkManager objects from a response object.
+:param response:
+:param previous_history:
+:param home_manager:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
+    &#34;&#34;&#34;
+    Returns a list of LinkManager objects from a response object.
+    :param response:
+    :param previous_history:
+    :param home_manager:
+    :return:
+    &#34;&#34;&#34;
+    managers = []
+    for link in self.link_extractor.extract_links(response):
+        if link.url == response.url:
+            continue
+        manager = LinkManager(link, previous_history, )
+        if home_manager and not home_manager.is_sub_link(manager):
+            continue
+        managers += manager,
+    return managers</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_manager"><code class="name flex">
+<span>def <span class="ident">get_scrapy_response_from_manager</span></span>(<span>self, manager)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_scrapy_response_from_manager(self,manager):
+    request_object = requests.get(manager.link.url)
+    response = HtmlResponse(url=manager.link.url, body=request_object.content)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_url"><code class="name flex">
+<span>def <span class="ident">get_scrapy_response_from_url</span></span>(<span>self, url)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_scrapy_response_from_url(self,url):
+    request_object = requests.get(url)
+    response = HtmlResponse(url=url, body=request_object.content)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_state_callback"><code class="name flex">
+<span>def <span class="ident">get_state_callback</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_state_callback(self):
+    return self.state_callback_map.get(self.controller.state)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.next_state"><code class="name flex">
+<span>def <span class="ident">next_state</span></span>(<span>self, approval=True, page_type=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def next_state(self,approval=True,page_type=None):
+    self.controller.approval = approval
+    self.controller.page_type = page_type
+    if self.controller.may_move():
+        self.controller.move()
+        self.controller.approval = False</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.spiders.academic_spider.AcademicSpider.setup_state_callback_map"><code class="name flex">
+<span>def <span class="ident">setup_state_callback_map</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def setup_state_callback_map(self):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="academic_crawler.spiders" href="index.html">academic_crawler.spiders</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider" href="#academic_crawler.spiders.academic_spider.AcademicSpider">AcademicSpider</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.generate_page_header" href="#academic_crawler.spiders.academic_spider.AcademicSpider.generate_page_header">generate_page_header</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_callback" href="#academic_crawler.spiders.academic_spider.AcademicSpider.get_callback">get_callback</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links" href="#academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links">get_page_links</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_manager" href="#academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_manager">get_scrapy_response_from_manager</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_url" href="#academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_url">get_scrapy_response_from_url</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.get_state_callback" href="#academic_crawler.spiders.academic_spider.AcademicSpider.get_state_callback">get_state_callback</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.next_state" href="#academic_crawler.spiders.academic_spider.AcademicSpider.next_state">next_state</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.rules" href="#academic_crawler.spiders.academic_spider.AcademicSpider.rules">rules</a></code></li>
+<li><code><a title="academic_crawler.spiders.academic_spider.AcademicSpider.setup_state_callback_map" href="#academic_crawler.spiders.academic_spider.AcademicSpider.setup_state_callback_map">setup_state_callback_map</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>academic_crawler.heuristics.operations API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>academic_crawler.heuristics.operations</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import re
+from abc import ABC, abstractmethod
+from collections import namedtuple
+from academic_crawler.config.enums import OperationStatus, OperationType
+from academic_crawler.config.predefined import keywords_structure_tags,keywords_key_affiliation,keywords_affiliation_map
+from academic_crawler.config import utils
+import  itertools
+
+OperationResult = namedtuple(&#34;OperationResult&#34;, [&#39;data&#39;, &#39;message&#39;])
+OperationMessage = namedtuple(&#34;OperationMessage&#34;, [&#39;type&#39;, &#39;status&#39;, &#39;has_information_data&#39;])
+
+
+def op_success(result: OperationResult):
+    return result.message.status == OperationStatus.SUCCESS
+
+
+def op_failed(result: OperationResult):
+    return result.message.status == OperationStatus.FAILED
+
+def get_op_status(expression):
+    return OperationStatus.SUCCESS if expression else OperationStatus.FAILED
+
+
+def make_operation_message(type=None, status=None, has_information_data=False):
+    return OperationMessage(type=type, status=status, has_information_data=has_information_data)
+
+
+class AbstractOperationManager(ABC):
+    &#34;&#34;&#34;
+        Class represents series of actions to obtain information from html site
+        It returns defined data structure
+    &#34;&#34;&#34;
+
+    def execute(self, name_operation: str) -&gt; OperationResult:
+        f_operation = getattr(self, name_operation)
+        return f_operation()
+
+    def find_value_in_any_attribute(self, soup, to_find):
+        results = soup.find_all(True)
+        found = []
+        for r in results:
+            for attr in r.attrs:
+                attrValue = r[attr]
+                if &#39;class&#39; == attr:
+                    attrValue = &#39; &#39;.join(attrValue)
+                if to_find in attrValue:
+                    # print(&#39;%s : %s&#39; % (attr, attrValue))
+                    found.append((r, attr))
+                    # class : myString bold
+                    # value : myString
+        return found
+
+    def find_text_in_tags(self,soup,to_find):
+       return soup.body.findAll(text=re.compile(to_find, re.I))
+
+
+    def extract_data_using_nlp(self,ner_list,entity_types):
+        this_name = []
+        all_names_list_tmp = []
+        for ner_dict in ner_list:
+            if ner_dict[&#39;entity&#39;] == entity_types[0]:
+                if len(this_name) == 0:
+                    this_name.append(ner_dict[&#39;word&#39;])
+                else:
+                    all_names_list_tmp.append(this_name)
+                    this_name = []
+                    this_name.append(ner_dict[&#39;word&#39;])
+            elif ner_dict[&#39;entity&#39;] == entity_types[1]:
+                this_name.append(ner_dict[&#39;word&#39;])
+
+        all_names_list_tmp.append(this_name)
+        for i in range(len(all_names_list_tmp)):
+            if len(all_names_list_tmp[i]) &gt; 1:
+                joined = &#34;&#34;.join(all_names_list_tmp[i])
+                if &#39;#&#39; in joined:
+                    all_names_list_tmp[i] = [joined.replace(&#34;#&#34;, &#39;&#39;)]
+
+        res = list(itertools.chain(*all_names_list_tmp))
+        res = &#34; &#34;.join(res) # TODO SPACES BETWEEN NAMES
+        return res
+
+    def extract_name_using_nlp(self,ner_list):
+        res = self.extract_data_using_nlp(ner_list,[&#39;B-PER&#39;,&#39;I-PER&#39;])
+        message = make_operation_message(
+            type=OperationType.EXTRACT_NAME_USING_NLP,
+            status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=res, message=message)
+
+    def extract_org_using_nlp(self,ner_list):
+        res = self.extract_data_using_nlp(ner_list,[&#39;B-ORG&#39;,&#39;I-ORG&#39;])
+        message = make_operation_message(
+            type=OperationType.EXTRACT_ORG_USING_NLP,
+            status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=res, message=message)
+
+
+
+
+class NaiveOperationManager(AbstractOperationManager):
+    def __init__(self) -&gt; None:
+        super().__init__()
+
+    def find_name_from_referrer(self, referer_text, soup) -&gt; OperationResult:
+        import nltk
+        import html
+        from .detectors import is_email
+        from academic_crawler.config.predefined import DataStructureManager
+        result_data = {
+            &#34;name&#34;:&#34;&#34;
+        }
+        to_find = referer_text
+        tokens = utils.simple_word_tokenization(to_find)
+        records = []
+        tags_email = []
+        for i, token in enumerate(tokens):
+            records.append([])
+            for record in soup.body.findAll(text=re.compile(token, re.I)):
+                text = html.unescape(record)
+                if is_email(text):
+                    tags_email.append(record.parent)
+                else:
+                    records[i].append(record.parent)
+
+        tags_name = list(set().union(*records))
+        tags_email = list(set().union(*records))
+
+        result_data[&#39;name&#39;] = self._extract_name_from_tags(tags_name)
+        status = result_data[&#39;name&#39;] is not None
+
+        message = make_operation_message(
+            type=OperationType.FIND_NAME_FROM_REFERER,
+            status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=result_data, message=message)
+
+    # https://dom.spec.whatwg.org/#concept-node-append
+    def find_structures(self, soup, threshold=50):
+
+        result_data = []
+        for tag_name, priority in keywords_structure_tags.items():
+            if priority &lt;= threshold:
+                continue
+            records = soup.find_all(tag_name)
+            if len(records) &gt; 0:
+                is_parent = priority &gt; 80
+                item = {
+                    &#34;tag_name&#34;: tag_name,
+                    &#34;parent&#34;: is_parent,
+                    &#34;tags&#34;: records
+                }
+                result_data.append(item)
+        message = make_operation_message(type=OperationType.FIND_STRUCTURES, status=OperationStatus.SUCCESS)
+        return OperationResult(data=result_data, message=message)
+
+    def process_structures(self, previous: OperationResult):
+        result_data = []
+        if previous.message.status == OperationStatus.SUCCESS and previous.data:
+            for item in previous.data:
+                if item[&#39;parent&#39;]:
+                    for tag in item[&#39;tags&#39;]:
+                        process_result = self.process_structure_parent(tag)
+                        result_data.append(process_result)
+                else:
+                    for tag in item[&#39;tags&#39;]:
+                        process_result = self.process_structure_child(tag)
+                        result_data.append(process_result)
+
+        message = make_operation_message(OperationType.PROCESS_STRUCTURES, OperationStatus.SUCCESS)
+        return OperationResult(data=result_data, message=message)
+
+    def process_structure_parent(self, tag):
+        result_data = None
+        if tag.name == &#34;table&#34;:
+            result_data = self.parse_table(tag)  #
+        elif tag.name == &#34;dl&#34;:
+            result_data = self.parse_dl(tag)
+        elif tag.name == &#34;ul&#34;:
+            result_data = self.parse_ul(tag)
+
+        if result_data is None:
+            return OperationResult(data=None,
+                                   message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                                  OperationStatus.FAILED)
+                                   )
+        result_data = {&#34;data&#34;: result_data, &#34;tag&#34;: tag}
+        return OperationResult(data=result_data, message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                                                OperationStatus.SUCCESS))
+
+    def process_structure_child(self, tag):
+        op_res = None
+        parent = tag.parent
+        if parent:
+            priority = keywords_structure_tags.get(parent.name, 0)
+            if priority &gt; 80:
+                op_res = self.process_structure_parent([parent])
+            if op_res:
+                return OperationResult(data=op_res.data,
+                                       message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                                      OperationStatus.SUCCESS))
+        return OperationResult(data=None,
+                               message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                              OperationStatus.FAILED))
+
+    def _extract_name_from_tags(self, tags):
+        finished = None
+        for tag in tags:
+            if tag.name in [&#39;h1&#39;, &#39;h2&#39;, &#39;h3&#39;, &#39;h4&#39;, &#39;h5&#39;, &#39;h6&#39;]:
+                finished = tag
+                break
+        if finished:
+            return finished.text
+        return None
+
+    def parse_dl(self, tag):
+        result = []
+        dt = tag.find(&#34;dt&#34;)
+        while dt:
+            key = dt.text
+            dd = dt.find_next_sibling()
+            while dd and dd.name == &#34;dd&#34;:
+                text = dd.text
+                item = tuple([key, text])
+                result.append(item)
+                dd = dd.find_next_sibling()
+            dt = dd if dd and dd.name == &#34;dt&#34; else None
+        return result
+
+    def parse_table(self, tag):
+        import pandas as pd
+        result = pd.read_html(tag.prettify())
+        if len(result) &gt; 0:
+            result = result[0].to_dict(&#34;list&#34;)
+            result = list(zip(*result.values()))
+            return result
+
+    def parse_ul(self, tag):
+        pass
+
+    def find_name_from_title(self, manager, soup):
+        result_data = {
+            &#34;name&#34;:[]
+        }
+        tag_title = soup.find(&#34;title&#34;)
+        title = tag_title.text
+        title_parts = re.split(&#39;\| | -&#39;, title)
+        #tokens = utils.simple_word_tokenization(manager.referer_text)
+        ncw = BERTNameConfidenceWrapper()
+        for part in title_parts:
+            confidence = ncw.get_name_confidence(text=part,include_ner=True)
+            if confidence[&#39;confidence_name&#39;] &gt; 0:
+                ner_list = confidence[&#39;ner&#39;]
+                op_result_name = self.extract_name_using_nlp(ner_list)
+                if op_success(op_result_name):
+                    result_data[&#39;name&#39;].append(op_result_name.data)
+
+        status = len(result_data[&#39;name&#39;]) &gt; 0
+        if status:
+            result_data[&#39;name&#39;] = result_data[&#39;name&#39;][0] # TODO BETTER Choosing of name
+        return OperationResult(data=result_data,message=make_operation_message(
+            type=OperationType.FIND_NAME_FROM_TITLE,
+            status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+            has_information_data=True
+        ))
+
+    def find_afifliation_keyword(self,manager,soup):
+        result_data = {
+            &#34;data&#34;:[]
+        }
+        affiliations_text = []
+        for keyword in keywords_key_affiliation:
+            tags = self.find_text_in_tags(soup,keyword)
+            if len(tags)&gt;0:
+                affiliations_text = affiliations_text + self.extract_affiliation_from_tag(tags,keyword)
+                #affiliations_text.append(keyword_category)
+            attributes = self.find_value_in_any_attribute(soup,keyword)
+            if len(attributes) &gt; 0:
+                affiliations_attribute = self.extract_affiliation_from_attribute(attributes,keyword)
+        result_data[&#39;data&#39;] = affiliations_text + affiliations_attribute
+        status = get_op_status(len(result_data[&#39;data&#39;]) &gt; 0)
+        return OperationResult(data=result_data,message=make_operation_message(
+            type=OperationType.FIND_AFFILIATION_KEYWORD,
+            status=status,
+            has_information_data=True
+        ))
+
+    def extract_affiliation_from_tag(self, tags, keyword):
+        result = []
+        for tag in tags:
+            text = str(tag.text).lower()
+            if keyword in keywords_affiliation_map[&#39;position&#39;]:
+                tokens = utils.simple_word_tokenization(text)
+                if len(tokens)&lt;5:
+                    result.append((&#39;position&#39;,text))
+
+
+        return result
+
+    def extract_affiliation_from_attribute(self, tags, keyword):
+        return []</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="academic_crawler.heuristics.operations.get_op_status"><code class="name flex">
+<span>def <span class="ident">get_op_status</span></span>(<span>expression)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_op_status(expression):
+    return OperationStatus.SUCCESS if expression else OperationStatus.FAILED</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.make_operation_message"><code class="name flex">
+<span>def <span class="ident">make_operation_message</span></span>(<span>type=None, status=None, has_information_data=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_operation_message(type=None, status=None, has_information_data=False):
+    return OperationMessage(type=type, status=status, has_information_data=has_information_data)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.op_failed"><code class="name flex">
+<span>def <span class="ident">op_failed</span></span>(<span>result: <a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def op_failed(result: OperationResult):
+    return result.message.status == OperationStatus.FAILED</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.op_success"><code class="name flex">
+<span>def <span class="ident">op_success</span></span>(<span>result: <a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def op_success(result: OperationResult):
+    return result.message.status == OperationStatus.SUCCESS</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager"><code class="flex name class">
+<span>class <span class="ident">AbstractOperationManager</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class represents series of actions to obtain information from html site
+It returns defined data structure</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AbstractOperationManager(ABC):
+    &#34;&#34;&#34;
+        Class represents series of actions to obtain information from html site
+        It returns defined data structure
+    &#34;&#34;&#34;
+
+    def execute(self, name_operation: str) -&gt; OperationResult:
+        f_operation = getattr(self, name_operation)
+        return f_operation()
+
+    def find_value_in_any_attribute(self, soup, to_find):
+        results = soup.find_all(True)
+        found = []
+        for r in results:
+            for attr in r.attrs:
+                attrValue = r[attr]
+                if &#39;class&#39; == attr:
+                    attrValue = &#39; &#39;.join(attrValue)
+                if to_find in attrValue:
+                    # print(&#39;%s : %s&#39; % (attr, attrValue))
+                    found.append((r, attr))
+                    # class : myString bold
+                    # value : myString
+        return found
+
+    def find_text_in_tags(self,soup,to_find):
+       return soup.body.findAll(text=re.compile(to_find, re.I))
+
+
+    def extract_data_using_nlp(self,ner_list,entity_types):
+        this_name = []
+        all_names_list_tmp = []
+        for ner_dict in ner_list:
+            if ner_dict[&#39;entity&#39;] == entity_types[0]:
+                if len(this_name) == 0:
+                    this_name.append(ner_dict[&#39;word&#39;])
+                else:
+                    all_names_list_tmp.append(this_name)
+                    this_name = []
+                    this_name.append(ner_dict[&#39;word&#39;])
+            elif ner_dict[&#39;entity&#39;] == entity_types[1]:
+                this_name.append(ner_dict[&#39;word&#39;])
+
+        all_names_list_tmp.append(this_name)
+        for i in range(len(all_names_list_tmp)):
+            if len(all_names_list_tmp[i]) &gt; 1:
+                joined = &#34;&#34;.join(all_names_list_tmp[i])
+                if &#39;#&#39; in joined:
+                    all_names_list_tmp[i] = [joined.replace(&#34;#&#34;, &#39;&#39;)]
+
+        res = list(itertools.chain(*all_names_list_tmp))
+        res = &#34; &#34;.join(res) # TODO SPACES BETWEEN NAMES
+        return res
+
+    def extract_name_using_nlp(self,ner_list):
+        res = self.extract_data_using_nlp(ner_list,[&#39;B-PER&#39;,&#39;I-PER&#39;])
+        message = make_operation_message(
+            type=OperationType.EXTRACT_NAME_USING_NLP,
+            status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=res, message=message)
+
+    def extract_org_using_nlp(self,ner_list):
+        res = self.extract_data_using_nlp(ner_list,[&#39;B-ORG&#39;,&#39;I-ORG&#39;])
+        message = make_operation_message(
+            type=OperationType.EXTRACT_ORG_USING_NLP,
+            status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=res, message=message)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="academic_crawler.heuristics.operations.NaiveOperationManager" href="#academic_crawler.heuristics.operations.NaiveOperationManager">NaiveOperationManager</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.execute"><code class="name flex">
+<span>def <span class="ident">execute</span></span>(<span>self, name_operation: str) ‑> <a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def execute(self, name_operation: str) -&gt; OperationResult:
+    f_operation = getattr(self, name_operation)
+    return f_operation()</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.extract_data_using_nlp"><code class="name flex">
+<span>def <span class="ident">extract_data_using_nlp</span></span>(<span>self, ner_list, entity_types)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_data_using_nlp(self,ner_list,entity_types):
+    this_name = []
+    all_names_list_tmp = []
+    for ner_dict in ner_list:
+        if ner_dict[&#39;entity&#39;] == entity_types[0]:
+            if len(this_name) == 0:
+                this_name.append(ner_dict[&#39;word&#39;])
+            else:
+                all_names_list_tmp.append(this_name)
+                this_name = []
+                this_name.append(ner_dict[&#39;word&#39;])
+        elif ner_dict[&#39;entity&#39;] == entity_types[1]:
+            this_name.append(ner_dict[&#39;word&#39;])
+
+    all_names_list_tmp.append(this_name)
+    for i in range(len(all_names_list_tmp)):
+        if len(all_names_list_tmp[i]) &gt; 1:
+            joined = &#34;&#34;.join(all_names_list_tmp[i])
+            if &#39;#&#39; in joined:
+                all_names_list_tmp[i] = [joined.replace(&#34;#&#34;, &#39;&#39;)]
+
+    res = list(itertools.chain(*all_names_list_tmp))
+    res = &#34; &#34;.join(res) # TODO SPACES BETWEEN NAMES
+    return res</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.extract_name_using_nlp"><code class="name flex">
+<span>def <span class="ident">extract_name_using_nlp</span></span>(<span>self, ner_list)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_name_using_nlp(self,ner_list):
+    res = self.extract_data_using_nlp(ner_list,[&#39;B-PER&#39;,&#39;I-PER&#39;])
+    message = make_operation_message(
+        type=OperationType.EXTRACT_NAME_USING_NLP,
+        status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+        has_information_data=True,
+    )
+
+    return OperationResult(data=res, message=message)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.extract_org_using_nlp"><code class="name flex">
+<span>def <span class="ident">extract_org_using_nlp</span></span>(<span>self, ner_list)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_org_using_nlp(self,ner_list):
+    res = self.extract_data_using_nlp(ner_list,[&#39;B-ORG&#39;,&#39;I-ORG&#39;])
+    message = make_operation_message(
+        type=OperationType.EXTRACT_ORG_USING_NLP,
+        status=OperationStatus.SUCCESS if len(res)&gt;0 else OperationStatus.FAILED,
+        has_information_data=True,
+    )
+
+    return OperationResult(data=res, message=message)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.find_text_in_tags"><code class="name flex">
+<span>def <span class="ident">find_text_in_tags</span></span>(<span>self, soup, to_find)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_text_in_tags(self,soup,to_find):
+   return soup.body.findAll(text=re.compile(to_find, re.I))</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.AbstractOperationManager.find_value_in_any_attribute"><code class="name flex">
+<span>def <span class="ident">find_value_in_any_attribute</span></span>(<span>self, soup, to_find)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_value_in_any_attribute(self, soup, to_find):
+    results = soup.find_all(True)
+    found = []
+    for r in results:
+        for attr in r.attrs:
+            attrValue = r[attr]
+            if &#39;class&#39; == attr:
+                attrValue = &#39; &#39;.join(attrValue)
+            if to_find in attrValue:
+                # print(&#39;%s : %s&#39; % (attr, attrValue))
+                found.append((r, attr))
+                # class : myString bold
+                # value : myString
+    return found</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager"><code class="flex name class">
+<span>class <span class="ident">NaiveOperationManager</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class represents series of actions to obtain information from html site
+It returns defined data structure</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NaiveOperationManager(AbstractOperationManager):
+    def __init__(self) -&gt; None:
+        super().__init__()
+
+    def find_name_from_referrer(self, referer_text, soup) -&gt; OperationResult:
+        import nltk
+        import html
+        from .detectors import is_email
+        from academic_crawler.config.predefined import DataStructureManager
+        result_data = {
+            &#34;name&#34;:&#34;&#34;
+        }
+        to_find = referer_text
+        tokens = utils.simple_word_tokenization(to_find)
+        records = []
+        tags_email = []
+        for i, token in enumerate(tokens):
+            records.append([])
+            for record in soup.body.findAll(text=re.compile(token, re.I)):
+                text = html.unescape(record)
+                if is_email(text):
+                    tags_email.append(record.parent)
+                else:
+                    records[i].append(record.parent)
+
+        tags_name = list(set().union(*records))
+        tags_email = list(set().union(*records))
+
+        result_data[&#39;name&#39;] = self._extract_name_from_tags(tags_name)
+        status = result_data[&#39;name&#39;] is not None
+
+        message = make_operation_message(
+            type=OperationType.FIND_NAME_FROM_REFERER,
+            status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+            has_information_data=True,
+        )
+
+        return OperationResult(data=result_data, message=message)
+
+    # https://dom.spec.whatwg.org/#concept-node-append
+    def find_structures(self, soup, threshold=50):
+
+        result_data = []
+        for tag_name, priority in keywords_structure_tags.items():
+            if priority &lt;= threshold:
+                continue
+            records = soup.find_all(tag_name)
+            if len(records) &gt; 0:
+                is_parent = priority &gt; 80
+                item = {
+                    &#34;tag_name&#34;: tag_name,
+                    &#34;parent&#34;: is_parent,
+                    &#34;tags&#34;: records
+                }
+                result_data.append(item)
+        message = make_operation_message(type=OperationType.FIND_STRUCTURES, status=OperationStatus.SUCCESS)
+        return OperationResult(data=result_data, message=message)
+
+    def process_structures(self, previous: OperationResult):
+        result_data = []
+        if previous.message.status == OperationStatus.SUCCESS and previous.data:
+            for item in previous.data:
+                if item[&#39;parent&#39;]:
+                    for tag in item[&#39;tags&#39;]:
+                        process_result = self.process_structure_parent(tag)
+                        result_data.append(process_result)
+                else:
+                    for tag in item[&#39;tags&#39;]:
+                        process_result = self.process_structure_child(tag)
+                        result_data.append(process_result)
+
+        message = make_operation_message(OperationType.PROCESS_STRUCTURES, OperationStatus.SUCCESS)
+        return OperationResult(data=result_data, message=message)
+
+    def process_structure_parent(self, tag):
+        result_data = None
+        if tag.name == &#34;table&#34;:
+            result_data = self.parse_table(tag)  #
+        elif tag.name == &#34;dl&#34;:
+            result_data = self.parse_dl(tag)
+        elif tag.name == &#34;ul&#34;:
+            result_data = self.parse_ul(tag)
+
+        if result_data is None:
+            return OperationResult(data=None,
+                                   message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                                  OperationStatus.FAILED)
+                                   )
+        result_data = {&#34;data&#34;: result_data, &#34;tag&#34;: tag}
+        return OperationResult(data=result_data, message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                                                OperationStatus.SUCCESS))
+
+    def process_structure_child(self, tag):
+        op_res = None
+        parent = tag.parent
+        if parent:
+            priority = keywords_structure_tags.get(parent.name, 0)
+            if priority &gt; 80:
+                op_res = self.process_structure_parent([parent])
+            if op_res:
+                return OperationResult(data=op_res.data,
+                                       message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                                      OperationStatus.SUCCESS))
+        return OperationResult(data=None,
+                               message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                              OperationStatus.FAILED))
+
+    def _extract_name_from_tags(self, tags):
+        finished = None
+        for tag in tags:
+            if tag.name in [&#39;h1&#39;, &#39;h2&#39;, &#39;h3&#39;, &#39;h4&#39;, &#39;h5&#39;, &#39;h6&#39;]:
+                finished = tag
+                break
+        if finished:
+            return finished.text
+        return None
+
+    def parse_dl(self, tag):
+        result = []
+        dt = tag.find(&#34;dt&#34;)
+        while dt:
+            key = dt.text
+            dd = dt.find_next_sibling()
+            while dd and dd.name == &#34;dd&#34;:
+                text = dd.text
+                item = tuple([key, text])
+                result.append(item)
+                dd = dd.find_next_sibling()
+            dt = dd if dd and dd.name == &#34;dt&#34; else None
+        return result
+
+    def parse_table(self, tag):
+        import pandas as pd
+        result = pd.read_html(tag.prettify())
+        if len(result) &gt; 0:
+            result = result[0].to_dict(&#34;list&#34;)
+            result = list(zip(*result.values()))
+            return result
+
+    def parse_ul(self, tag):
+        pass
+
+    def find_name_from_title(self, manager, soup):
+        result_data = {
+            &#34;name&#34;:[]
+        }
+        tag_title = soup.find(&#34;title&#34;)
+        title = tag_title.text
+        title_parts = re.split(&#39;\| | -&#39;, title)
+        #tokens = utils.simple_word_tokenization(manager.referer_text)
+        ncw = BERTNameConfidenceWrapper()
+        for part in title_parts:
+            confidence = ncw.get_name_confidence(text=part,include_ner=True)
+            if confidence[&#39;confidence_name&#39;] &gt; 0:
+                ner_list = confidence[&#39;ner&#39;]
+                op_result_name = self.extract_name_using_nlp(ner_list)
+                if op_success(op_result_name):
+                    result_data[&#39;name&#39;].append(op_result_name.data)
+
+        status = len(result_data[&#39;name&#39;]) &gt; 0
+        if status:
+            result_data[&#39;name&#39;] = result_data[&#39;name&#39;][0] # TODO BETTER Choosing of name
+        return OperationResult(data=result_data,message=make_operation_message(
+            type=OperationType.FIND_NAME_FROM_TITLE,
+            status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+            has_information_data=True
+        ))
+
+    def find_afifliation_keyword(self,manager,soup):
+        result_data = {
+            &#34;data&#34;:[]
+        }
+        affiliations_text = []
+        for keyword in keywords_key_affiliation:
+            tags = self.find_text_in_tags(soup,keyword)
+            if len(tags)&gt;0:
+                affiliations_text = affiliations_text + self.extract_affiliation_from_tag(tags,keyword)
+                #affiliations_text.append(keyword_category)
+            attributes = self.find_value_in_any_attribute(soup,keyword)
+            if len(attributes) &gt; 0:
+                affiliations_attribute = self.extract_affiliation_from_attribute(attributes,keyword)
+        result_data[&#39;data&#39;] = affiliations_text + affiliations_attribute
+        status = get_op_status(len(result_data[&#39;data&#39;]) &gt; 0)
+        return OperationResult(data=result_data,message=make_operation_message(
+            type=OperationType.FIND_AFFILIATION_KEYWORD,
+            status=status,
+            has_information_data=True
+        ))
+
+    def extract_affiliation_from_tag(self, tags, keyword):
+        result = []
+        for tag in tags:
+            text = str(tag.text).lower()
+            if keyword in keywords_affiliation_map[&#39;position&#39;]:
+                tokens = utils.simple_word_tokenization(text)
+                if len(tokens)&lt;5:
+                    result.append((&#39;position&#39;,text))
+
+
+        return result
+
+    def extract_affiliation_from_attribute(self, tags, keyword):
+        return []</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="academic_crawler.heuristics.operations.AbstractOperationManager" href="#academic_crawler.heuristics.operations.AbstractOperationManager">AbstractOperationManager</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_attribute"><code class="name flex">
+<span>def <span class="ident">extract_affiliation_from_attribute</span></span>(<span>self, tags, keyword)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_affiliation_from_attribute(self, tags, keyword):
+    return []</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_tag"><code class="name flex">
+<span>def <span class="ident">extract_affiliation_from_tag</span></span>(<span>self, tags, keyword)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_affiliation_from_tag(self, tags, keyword):
+    result = []
+    for tag in tags:
+        text = str(tag.text).lower()
+        if keyword in keywords_affiliation_map[&#39;position&#39;]:
+            tokens = utils.simple_word_tokenization(text)
+            if len(tokens)&lt;5:
+                result.append((&#39;position&#39;,text))
+
+
+    return result</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.find_afifliation_keyword"><code class="name flex">
+<span>def <span class="ident">find_afifliation_keyword</span></span>(<span>self, manager, soup)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_afifliation_keyword(self,manager,soup):
+    result_data = {
+        &#34;data&#34;:[]
+    }
+    affiliations_text = []
+    for keyword in keywords_key_affiliation:
+        tags = self.find_text_in_tags(soup,keyword)
+        if len(tags)&gt;0:
+            affiliations_text = affiliations_text + self.extract_affiliation_from_tag(tags,keyword)
+            #affiliations_text.append(keyword_category)
+        attributes = self.find_value_in_any_attribute(soup,keyword)
+        if len(attributes) &gt; 0:
+            affiliations_attribute = self.extract_affiliation_from_attribute(attributes,keyword)
+    result_data[&#39;data&#39;] = affiliations_text + affiliations_attribute
+    status = get_op_status(len(result_data[&#39;data&#39;]) &gt; 0)
+    return OperationResult(data=result_data,message=make_operation_message(
+        type=OperationType.FIND_AFFILIATION_KEYWORD,
+        status=status,
+        has_information_data=True
+    ))</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_referrer"><code class="name flex">
+<span>def <span class="ident">find_name_from_referrer</span></span>(<span>self, referer_text, soup) ‑> <a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_name_from_referrer(self, referer_text, soup) -&gt; OperationResult:
+    import nltk
+    import html
+    from .detectors import is_email
+    from academic_crawler.config.predefined import DataStructureManager
+    result_data = {
+        &#34;name&#34;:&#34;&#34;
+    }
+    to_find = referer_text
+    tokens = utils.simple_word_tokenization(to_find)
+    records = []
+    tags_email = []
+    for i, token in enumerate(tokens):
+        records.append([])
+        for record in soup.body.findAll(text=re.compile(token, re.I)):
+            text = html.unescape(record)
+            if is_email(text):
+                tags_email.append(record.parent)
+            else:
+                records[i].append(record.parent)
+
+    tags_name = list(set().union(*records))
+    tags_email = list(set().union(*records))
+
+    result_data[&#39;name&#39;] = self._extract_name_from_tags(tags_name)
+    status = result_data[&#39;name&#39;] is not None
+
+    message = make_operation_message(
+        type=OperationType.FIND_NAME_FROM_REFERER,
+        status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+        has_information_data=True,
+    )
+
+    return OperationResult(data=result_data, message=message)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_title"><code class="name flex">
+<span>def <span class="ident">find_name_from_title</span></span>(<span>self, manager, soup)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_name_from_title(self, manager, soup):
+    result_data = {
+        &#34;name&#34;:[]
+    }
+    tag_title = soup.find(&#34;title&#34;)
+    title = tag_title.text
+    title_parts = re.split(&#39;\| | -&#39;, title)
+    #tokens = utils.simple_word_tokenization(manager.referer_text)
+    ncw = BERTNameConfidenceWrapper()
+    for part in title_parts:
+        confidence = ncw.get_name_confidence(text=part,include_ner=True)
+        if confidence[&#39;confidence_name&#39;] &gt; 0:
+            ner_list = confidence[&#39;ner&#39;]
+            op_result_name = self.extract_name_using_nlp(ner_list)
+            if op_success(op_result_name):
+                result_data[&#39;name&#39;].append(op_result_name.data)
+
+    status = len(result_data[&#39;name&#39;]) &gt; 0
+    if status:
+        result_data[&#39;name&#39;] = result_data[&#39;name&#39;][0] # TODO BETTER Choosing of name
+    return OperationResult(data=result_data,message=make_operation_message(
+        type=OperationType.FIND_NAME_FROM_TITLE,
+        status=OperationStatus.SUCCESS if status else OperationStatus.FAILED,
+        has_information_data=True
+    ))</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.find_structures"><code class="name flex">
+<span>def <span class="ident">find_structures</span></span>(<span>self, soup, threshold=50)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_structures(self, soup, threshold=50):
+
+    result_data = []
+    for tag_name, priority in keywords_structure_tags.items():
+        if priority &lt;= threshold:
+            continue
+        records = soup.find_all(tag_name)
+        if len(records) &gt; 0:
+            is_parent = priority &gt; 80
+            item = {
+                &#34;tag_name&#34;: tag_name,
+                &#34;parent&#34;: is_parent,
+                &#34;tags&#34;: records
+            }
+            result_data.append(item)
+    message = make_operation_message(type=OperationType.FIND_STRUCTURES, status=OperationStatus.SUCCESS)
+    return OperationResult(data=result_data, message=message)</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.parse_dl"><code class="name flex">
+<span>def <span class="ident">parse_dl</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_dl(self, tag):
+    result = []
+    dt = tag.find(&#34;dt&#34;)
+    while dt:
+        key = dt.text
+        dd = dt.find_next_sibling()
+        while dd and dd.name == &#34;dd&#34;:
+            text = dd.text
+            item = tuple([key, text])
+            result.append(item)
+            dd = dd.find_next_sibling()
+        dt = dd if dd and dd.name == &#34;dt&#34; else None
+    return result</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.parse_table"><code class="name flex">
+<span>def <span class="ident">parse_table</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_table(self, tag):
+    import pandas as pd
+    result = pd.read_html(tag.prettify())
+    if len(result) &gt; 0:
+        result = result[0].to_dict(&#34;list&#34;)
+        result = list(zip(*result.values()))
+        return result</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.parse_ul"><code class="name flex">
+<span>def <span class="ident">parse_ul</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_ul(self, tag):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_child"><code class="name flex">
+<span>def <span class="ident">process_structure_child</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_structure_child(self, tag):
+    op_res = None
+    parent = tag.parent
+    if parent:
+        priority = keywords_structure_tags.get(parent.name, 0)
+        if priority &gt; 80:
+            op_res = self.process_structure_parent([parent])
+        if op_res:
+            return OperationResult(data=op_res.data,
+                                   message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                                  OperationStatus.SUCCESS))
+    return OperationResult(data=None,
+                           message=make_operation_message(OperationType.PROCESS_STRUCTURE_CHILD,
+                                                          OperationStatus.FAILED))</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_parent"><code class="name flex">
+<span>def <span class="ident">process_structure_parent</span></span>(<span>self, tag)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_structure_parent(self, tag):
+    result_data = None
+    if tag.name == &#34;table&#34;:
+        result_data = self.parse_table(tag)  #
+    elif tag.name == &#34;dl&#34;:
+        result_data = self.parse_dl(tag)
+    elif tag.name == &#34;ul&#34;:
+        result_data = self.parse_ul(tag)
+
+    if result_data is None:
+        return OperationResult(data=None,
+                               message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                              OperationStatus.FAILED)
+                               )
+    result_data = {&#34;data&#34;: result_data, &#34;tag&#34;: tag}
+    return OperationResult(data=result_data, message=make_operation_message(OperationType.PROCESS_STRUCTURE_PARENT,
+                                                                            OperationStatus.SUCCESS))</code></pre>
+</details>
+</dd>
+<dt id="academic_crawler.heuristics.operations.NaiveOperationManager.process_structures"><code class="name flex">
+<span>def <span class="ident">process_structures</span></span>(<span>self, previous: <a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_structures(self, previous: OperationResult):
+    result_data = []
+    if previous.message.status == OperationStatus.SUCCESS and previous.data:
+        for item in previous.data:
+            if item[&#39;parent&#39;]:
+                for tag in item[&#39;tags&#39;]:
+                    process_result = self.process_structure_parent(tag)
+                    result_data.append(process_result)
+            else:
+                for tag in item[&#39;tags&#39;]:
+                    process_result = self.process_structure_child(tag)
+                    result_data.append(process_result)
+
+    message = make_operation_message(OperationType.PROCESS_STRUCTURES, OperationStatus.SUCCESS)
+    return OperationResult(data=result_data, message=message)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="academic_crawler.heuristics.operations.OperationMessage"><code class="flex name class">
+<span>class <span class="ident">OperationMessage</span></span>
+<span>(</span><span>type, status, has_information_data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OperationMessage(type, status, has_information_data)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="academic_crawler.heuristics.operations.OperationMessage.has_information_data"><code class="name">var <span class="ident">has_information_data</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
+</dd>
+<dt id="academic_crawler.heuristics.operations.OperationMessage.status"><code class="name">var <span class="ident">status</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+<dt id="academic_crawler.heuristics.operations.OperationMessage.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="academic_crawler.heuristics.operations.OperationResult"><code class="flex name class">
+<span>class <span class="ident">OperationResult</span></span>
+<span>(</span><span>data, message)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OperationResult(data, message)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="academic_crawler.heuristics.operations.OperationResult.data"><code class="name">var <span class="ident">data</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+<dt id="academic_crawler.heuristics.operations.OperationResult.message"><code class="name">var <span class="ident">message</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="academic_crawler.heuristics" href="index.html">academic_crawler.heuristics</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="academic_crawler.heuristics.operations.get_op_status" href="#academic_crawler.heuristics.operations.get_op_status">get_op_status</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.make_operation_message" href="#academic_crawler.heuristics.operations.make_operation_message">make_operation_message</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.op_failed" href="#academic_crawler.heuristics.operations.op_failed">op_failed</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.op_success" href="#academic_crawler.heuristics.operations.op_success">op_success</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager" href="#academic_crawler.heuristics.operations.AbstractOperationManager">AbstractOperationManager</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.execute" href="#academic_crawler.heuristics.operations.AbstractOperationManager.execute">execute</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.extract_data_using_nlp" href="#academic_crawler.heuristics.operations.AbstractOperationManager.extract_data_using_nlp">extract_data_using_nlp</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.extract_name_using_nlp" href="#academic_crawler.heuristics.operations.AbstractOperationManager.extract_name_using_nlp">extract_name_using_nlp</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.extract_org_using_nlp" href="#academic_crawler.heuristics.operations.AbstractOperationManager.extract_org_using_nlp">extract_org_using_nlp</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.find_text_in_tags" href="#academic_crawler.heuristics.operations.AbstractOperationManager.find_text_in_tags">find_text_in_tags</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.AbstractOperationManager.find_value_in_any_attribute" href="#academic_crawler.heuristics.operations.AbstractOperationManager.find_value_in_any_attribute">find_value_in_any_attribute</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager" href="#academic_crawler.heuristics.operations.NaiveOperationManager">NaiveOperationManager</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_attribute" href="#academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_attribute">extract_affiliation_from_attribute</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_tag" href="#academic_crawler.heuristics.operations.NaiveOperationManager.extract_affiliation_from_tag">extract_affiliation_from_tag</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.find_afifliation_keyword" href="#academic_crawler.heuristics.operations.NaiveOperationManager.find_afifliation_keyword">find_afifliation_keyword</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_referrer" href="#academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_referrer">find_name_from_referrer</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_title" href="#academic_crawler.heuristics.operations.NaiveOperationManager.find_name_from_title">find_name_from_title</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.find_structures" href="#academic_crawler.heuristics.operations.NaiveOperationManager.find_structures">find_structures</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.parse_dl" href="#academic_crawler.heuristics.operations.NaiveOperationManager.parse_dl">parse_dl</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.parse_table" href="#academic_crawler.heuristics.operations.NaiveOperationManager.parse_table">parse_table</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.parse_ul" href="#academic_crawler.heuristics.operations.NaiveOperationManager.parse_ul">parse_ul</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_child" href="#academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_child">process_structure_child</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_parent" href="#academic_crawler.heuristics.operations.NaiveOperationManager.process_structure_parent">process_structure_parent</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.NaiveOperationManager.process_structures" href="#academic_crawler.heuristics.operations.NaiveOperationManager.process_structures">process_structures</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="academic_crawler.heuristics.operations.OperationMessage" href="#academic_crawler.heuristics.operations.OperationMessage">OperationMessage</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.heuristics.operations.OperationMessage.has_information_data" href="#academic_crawler.heuristics.operations.OperationMessage.has_information_data">has_information_data</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.OperationMessage.status" href="#academic_crawler.heuristics.operations.OperationMessage.status">status</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.OperationMessage.type" href="#academic_crawler.heuristics.operations.OperationMessage.type">type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="academic_crawler.heuristics.operations.OperationResult" href="#academic_crawler.heuristics.operations.OperationResult">OperationResult</a></code></h4>
+<ul class="">
+<li><code><a title="academic_crawler.heuristics.operations.OperationResult.data" href="#academic_crawler.heuristics.operations.OperationResult.data">data</a></code></li>
+<li><code><a title="academic_crawler.heuristics.operations.OperationResult.message" href="#academic_crawler.heuristics.operations.OperationResult.message">message</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
