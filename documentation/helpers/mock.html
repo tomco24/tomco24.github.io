@@ -22,101 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.mock</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import requests
-from bs4 import BeautifulSoup
-
-from academic_crawler.config.page_types import PAGE_TYPE
-from academic_crawler.heuristics.page_features.pipeline import PageFeaturesPipeline
-from academic_crawler.heuristics.tree import HTMLTreeGenerator, EntityNode, HTMLSematicTreeGenerator
-from academic_crawler.config.state import ProgramState
-from academic_crawler.scrapers.templates import Organization, Person
-
-
-def get_mock_department_item(url,id_=0):
-    response = requests.get(url).text
-
-    soup = BeautifulSoup(response, &#39;html.parser&#39;)
-    state = ProgramState(ProgramState.States.DISCOVERY, {&#34;organization&#34;:get_mock_organization(id_)})
-    generator = HTMLSematicTreeGenerator()
-    tree = generator.build_page_tree(soup)
-    page_header = {
-        &#34;title&#34;: soup.find(&#39;title&#39;).text,
-        &#34;soup&#34;: soup,
-        &#34;tree&#34;: tree,
-        &#34;url&#34;: url,
-    }
-    state.page_header = page_header
-
-    pipeline = PageFeaturesPipeline(state)
-    page_type = pipeline.execute()
-    return {
-        &#34;page_type&#34;: page_type,
-        &#34;state&#34;: state,
-    }
-
-def get_mock_organization(id=0):
-    child_cvut = Organization(name=&#34;Faculty of Information Technology&#34;,
-                              domain=&#34;fit.cvut.cz&#34;,
-                              abbreviation=&#34;FIT&#34;,
-                              url=&#34;https://www.fit.cvut.cz/en&#34;,
-                              parent=None,
-                              )
-    result = [
-        Organization(name=&#34;Czech Technical University in Prague&#34;,
-                     abbreviation=&#34;CTU&#34;,
-                     domain=&#34;cvut.cz&#34;,
-                     url=&#34;https://www.cvut.cz/en/&#34;,
-                     parent=None,
-                     ),
-        Organization(name=&#34;CUNI&#34;,
-                     domain=&#34;cuni.cz&#34;,
-                     url=&#34;https://cuni.cz/UKEN-1.html&#34;,
-                     parent=None,
-                     ),
-    ]
-    child_cvut.parent = result[0]
-    return result[id], child_cvut
-
-def get_mock_single_person_item(url=None):
-    _,org = get_mock_organization(0)
-    person = Person(name=&#34;Bařinka Lukáš, Ing.&#34;,organization=org,url=&#34;https://fit.cvut.cz/en/faculty/people/5016-lukas-barinka&#34;)
-    if url:
-        person.url = url
-    #person = Person(name=&#34;Kirill Alekhnovich&#34;,organization=org,url=&#34;https://fit.cvut.cz/en/faculty/people/18913-kirill-alekhnovich&#34;)
-    #person.url = &#34;https://www.mff.cuni.cz/en/faculty/organizational-structure/people?hdl=3363&#34;
-    response = requests.get(person.url).text
-    #soup = BeautifulSoup(open(&#34;single.html&#34;, &#34;r&#34;))
-    soup = BeautifulSoup(response, &#39;html.parser&#39;)
-    generator = HTMLSematicTreeGenerator()
-    # tree = generator.build_page_tree(soup, prune_tree=prune_tree)
-    tree = generator.build_page_tree(soup)
-    page_header = {
-        &#34;title&#34;: soup.find(&#39;title&#39;).text,
-        &#34;soup&#34;: soup,
-        &#34;tree&#34;: tree,
-        &#34;url&#34;: person.url,
-    }
-    domain_specific = {
-        &#34;departments_has_own_subdomain&#34;: False,
-        &#34;organization&#34;: get_mock_organization(0),
-
-    }
-    program_state = ProgramState(ProgramState.States.SCRAPING, domain_specific)
-    program_state.page_header = page_header
-    program_state.set_state_attributes(&#39;current_ORG&#39;,org)
-    pipeline = PageFeaturesPipeline(program_state)
-    page_type = pipeline.execute()
-    candidate = {
-            &#34;page_type&#34;: PAGE_TYPE.PAGE_SINGLE_PERSON,
-            &#34;state&#34;: program_state,
-            &#34;person&#34;:person
-        }
-    return candidate</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -130,111 +35,18 @@ def get_mock_single_person_item(url=None):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_mock_department_item(url,id_=0):
-    response = requests.get(url).text
-
-    soup = BeautifulSoup(response, &#39;html.parser&#39;)
-    state = ProgramState(ProgramState.States.DISCOVERY, {&#34;organization&#34;:get_mock_organization(id_)})
-    generator = HTMLSematicTreeGenerator()
-    tree = generator.build_page_tree(soup)
-    page_header = {
-        &#34;title&#34;: soup.find(&#39;title&#39;).text,
-        &#34;soup&#34;: soup,
-        &#34;tree&#34;: tree,
-        &#34;url&#34;: url,
-    }
-    state.page_header = page_header
-
-    pipeline = PageFeaturesPipeline(state)
-    page_type = pipeline.execute()
-    return {
-        &#34;page_type&#34;: page_type,
-        &#34;state&#34;: state,
-    }</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.mock.get_mock_organization"><code class="name flex">
 <span>def <span class="ident">get_mock_organization</span></span>(<span>id=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_mock_organization(id=0):
-    child_cvut = Organization(name=&#34;Faculty of Information Technology&#34;,
-                              domain=&#34;fit.cvut.cz&#34;,
-                              abbreviation=&#34;FIT&#34;,
-                              url=&#34;https://www.fit.cvut.cz/en&#34;,
-                              parent=None,
-                              )
-    result = [
-        Organization(name=&#34;Czech Technical University in Prague&#34;,
-                     abbreviation=&#34;CTU&#34;,
-                     domain=&#34;cvut.cz&#34;,
-                     url=&#34;https://www.cvut.cz/en/&#34;,
-                     parent=None,
-                     ),
-        Organization(name=&#34;CUNI&#34;,
-                     domain=&#34;cuni.cz&#34;,
-                     url=&#34;https://cuni.cz/UKEN-1.html&#34;,
-                     parent=None,
-                     ),
-    ]
-    child_cvut.parent = result[0]
-    return result[id], child_cvut</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.mock.get_mock_single_person_item"><code class="name flex">
 <span>def <span class="ident">get_mock_single_person_item</span></span>(<span>url=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_mock_single_person_item(url=None):
-    _,org = get_mock_organization(0)
-    person = Person(name=&#34;Bařinka Lukáš, Ing.&#34;,organization=org,url=&#34;https://fit.cvut.cz/en/faculty/people/5016-lukas-barinka&#34;)
-    if url:
-        person.url = url
-    #person = Person(name=&#34;Kirill Alekhnovich&#34;,organization=org,url=&#34;https://fit.cvut.cz/en/faculty/people/18913-kirill-alekhnovich&#34;)
-    #person.url = &#34;https://www.mff.cuni.cz/en/faculty/organizational-structure/people?hdl=3363&#34;
-    response = requests.get(person.url).text
-    #soup = BeautifulSoup(open(&#34;single.html&#34;, &#34;r&#34;))
-    soup = BeautifulSoup(response, &#39;html.parser&#39;)
-    generator = HTMLSematicTreeGenerator()
-    # tree = generator.build_page_tree(soup, prune_tree=prune_tree)
-    tree = generator.build_page_tree(soup)
-    page_header = {
-        &#34;title&#34;: soup.find(&#39;title&#39;).text,
-        &#34;soup&#34;: soup,
-        &#34;tree&#34;: tree,
-        &#34;url&#34;: person.url,
-    }
-    domain_specific = {
-        &#34;departments_has_own_subdomain&#34;: False,
-        &#34;organization&#34;: get_mock_organization(0),
-
-    }
-    program_state = ProgramState(ProgramState.States.SCRAPING, domain_specific)
-    program_state.page_header = page_header
-    program_state.set_state_attributes(&#39;current_ORG&#39;,org)
-    pipeline = PageFeaturesPipeline(program_state)
-    page_type = pipeline.execute()
-    candidate = {
-            &#34;page_type&#34;: PAGE_TYPE.PAGE_SINGLE_PERSON,
-            &#34;state&#34;: program_state,
-            &#34;person&#34;:person
-        }
-    return candidate</code></pre>
-</details>
 </dd>
 </dl>
 </section>

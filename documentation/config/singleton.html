@@ -22,49 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.singleton</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import spacy
-def Singleton(class_):
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-
-    return get_instance
-
-
-class NlpSingleton:
-    _instance = None
-    _instance_embeddings = None
-    _instance_transformers = None
-
-    @classmethod
-    def get_instance(cls,embeddings=None):
-        model_ = &#34;en_core_web_trf&#34; if not embeddings else &#34;en_core_web_md&#34;
-        if embeddings:
-            if cls._instance_embeddings is None:
-                cls._instance_embeddings = spacy.load(model_)
-            return cls._instance_embeddings
-        else:
-            if cls._instance is None:
-                cls._instance = spacy.load(model_)
-            return cls._instance
-&#34;&#34;&#34;
-class NLP_Singleton:
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.ncw = BERTNameConfidenceWrapper()
-
-    def get_ncw_instance(self) -&gt;BERTNameConfidenceWrapper:
-        return self.ncw
-        
-&#34;&#34;&#34;</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -78,20 +35,6 @@ class NLP_Singleton:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def Singleton(class_):
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-
-    return get_instance</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -103,27 +46,6 @@ class NLP_Singleton:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class NlpSingleton:
-    _instance = None
-    _instance_embeddings = None
-    _instance_transformers = None
-
-    @classmethod
-    def get_instance(cls,embeddings=None):
-        model_ = &#34;en_core_web_trf&#34; if not embeddings else &#34;en_core_web_md&#34;
-        if embeddings:
-            if cls._instance_embeddings is None:
-                cls._instance_embeddings = spacy.load(model_)
-            return cls._instance_embeddings
-        else:
-            if cls._instance is None:
-                cls._instance = spacy.load(model_)
-            return cls._instance</code></pre>
-</details>
 <h3>Static methods</h3>
 <dl>
 <dt id="academic_crawler.config.singleton.NlpSingleton.get_instance"><code class="name flex">
@@ -131,22 +53,6 @@ class NLP_Singleton:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@classmethod
-def get_instance(cls,embeddings=None):
-    model_ = &#34;en_core_web_trf&#34; if not embeddings else &#34;en_core_web_md&#34;
-    if embeddings:
-        if cls._instance_embeddings is None:
-            cls._instance_embeddings = spacy.load(model_)
-        return cls._instance_embeddings
-    else:
-        if cls._instance is None:
-            cls._instance = spacy.load(model_)
-        return cls._instance</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

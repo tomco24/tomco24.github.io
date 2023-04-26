@@ -22,148 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.processing</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import pprint
-from collections import defaultdict, Counter
-
-import pandas as pd
-
-from academic_crawler.config.state import ProgramState
-from academic_crawler.scrapers.templates import Organization, Person, Affiliation
-import requests
-import json
-
-
-# {&#39;instance&#39;:instance, &#39;type&#39;:&#39;ORGANIZATION&#39;, &#39;status&#39;:&#39;FULL&#39;}
-def process_scraped_org_structure_items(org_structure_items) -&gt; list[Organization]:
-    def get_status_code(url):
-        try:
-            return requests.get(url, timeout=5).status_code
-        except:
-            return 404
-    def filter_orgs(instances:list[Organization])-&gt;list[Organization]:
-        result = []
-        domain_dict = defaultdict(list)
-        for instance in instances:
-            if instance.parent.is_subdomain(instance.url):
-                domain_dict[instance.domain].append(instance)
-            else:
-                result.append(instance)
-
-        for domain,instances in domain_dict.items():
-            if len(instances) == 1:
-                result.append(instances[0])
-            else:
-                most_common_name = Counter([instance.name for instance in instances]).most_common(1)[0][0]
-                for instance in instances:
-                    if instance.name == most_common_name:
-                        result.append(instance)
-                        break
-
-        return result
-
-
-    result = []
-    for item in org_structure_items:
-        if item[&#39;type&#39;] == &#39;ORGANIZATION&#39;:
-            status_code = get_status_code(item[&#39;instance&#39;].url)
-            print(f&#34;Status code for {item[&#39;instance&#39;].url} is {status_code}&#34;)
-            if status_code == 200:
-                result.append(item[&#39;instance&#39;])
-    result = filter_orgs(result)
-    pprint.pprint(result)
-    return result
-&#34;&#34;&#34;
- try:
-        with open(&#39;orgs_graz.json&#39;, &#39;w&#39;) as f:
-            item_dicts = [item.to_dict() for item in result]
-            json.dump(item_dicts, f)
-    except Exception as e:
-        print(&#34;Error writing to file.&#34;)
-&#34;&#34;&#34;
-
-def process_scraped_people_items(people_items) -&gt; list[Person]:
-    result = []
-    for item in people_items:
-        person = item.get(&#39;person&#39;, None)
-        if person is None or len(person.name) == 0 or len(person.name) &gt; 50 or (not isinstance(person, Person)):
-            continue
-        person.add_implicit_affiliations()
-        result.append(person)
-    return result
-
-
-class ReferenceRawProcessor:
-    def __init__(self) -&gt; None:
-        super().__init__()
-
-    def process_root_organization(self, df: pd.DataFrame, cols=(&#39;university_1&#39;, &#39;division&#39;), meta=None):
-        df[&#39;organization&#39;] = meta
-        root_col = cols[0]
-        col_1_is_none = df[cols[0]].isna().all()
-        if col_1_is_none:
-            col_2_is_none = df[cols[1]].isna().all()
-            if col_2_is_none:
-                return None
-            else:
-                # drop column cols[0]
-                # df.drop(columns=cols[0],inplace=True)
-                root_col = cols[1]
-                return root_col
-        # set values for root_col to meta.name if  value is None
-        df[root_col].fillna(meta.name, inplace=True)
-        # if values for root_col != meta.name put these values into separata variable
-        separate_vals = df[df[root_col] != meta.name][root_col].unique().tolist()
-        if len(separate_vals) &gt; 0:
-            sub_orgs = {}
-            for value in separate_vals:
-                new_meta = Organization(name=value, url=&#34;&#34;, parent=meta, domain=&#34;&#34;)
-                sub_orgs[value] = new_meta
-            df[&#39;organization&#39;] = df[root_col].apply(lambda x: sub_orgs[x] if x in sub_orgs else meta)
-
-        # replace value &#39;organization&#39; column with Organization instance from sub_orgs
-
-        df.dropna(subset=[root_col], inplace=True)
-        # remove
-        val_count = df[root_col].value_counts().argmax()
-        print(f&#34;Root column is {root_col}&#34;)
-        print(f&#34;Value counts for root column are {val_count}&#34;)
-
-        pass
-
-    def process_affiliations(self, df: pd.DataFrame):
-        affiliations = []
-        df[&#39;affiliations&#39;] = None
-        # iterate over rows as dicts and create Affiliation instances
-        for index, row in df.iterrows():
-            affiliations = []
-            if row[&#39;division&#39;] is not None:
-                affiliation = Affiliation(division=row[&#39;division&#39;], position=row[&#39;role&#39;])
-                affiliations.append(affiliation)
-            # add it to the row in dataframe
-            df.at[index, &#39;affiliations&#39;] = affiliations
-        return affiliations
-
-    def process_people(self, df: pd.DataFrame):
-        people = []
-        df[&#39;person&#39;] = None
-        # iterate over rows as dicts and create Person instances
-        for index, row in df.iterrows():
-            person = Person(organization=row[&#39;organization&#39;], name=row[&#39;name&#39;])
-            person.affiliations = row[&#39;affiliations&#39;]
-            people.append(person)
-            df.at[index, &#39;person&#39;] = person
-        return people
-
-    def load_raw(self, path):
-        df_raw = pd.read_csv(path)
-        columns = [&#39;name&#39;, &#39;university_1&#39;, &#39;division&#39;, &#39;role&#39;]
-        df = df_raw.reindex(columns=columns, fill_value=None)
-        return df</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -173,73 +31,19 @@ class ReferenceRawProcessor:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="academic_crawler.helpers.processing.process_scraped_org_structure_items"><code class="name flex">
-<span>def <span class="ident">process_scraped_org_structure_items</span></span>(<span>org_structure_items) ‑> list[<a title="academic_crawler.scrapers.templates.Organization" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Organization">Organization</a>]</span>
+<span>def <span class="ident">process_scraped_org_structure_items</span></span>(<span>org_structure_items: list[dict]) ‑> list[<a title="academic_crawler.scrapers.templates.Organization" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Organization">Organization</a>]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_scraped_org_structure_items(org_structure_items) -&gt; list[Organization]:
-    def get_status_code(url):
-        try:
-            return requests.get(url, timeout=5).status_code
-        except:
-            return 404
-    def filter_orgs(instances:list[Organization])-&gt;list[Organization]:
-        result = []
-        domain_dict = defaultdict(list)
-        for instance in instances:
-            if instance.parent.is_subdomain(instance.url):
-                domain_dict[instance.domain].append(instance)
-            else:
-                result.append(instance)
-
-        for domain,instances in domain_dict.items():
-            if len(instances) == 1:
-                result.append(instances[0])
-            else:
-                most_common_name = Counter([instance.name for instance in instances]).most_common(1)[0][0]
-                for instance in instances:
-                    if instance.name == most_common_name:
-                        result.append(instance)
-                        break
-
-        return result
-
-
-    result = []
-    for item in org_structure_items:
-        if item[&#39;type&#39;] == &#39;ORGANIZATION&#39;:
-            status_code = get_status_code(item[&#39;instance&#39;].url)
-            print(f&#34;Status code for {item[&#39;instance&#39;].url} is {status_code}&#34;)
-            if status_code == 200:
-                result.append(item[&#39;instance&#39;])
-    result = filter_orgs(result)
-    pprint.pprint(result)
-    return result</code></pre>
-</details>
+<div class="desc"><p>This function processes the scraped Organization items and returns a list of Organization instances.</p>
+<h2 id="args">Args</h2>
+<p>org_structure_items:
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.helpers.processing.process_scraped_people_items"><code class="name flex">
 <span>def <span class="ident">process_scraped_people_items</span></span>(<span>people_items) ‑> list[<a title="academic_crawler.scrapers.templates.Person" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_scraped_people_items(people_items) -&gt; list[Person]:
-    result = []
-    for item in people_items:
-        person = item.get(&#39;person&#39;, None)
-        if person is None or len(person.name) == 0 or len(person.name) &gt; 50 or (not isinstance(person, Person)):
-            continue
-        person.add_implicit_affiliations()
-        result.append(person)
-    return result</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -250,79 +54,7 @@ class ReferenceRawProcessor:
 <span>class <span class="ident">ReferenceRawProcessor</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ReferenceRawProcessor:
-    def __init__(self) -&gt; None:
-        super().__init__()
-
-    def process_root_organization(self, df: pd.DataFrame, cols=(&#39;university_1&#39;, &#39;division&#39;), meta=None):
-        df[&#39;organization&#39;] = meta
-        root_col = cols[0]
-        col_1_is_none = df[cols[0]].isna().all()
-        if col_1_is_none:
-            col_2_is_none = df[cols[1]].isna().all()
-            if col_2_is_none:
-                return None
-            else:
-                # drop column cols[0]
-                # df.drop(columns=cols[0],inplace=True)
-                root_col = cols[1]
-                return root_col
-        # set values for root_col to meta.name if  value is None
-        df[root_col].fillna(meta.name, inplace=True)
-        # if values for root_col != meta.name put these values into separata variable
-        separate_vals = df[df[root_col] != meta.name][root_col].unique().tolist()
-        if len(separate_vals) &gt; 0:
-            sub_orgs = {}
-            for value in separate_vals:
-                new_meta = Organization(name=value, url=&#34;&#34;, parent=meta, domain=&#34;&#34;)
-                sub_orgs[value] = new_meta
-            df[&#39;organization&#39;] = df[root_col].apply(lambda x: sub_orgs[x] if x in sub_orgs else meta)
-
-        # replace value &#39;organization&#39; column with Organization instance from sub_orgs
-
-        df.dropna(subset=[root_col], inplace=True)
-        # remove
-        val_count = df[root_col].value_counts().argmax()
-        print(f&#34;Root column is {root_col}&#34;)
-        print(f&#34;Value counts for root column are {val_count}&#34;)
-
-        pass
-
-    def process_affiliations(self, df: pd.DataFrame):
-        affiliations = []
-        df[&#39;affiliations&#39;] = None
-        # iterate over rows as dicts and create Affiliation instances
-        for index, row in df.iterrows():
-            affiliations = []
-            if row[&#39;division&#39;] is not None:
-                affiliation = Affiliation(division=row[&#39;division&#39;], position=row[&#39;role&#39;])
-                affiliations.append(affiliation)
-            # add it to the row in dataframe
-            df.at[index, &#39;affiliations&#39;] = affiliations
-        return affiliations
-
-    def process_people(self, df: pd.DataFrame):
-        people = []
-        df[&#39;person&#39;] = None
-        # iterate over rows as dicts and create Person instances
-        for index, row in df.iterrows():
-            person = Person(organization=row[&#39;organization&#39;], name=row[&#39;name&#39;])
-            person.affiliations = row[&#39;affiliations&#39;]
-            people.append(person)
-            df.at[index, &#39;person&#39;] = person
-        return people
-
-    def load_raw(self, path):
-        df_raw = pd.read_csv(path)
-        columns = [&#39;name&#39;, &#39;university_1&#39;, &#39;division&#39;, &#39;role&#39;]
-        df = df_raw.reindex(columns=columns, fill_value=None)
-        return df</code></pre>
-</details>
+<div class="desc"><p>This class processes the raw reference data and returns a list of Organization instances.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.helpers.processing.ReferenceRawProcessor.load_raw"><code class="name flex">
@@ -330,104 +62,24 @@ class ReferenceRawProcessor:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_raw(self, path):
-    df_raw = pd.read_csv(path)
-    columns = [&#39;name&#39;, &#39;university_1&#39;, &#39;division&#39;, &#39;role&#39;]
-    df = df_raw.reindex(columns=columns, fill_value=None)
-    return df</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.processing.ReferenceRawProcessor.process_affiliations"><code class="name flex">
 <span>def <span class="ident">process_affiliations</span></span>(<span>self, df: pandas.core.frame.DataFrame)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_affiliations(self, df: pd.DataFrame):
-    affiliations = []
-    df[&#39;affiliations&#39;] = None
-    # iterate over rows as dicts and create Affiliation instances
-    for index, row in df.iterrows():
-        affiliations = []
-        if row[&#39;division&#39;] is not None:
-            affiliation = Affiliation(division=row[&#39;division&#39;], position=row[&#39;role&#39;])
-            affiliations.append(affiliation)
-        # add it to the row in dataframe
-        df.at[index, &#39;affiliations&#39;] = affiliations
-    return affiliations</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.processing.ReferenceRawProcessor.process_people"><code class="name flex">
 <span>def <span class="ident">process_people</span></span>(<span>self, df: pandas.core.frame.DataFrame)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_people(self, df: pd.DataFrame):
-    people = []
-    df[&#39;person&#39;] = None
-    # iterate over rows as dicts and create Person instances
-    for index, row in df.iterrows():
-        person = Person(organization=row[&#39;organization&#39;], name=row[&#39;name&#39;])
-        person.affiliations = row[&#39;affiliations&#39;]
-        people.append(person)
-        df.at[index, &#39;person&#39;] = person
-    return people</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.processing.ReferenceRawProcessor.process_root_organization"><code class="name flex">
 <span>def <span class="ident">process_root_organization</span></span>(<span>self, df: pandas.core.frame.DataFrame, cols=('university_1', 'division'), meta=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_root_organization(self, df: pd.DataFrame, cols=(&#39;university_1&#39;, &#39;division&#39;), meta=None):
-    df[&#39;organization&#39;] = meta
-    root_col = cols[0]
-    col_1_is_none = df[cols[0]].isna().all()
-    if col_1_is_none:
-        col_2_is_none = df[cols[1]].isna().all()
-        if col_2_is_none:
-            return None
-        else:
-            # drop column cols[0]
-            # df.drop(columns=cols[0],inplace=True)
-            root_col = cols[1]
-            return root_col
-    # set values for root_col to meta.name if  value is None
-    df[root_col].fillna(meta.name, inplace=True)
-    # if values for root_col != meta.name put these values into separata variable
-    separate_vals = df[df[root_col] != meta.name][root_col].unique().tolist()
-    if len(separate_vals) &gt; 0:
-        sub_orgs = {}
-        for value in separate_vals:
-            new_meta = Organization(name=value, url=&#34;&#34;, parent=meta, domain=&#34;&#34;)
-            sub_orgs[value] = new_meta
-        df[&#39;organization&#39;] = df[root_col].apply(lambda x: sub_orgs[x] if x in sub_orgs else meta)
-
-    # replace value &#39;organization&#39; column with Organization instance from sub_orgs
-
-    df.dropna(subset=[root_col], inplace=True)
-    # remove
-    val_count = df[root_col].value_counts().argmax()
-    print(f&#34;Root column is {root_col}&#34;)
-    print(f&#34;Value counts for root column are {val_count}&#34;)
-
-    pass</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

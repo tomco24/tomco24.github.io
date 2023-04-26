@@ -22,75 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.spiders.weblinks</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import re
-from scrapy.linkextractors import LinkExtractor
-from scrapy.spiders import CrawlSpider, Rule
-from w3lib.url import url_query_cleaner
-
-
-def process_links(links):
-    for link in links:
-        link.url = url_query_cleaner(link.url)
-        yield link
-
-
-class WeblinksSpider(CrawlSpider):
-    name = &#39;weblinks&#39;
-    allowed_domains = [&#39;fit.cvut.cz&#39;]
-    start_urls = [&#39;http://fit.cvut.cz/&#39;]
-    base_url = &#39;http://fit.cvut.cz&#39;
-
-    custom_settings = {
-        # in order to reduce the risk of getting blocked
-        # &#39;DOWNLOADER_MIDDLEWARES&#39;: {&#39;academic_crawler.middlewares.RotateUserAgentMiddleware&#39;: 400,},
-        &#39;COOKIES_ENABLED&#39;: False,
-        &#39;CONCURRENT_REQUESTS&#39;: 6,
-        &#39;DOWNLOAD_DELAY&#39;: 2,
-
-        # This settings are a must:
-
-        # Duplicates pipeline
-        &#39;ITEM_PIPELINES&#39;: {&#39;academic_crawler.pipelines.DuplicatesPipeline&#39;: 300,
-                           &#39;academic_crawler.pipelines.AnalyticPipeLine&#39;: 200},
-
-        # In order to create a CSV file:
-        &#39;FEEDS&#39;: {&#39;csv_file.csv&#39;: {&#39;format&#39;: &#39;csv&#39;}}
-    }
-
-    rules = (
-        Rule(
-            LinkExtractor(allow_domains=&#39;fit.cvut.cz&#39;),
-            process_links=process_links,
-            callback=&#39;parse_item&#39;,
-            follow=True
-        ),
-    )
-
-    def parse(self, response):
-        LinkExtractor(allow_domains=&#39;fit.cvut.cz&#39;),
-
-    def parse_item(self, response):
-        yield {
-            &#39;url&#39;: response.url
-        }
-
-        # see if you really need this loop (since you&#39;re parsing all the urls in the domain anyway, and you&#39;ll need
-        # to filter all those duplicates):
-
-        all_urls = response.css(&#39;a::attr(href)&#39;).getall()
-
-        # In order to change from relative to absolute url in the pipeline:
-        self.base_url = response.url
-
-        # for url in all_urls:
-        #    yield {
-        #       &#39;url&#39;: url
-        #   }</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -104,15 +35,6 @@ class WeblinksSpider(CrawlSpider):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_links(links):
-    for link in links:
-        link.url = url_query_cleaner(link.url)
-        yield link</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -126,63 +48,6 @@ class WeblinksSpider(CrawlSpider):
 <dd>
 <div class="desc"><p>Base class for scrapy spiders. All spiders must inherit from this
 class.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class WeblinksSpider(CrawlSpider):
-    name = &#39;weblinks&#39;
-    allowed_domains = [&#39;fit.cvut.cz&#39;]
-    start_urls = [&#39;http://fit.cvut.cz/&#39;]
-    base_url = &#39;http://fit.cvut.cz&#39;
-
-    custom_settings = {
-        # in order to reduce the risk of getting blocked
-        # &#39;DOWNLOADER_MIDDLEWARES&#39;: {&#39;academic_crawler.middlewares.RotateUserAgentMiddleware&#39;: 400,},
-        &#39;COOKIES_ENABLED&#39;: False,
-        &#39;CONCURRENT_REQUESTS&#39;: 6,
-        &#39;DOWNLOAD_DELAY&#39;: 2,
-
-        # This settings are a must:
-
-        # Duplicates pipeline
-        &#39;ITEM_PIPELINES&#39;: {&#39;academic_crawler.pipelines.DuplicatesPipeline&#39;: 300,
-                           &#39;academic_crawler.pipelines.AnalyticPipeLine&#39;: 200},
-
-        # In order to create a CSV file:
-        &#39;FEEDS&#39;: {&#39;csv_file.csv&#39;: {&#39;format&#39;: &#39;csv&#39;}}
-    }
-
-    rules = (
-        Rule(
-            LinkExtractor(allow_domains=&#39;fit.cvut.cz&#39;),
-            process_links=process_links,
-            callback=&#39;parse_item&#39;,
-            follow=True
-        ),
-    )
-
-    def parse(self, response):
-        LinkExtractor(allow_domains=&#39;fit.cvut.cz&#39;),
-
-    def parse_item(self, response):
-        yield {
-            &#39;url&#39;: response.url
-        }
-
-        # see if you really need this loop (since you&#39;re parsing all the urls in the domain anyway, and you&#39;ll need
-        # to filter all those duplicates):
-
-        all_urls = response.css(&#39;a::attr(href)&#39;).getall()
-
-        # In order to change from relative to absolute url in the pipeline:
-        self.base_url = response.url
-
-        # for url in all_urls:
-        #    yield {
-        #       &#39;url&#39;: url
-        #   }</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scrapy.spiders.crawl.CrawlSpider</li>
@@ -223,41 +88,12 @@ class.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse(self, response):
-    LinkExtractor(allow_domains=&#39;fit.cvut.cz&#39;),</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.weblinks.WeblinksSpider.parse_item"><code class="name flex">
 <span>def <span class="ident">parse_item</span></span>(<span>self, response)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_item(self, response):
-    yield {
-        &#39;url&#39;: response.url
-    }
-
-    # see if you really need this loop (since you&#39;re parsing all the urls in the domain anyway, and you&#39;ll need
-    # to filter all those duplicates):
-
-    all_urls = response.css(&#39;a::attr(href)&#39;).getall()
-
-    # In order to change from relative to absolute url in the pipeline:
-    self.base_url = response.url
-
-    # for url in all_urls:
-    #    yield {
-    #       &#39;url&#39;: url
-    #   }</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

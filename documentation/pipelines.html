@@ -22,107 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.pipelines</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python"># Define your item pipelines here
-#
-# Don&#39;t forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import logging
-from pprint import pprint
-
-from dataclass_wizard import asdict
-# useful for handling different item types with a single interface
-from scrapy.exceptions import DropItem
-
-from academic_crawler.scrapers.manager import ScrapingManager
-from academic_crawler.scrapers.templates import Person, Organization
-import json
-
-from itemadapter import ItemAdapter
-class AcademicSpiderPipeline:
-    def __init__(self):
-        self.manager:ScrapingManager = None
-    def open_spider(self, spider):
-        self.manager:ScrapingManager = ScrapingManager(spider)
-        spider.scraping_manager = self.manager
-
-    def process_item(self, item, spider):
-        type_ = item.get(&#34;type&#34;)
-        if type_ == &#34;person&#34;:
-            person:Person = item.get(&#34;data&#34;)
-            self.manager.add_person(person)
-        elif type_ == &#34;org&#34;:
-            org:Organization = item.get(&#34;data&#34;)
-            self.manager.add_org(org)
-        elif type_ == &#34;people_page&#34;:
-            pass
-        elif type_ == &#34;org_page&#34;:
-            pass
-        else:
-            return item
-        return item
-
-    def close_spider(self, spider):
-        pass
-class JsonWriterPipeline:
-
-    def open_spider(self, spider):
-        filename = spider.name or &#39;items&#39;
-        self.file = open(&#39;{}.jsonl&#39;.format(filename), &#39;w&#39;)
-
-    def close_spider(self, spider):
-        logging.info(f&#34;Pipeline: Writing results to file.&#34;)
-        pprint(spider.scraping_manager.results[&#39;people&#39;])
-        self.file.close()
-
-    def process_item(self, item, spider):
-        line = item[&#39;person&#39;].to_json() + &#34;\n&#34;
-        logging.info(f&#34;Pipeline: Writing item {line} .&#34;)
-        self.file.write(line)
-        return item
-
-
-class PersonPagePipeline:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.scraper = NaiveScraper(config)
-
-    def process_item(self, item, spider):
-        manager = item.get(&#34;manager&#34;)
-        response = item.get(&#34;response&#34;)
-        pattern_matcher = item.get(&#34;pattern_matcher&#34;)
-        result = self.scraper.scrape(response, manager)
-        if len(result.get(&#39;affiliation&#39;,[])) == 0:
-            logging.info(f&#34;Dropping item {result} .&#34;)
-            raise DropItem(&#34;No affiliation found!&#34;)
-        url = manager.link.url
-        pattern_matcher.add_pattern(url)
-
-        return result
-
-
-class DuplicatesPipeline:
-    def __init__(self):
-        self.scraped_urls = set()
-
-    def process_item(self, item, spider):
-        url = item[&#39;url&#39;].strip()
-
-        # if it&#39;s a relative url then convert to absolute url
-        if &#39;http&#39; not in url:
-            url = spider.base_url + url
-            item[&#39;url&#39;] = url
-
-        if url in self.scraped_urls:
-            raise DropItem(f&#39;Duplicate url: \&#34;{url}\&#34;&#39;)
-        else:
-            self.scraped_urls.add(url)
-            return item</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -138,36 +37,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AcademicSpiderPipeline:
-    def __init__(self):
-        self.manager:ScrapingManager = None
-    def open_spider(self, spider):
-        self.manager:ScrapingManager = ScrapingManager(spider)
-        spider.scraping_manager = self.manager
-
-    def process_item(self, item, spider):
-        type_ = item.get(&#34;type&#34;)
-        if type_ == &#34;person&#34;:
-            person:Person = item.get(&#34;data&#34;)
-            self.manager.add_person(person)
-        elif type_ == &#34;org&#34;:
-            org:Organization = item.get(&#34;data&#34;)
-            self.manager.add_org(org)
-        elif type_ == &#34;people_page&#34;:
-            pass
-        elif type_ == &#34;org_page&#34;:
-            pass
-        else:
-            return item
-        return item
-
-    def close_spider(self, spider):
-        pass</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.pipelines.AcademicSpiderPipeline.close_spider"><code class="name flex">
@@ -175,53 +44,18 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def close_spider(self, spider):
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.pipelines.AcademicSpiderPipeline.open_spider"><code class="name flex">
 <span>def <span class="ident">open_spider</span></span>(<span>self, spider)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def open_spider(self, spider):
-    self.manager:ScrapingManager = ScrapingManager(spider)
-    spider.scraping_manager = self.manager</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.pipelines.AcademicSpiderPipeline.process_item"><code class="name flex">
 <span>def <span class="ident">process_item</span></span>(<span>self, item, spider)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_item(self, item, spider):
-    type_ = item.get(&#34;type&#34;)
-    if type_ == &#34;person&#34;:
-        person:Person = item.get(&#34;data&#34;)
-        self.manager.add_person(person)
-    elif type_ == &#34;org&#34;:
-        org:Organization = item.get(&#34;data&#34;)
-        self.manager.add_org(org)
-    elif type_ == &#34;people_page&#34;:
-        pass
-    elif type_ == &#34;org_page&#34;:
-        pass
-    else:
-        return item
-    return item</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -230,28 +64,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class DuplicatesPipeline:
-    def __init__(self):
-        self.scraped_urls = set()
-
-    def process_item(self, item, spider):
-        url = item[&#39;url&#39;].strip()
-
-        # if it&#39;s a relative url then convert to absolute url
-        if &#39;http&#39; not in url:
-            url = spider.base_url + url
-            item[&#39;url&#39;] = url
-
-        if url in self.scraped_urls:
-            raise DropItem(f&#39;Duplicate url: \&#34;{url}\&#34;&#39;)
-        else:
-            self.scraped_urls.add(url)
-            return item</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.pipelines.DuplicatesPipeline.process_item"><code class="name flex">
@@ -259,24 +71,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_item(self, item, spider):
-    url = item[&#39;url&#39;].strip()
-
-    # if it&#39;s a relative url then convert to absolute url
-    if &#39;http&#39; not in url:
-        url = spider.base_url + url
-        item[&#39;url&#39;] = url
-
-    if url in self.scraped_urls:
-        raise DropItem(f&#39;Duplicate url: \&#34;{url}\&#34;&#39;)
-    else:
-        self.scraped_urls.add(url)
-        return item</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -285,27 +79,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class JsonWriterPipeline:
-
-    def open_spider(self, spider):
-        filename = spider.name or &#39;items&#39;
-        self.file = open(&#39;{}.jsonl&#39;.format(filename), &#39;w&#39;)
-
-    def close_spider(self, spider):
-        logging.info(f&#34;Pipeline: Writing results to file.&#34;)
-        pprint(spider.scraping_manager.results[&#39;people&#39;])
-        self.file.close()
-
-    def process_item(self, item, spider):
-        line = item[&#39;person&#39;].to_json() + &#34;\n&#34;
-        logging.info(f&#34;Pipeline: Writing item {line} .&#34;)
-        self.file.write(line)
-        return item</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.pipelines.JsonWriterPipeline.close_spider"><code class="name flex">
@@ -313,45 +86,18 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def close_spider(self, spider):
-    logging.info(f&#34;Pipeline: Writing results to file.&#34;)
-    pprint(spider.scraping_manager.results[&#39;people&#39;])
-    self.file.close()</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.pipelines.JsonWriterPipeline.open_spider"><code class="name flex">
 <span>def <span class="ident">open_spider</span></span>(<span>self, spider)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def open_spider(self, spider):
-    filename = spider.name or &#39;items&#39;
-    self.file = open(&#39;{}.jsonl&#39;.format(filename), &#39;w&#39;)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.pipelines.JsonWriterPipeline.process_item"><code class="name flex">
 <span>def <span class="ident">process_item</span></span>(<span>self, item, spider)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_item(self, item, spider):
-    line = item[&#39;person&#39;].to_json() + &#34;\n&#34;
-    logging.info(f&#34;Pipeline: Writing item {line} .&#34;)
-    self.file.write(line)
-    return item</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -360,29 +106,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PersonPagePipeline:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.scraper = NaiveScraper(config)
-
-    def process_item(self, item, spider):
-        manager = item.get(&#34;manager&#34;)
-        response = item.get(&#34;response&#34;)
-        pattern_matcher = item.get(&#34;pattern_matcher&#34;)
-        result = self.scraper.scrape(response, manager)
-        if len(result.get(&#39;affiliation&#39;,[])) == 0:
-            logging.info(f&#34;Dropping item {result} .&#34;)
-            raise DropItem(&#34;No affiliation found!&#34;)
-        url = manager.link.url
-        pattern_matcher.add_pattern(url)
-
-        return result</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.pipelines.PersonPagePipeline.process_item"><code class="name flex">
@@ -390,23 +113,6 @@ class DuplicatesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def process_item(self, item, spider):
-    manager = item.get(&#34;manager&#34;)
-    response = item.get(&#34;response&#34;)
-    pattern_matcher = item.get(&#34;pattern_matcher&#34;)
-    result = self.scraper.scrape(response, manager)
-    if len(result.get(&#39;affiliation&#39;,[])) == 0:
-        logging.info(f&#34;Dropping item {result} .&#34;)
-        raise DropItem(&#34;No affiliation found!&#34;)
-    url = manager.link.url
-    pattern_matcher.add_pattern(url)
-
-    return result</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

@@ -22,44 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.predefined</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class DataStructureManager:
-
-    @staticmethod
-    def get_name_data_structure():
-        return {
-            &#34;name&#34;: None,
-            &#34;affiliation&#34;: None,
-            &#34;email&#34;: None,
-        }
-
-
-keywords_structure_tags = {&#39;ul&#39;: 90, &#39;table&#39;: 100, &#39;dl&#39;: 100, &#34;div&#34;: 50, &#34;td&#34;: 40, &#34;tr&#34;: 40, &#34;dt&#34;: 40, &#34;dd&#34;: 40}
-
-keywords_key_affiliation = [&#39;email&#39;, &#39;e-mail&#39;, &#39;mail&#39;, &#39;employee&#39;, &#39;student&#39;, &#39;department&#39;, &#39;zaměstnanec&#39;,
-                            &#39;spolupracovník&#39;, &#39;vedoucí&#39;,&#39;position&#39;, &#39;role&#39;,&#39;professor&#39;,&#39;docent&#39;,&#39;assistant&#39;,&#39;lecturer&#39;,&#39;teacher&#39;,&#39;asistent&#39;,&#39;position&#39;,&#39;title&#39;]
-
-keywords_affiliation_map ={
-    &#34;contact&#34;:[&#39;email&#39;, &#39;e-mail&#39;, &#39;mail&#39;],
-    &#34;position&#34;:[&#39;employee&#39;,&#39;lecturer&#39;,&#39;professor&#39;,&#39;teacher&#39;,&#39;assistant&#39;,&#39;associate&#39;,&#39;docent&#39;]
-}
-
-keywords_person_structure_positive = [&#34;people&#34;, &#34;organization&#34;, &#34;department&#34;, &#34;persons&#34;, &#34;person&#34;, &#34;structure&#34;,&#34;professor&#34;,&#34;profile&#34;]
-keywords_person_structure_negative = [&#39;student&#39;, &#39;applicant&#39;, &#39;studies&#39;, &#39;cooperation&#39;, &#39;study&#39;, &#39;applicant&#39;]
-
-keywords_map = {
-    &#34;keywords_work_position&#34;: (
-    &#39;professor&#39;, &#39;lecturer&#39;, &#39;teacher&#39;, &#39;instructor&#39;, &#39;assistant professor&#39;, &#39;associate professor&#39;, &#39;dean&#39;,
-    &#39;researcher&#39;, &#39;scientist&#39;, &#39;manager&#39;,&#39;employee&#39;,&#39;member&#39;),
-    &#34;keywords_org_structure&#34;: (
-    &#39;department&#39;, &#39;faculty&#39;, &#39;school&#39;, &#39;college&#39;, &#39;institute&#39;, &#39;center&#39;, &#39;unit&#39;, &#39;division&#39;, &#39;office&#39;,&#39;structure&#39;),
-    &#34;keywords_people_page&#34;:(&#39;people&#39;,&#39;organization&#39;,&#39;persons&#39;,&#39;staff&#39;,&#39;structure&#39;,&#39;employees&#39;),
-    &#34;keywords_negative_page&#34;: (&#39;publications&#39;, &#39;events&#39;, &#39;news&#39;, &#39;press releases&#39;, &#39;announcements&#39;, &#39;advertisements&#39;, &#39;promotions&#39;, &#39;fundraising&#39;, &#39;donations&#39;, &#39;grants&#39;, &#39;scholarships&#39;, &#39;awards&#39;, &#39;alumni&#39;, &#39;outreach&#39;, &#39;community engagement&#39;, &#39;partnership&#39;)
-}</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -75,20 +37,6 @@ keywords_map = {
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class DataStructureManager:
-
-    @staticmethod
-    def get_name_data_structure():
-        return {
-            &#34;name&#34;: None,
-            &#34;affiliation&#34;: None,
-            &#34;email&#34;: None,
-        }</code></pre>
-</details>
 <h3>Static methods</h3>
 <dl>
 <dt id="academic_crawler.config.predefined.DataStructureManager.get_name_data_structure"><code class="name flex">
@@ -96,18 +44,6 @@ keywords_map = {
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def get_name_data_structure():
-    return {
-        &#34;name&#34;: None,
-        &#34;affiliation&#34;: None,
-        &#34;email&#34;: None,
-    }</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

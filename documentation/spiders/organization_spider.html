@@ -22,143 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.spiders.organization_spider</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import re
-
-import scrapy
-from scrapy import Request
-from scrapy.spiders import Rule, CrawlSpider
-from w3lib.url import url_query_cleaner
-from scrapy.linkextractors import LinkExtractor
-from .academic_spider import AcademicSpider
-from ..config.page_types import PAGE_TYPE
-from ..config.utils import save_graph
-from ..helpers.web_search import get_search_query_domains
-
-from ..heuristics.links import LinkManager, UrlPatternMatcher
-from academic_crawler.config.history import LinkHistory
-from academic_crawler.config.site_tree import SiteTreeManager
-import logging
-from academic_crawler.controllers.organization import StatesOrganization
-from scrapy_splash import SplashRequest
-from academic_crawler.heuristics.page_features.pipeline import PageFeaturesPipeline
-from ..scrapers.org_structure import OrgStructureScraper
-
-
-class OrganizationSpider(AcademicSpider):
-    name = &#39;OrganizationSpider&#39;
-    custom_settings = {
-        &#39;ITEM_PIPELINES&#39;: {
-        },
-    }
-
-    def __init__(self, *a, **kw):
-        super().__init__(*a, **kw)
-        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
-
-        self.scraper = OrgStructureScraper()
-        self.setup_state_callback_map()
-
-        self.next_state()
-
-    def setup_state_callback_map(self):
-        self.state_callback_map = {
-            StatesOrganization.PARSE_HOME_LINKS:self.parse_home,
-            StatesOrganization.PARSE_CANDIDATES:self.parse_candidate,
-
-        }
-
-
-
-    def start_requests(self):
-        if len(self.start_urls) == 0:
-            return []
-        url = self.start_urls[0]
-        yield SplashRequest(url, self.get_state_callback(), args={&#39;wait&#39;: 1.5})
-
-    def parse_home(self, response, **kwargs):
-        logging.info(f&#34;Starting to scrape home page of domain{ self.allowed_domains[0]}&#34;)
-        managers = self.get_page_links(response,{})
-        candidates = []
-        for manager in managers:
-            if manager.keyword_entity_match(self.detectors.get(&#39;keyword_category&#39;),&#34;keywords_org_structure&#34;):
-                if len(manager.get_referer_text_tokens()) &lt;=5:
-                    candidates.append(manager)
-
-        if len(candidates)&gt;0:
-            self.next_state()
-            i = len(candidates) +1
-            for manager in candidates:
-                i -=1
-                yield SplashRequest(manager.link.url,self.get_state_callback(),args={&#39;wait&#39;: 1.5},priority=i)
-        else:
-            self.next_state(False)
-
-    def parse_candidate(self,response,**kwargs):
-        &#34;&#34;&#34;
-        This method tries to extract Organization instances from the given response page
-        Args:
-            response:
-            **kwargs:
-
-        Returns:
-
-        &#34;&#34;&#34;
-        self.generate_page_header(response, prune_tree=False)
-        pipeline = PageFeaturesPipeline(self.program_state)
-        page_type = pipeline.execute()
-        if page_type != PAGE_TYPE.PAGE_ORGANIZATIONS:
-            return
-        #save_graph(self.program_state.get_page(&#34;tree&#34;),self.program_state.get_page(&#34;title&#34;)+&#34;.gexf&#34;)
-        candidate = {
-            &#34;page_type&#34;:page_type,
-            &#34;state&#34;:self.program_state,
-        }
-        instances =self.scraper.scrape(candidate)
-        if len(instances)&gt;0:
-            internal_instances = instances.get(&#34;internal&#34;)
-            for instance in internal_instances:
-                yield SplashRequest(instance.url, self.look_for_subdomain_link, args={&#34;wait&#34;:1.5}, meta={&#34;instance&#34;:instance})
-            children_instances = instances.get(&#34;children&#34;)
-            for instance in children_instances:
-                yield {&#39;instance&#39;:instance, &#39;type&#39;:&#39;ORGANIZATION&#39;, &#39;status&#39;:&#39;FULL&#39;}
-
-    def look_for_subdomain_link(self,response):
-        &#34;&#34;&#34;
-        This method tries to find a link to the subdomain of the Organization instance
-        Args:
-            response:
-
-        Returns:
-
-        &#34;&#34;&#34;
-        instance = response.meta.get(&#34;instance&#34;)
-        managers = self.get_page_links(response,{})
-        parent_org = self.program_state.get_domain(&#34;organization&#34;)
-        search_query = f&#34;{parent_org.name} - {instance.name}&#34;
-        web_search_domains = get_search_query_domains(search_query)
-        most_likely_domain = web_search_domains.most_common(1)[0][0]
-        logging.warning(f&#34;Most likely domain for {search_query} is {most_likely_domain} with {web_search_domains.most_common(1)[0][1]} results&#34;)
-        candidates = []
-        for manager in managers:
-            if parent_org.is_subdomain(manager.link.url) and most_likely_domain in manager.link.url:
-                logging.info(
-                    f&#34;Checking link {manager.link.url} for subdomain of {parent_org.name} ({parent_org.domain})&#34;)
-                candidates.append(manager)
-        candidates_filtered = [candidate for candidate in candidates if &#39;en&#39; in candidate.link.url]  # TODO BETTER FIX
-        if len(candidates_filtered) &gt; 0:
-            candidates_sorted = sorted(candidates_filtered, key=lambda x: len(x.link.url))
-            manager = candidates_sorted[0]
-            instance.url = manager.link.url
-            instance.domain = manager.url.host
-            self.scraper.add_instance(instance)
-            yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}
-        else:
-            yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -174,122 +37,7 @@ class OrganizationSpider(AcademicSpider):
 <span>(</span><span>*a, **kw)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base class for all spiders from this component.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OrganizationSpider(AcademicSpider):
-    name = &#39;OrganizationSpider&#39;
-    custom_settings = {
-        &#39;ITEM_PIPELINES&#39;: {
-        },
-    }
-
-    def __init__(self, *a, **kw):
-        super().__init__(*a, **kw)
-        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
-
-        self.scraper = OrgStructureScraper()
-        self.setup_state_callback_map()
-
-        self.next_state()
-
-    def setup_state_callback_map(self):
-        self.state_callback_map = {
-            StatesOrganization.PARSE_HOME_LINKS:self.parse_home,
-            StatesOrganization.PARSE_CANDIDATES:self.parse_candidate,
-
-        }
-
-
-
-    def start_requests(self):
-        if len(self.start_urls) == 0:
-            return []
-        url = self.start_urls[0]
-        yield SplashRequest(url, self.get_state_callback(), args={&#39;wait&#39;: 1.5})
-
-    def parse_home(self, response, **kwargs):
-        logging.info(f&#34;Starting to scrape home page of domain{ self.allowed_domains[0]}&#34;)
-        managers = self.get_page_links(response,{})
-        candidates = []
-        for manager in managers:
-            if manager.keyword_entity_match(self.detectors.get(&#39;keyword_category&#39;),&#34;keywords_org_structure&#34;):
-                if len(manager.get_referer_text_tokens()) &lt;=5:
-                    candidates.append(manager)
-
-        if len(candidates)&gt;0:
-            self.next_state()
-            i = len(candidates) +1
-            for manager in candidates:
-                i -=1
-                yield SplashRequest(manager.link.url,self.get_state_callback(),args={&#39;wait&#39;: 1.5},priority=i)
-        else:
-            self.next_state(False)
-
-    def parse_candidate(self,response,**kwargs):
-        &#34;&#34;&#34;
-        This method tries to extract Organization instances from the given response page
-        Args:
-            response:
-            **kwargs:
-
-        Returns:
-
-        &#34;&#34;&#34;
-        self.generate_page_header(response, prune_tree=False)
-        pipeline = PageFeaturesPipeline(self.program_state)
-        page_type = pipeline.execute()
-        if page_type != PAGE_TYPE.PAGE_ORGANIZATIONS:
-            return
-        #save_graph(self.program_state.get_page(&#34;tree&#34;),self.program_state.get_page(&#34;title&#34;)+&#34;.gexf&#34;)
-        candidate = {
-            &#34;page_type&#34;:page_type,
-            &#34;state&#34;:self.program_state,
-        }
-        instances =self.scraper.scrape(candidate)
-        if len(instances)&gt;0:
-            internal_instances = instances.get(&#34;internal&#34;)
-            for instance in internal_instances:
-                yield SplashRequest(instance.url, self.look_for_subdomain_link, args={&#34;wait&#34;:1.5}, meta={&#34;instance&#34;:instance})
-            children_instances = instances.get(&#34;children&#34;)
-            for instance in children_instances:
-                yield {&#39;instance&#39;:instance, &#39;type&#39;:&#39;ORGANIZATION&#39;, &#39;status&#39;:&#39;FULL&#39;}
-
-    def look_for_subdomain_link(self,response):
-        &#34;&#34;&#34;
-        This method tries to find a link to the subdomain of the Organization instance
-        Args:
-            response:
-
-        Returns:
-
-        &#34;&#34;&#34;
-        instance = response.meta.get(&#34;instance&#34;)
-        managers = self.get_page_links(response,{})
-        parent_org = self.program_state.get_domain(&#34;organization&#34;)
-        search_query = f&#34;{parent_org.name} - {instance.name}&#34;
-        web_search_domains = get_search_query_domains(search_query)
-        most_likely_domain = web_search_domains.most_common(1)[0][0]
-        logging.warning(f&#34;Most likely domain for {search_query} is {most_likely_domain} with {web_search_domains.most_common(1)[0][1]} results&#34;)
-        candidates = []
-        for manager in managers:
-            if parent_org.is_subdomain(manager.link.url) and most_likely_domain in manager.link.url:
-                logging.info(
-                    f&#34;Checking link {manager.link.url} for subdomain of {parent_org.name} ({parent_org.domain})&#34;)
-                candidates.append(manager)
-        candidates_filtered = [candidate for candidate in candidates if &#39;en&#39; in candidate.link.url]  # TODO BETTER FIX
-        if len(candidates_filtered) &gt; 0:
-            candidates_sorted = sorted(candidates_filtered, key=lambda x: len(x.link.url))
-            manager = candidates_sorted[0]
-            instance.url = manager.link.url
-            instance.domain = manager.url.host
-            self.scraper.add_instance(instance)
-            yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}
-        else:
-            yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}</code></pre>
-</details>
+<div class="desc"><p>This spider is responsible for extracting organization information from main website of a given domain.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.spiders.academic_spider.AcademicSpider" href="academic_spider.html#academic_crawler.spiders.academic_spider.AcademicSpider">AcademicSpider</a></li>
@@ -320,149 +68,34 @@ class OrganizationSpider(AcademicSpider):
 <dd>
 <div class="desc"><p>This method tries to find a link to the subdomain of the Organization instance</p>
 <h2 id="args">Args</h2>
-<p>response:
-Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def look_for_subdomain_link(self,response):
-    &#34;&#34;&#34;
-    This method tries to find a link to the subdomain of the Organization instance
-    Args:
-        response:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    instance = response.meta.get(&#34;instance&#34;)
-    managers = self.get_page_links(response,{})
-    parent_org = self.program_state.get_domain(&#34;organization&#34;)
-    search_query = f&#34;{parent_org.name} - {instance.name}&#34;
-    web_search_domains = get_search_query_domains(search_query)
-    most_likely_domain = web_search_domains.most_common(1)[0][0]
-    logging.warning(f&#34;Most likely domain for {search_query} is {most_likely_domain} with {web_search_domains.most_common(1)[0][1]} results&#34;)
-    candidates = []
-    for manager in managers:
-        if parent_org.is_subdomain(manager.link.url) and most_likely_domain in manager.link.url:
-            logging.info(
-                f&#34;Checking link {manager.link.url} for subdomain of {parent_org.name} ({parent_org.domain})&#34;)
-            candidates.append(manager)
-    candidates_filtered = [candidate for candidate in candidates if &#39;en&#39; in candidate.link.url]  # TODO BETTER FIX
-    if len(candidates_filtered) &gt; 0:
-        candidates_sorted = sorted(candidates_filtered, key=lambda x: len(x.link.url))
-        manager = candidates_sorted[0]
-        instance.url = manager.link.url
-        instance.domain = manager.url.host
-        self.scraper.add_instance(instance)
-        yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}
-    else:
-        yield {&#39;instance&#39;: instance, &#39;type&#39;: &#39;ORGANIZATION&#39;, &#39;status&#39;: &#39;FULL&#39;}</code></pre>
-</details>
+<p>response:</p></div>
 </dd>
 <dt id="academic_crawler.spiders.organization_spider.OrganizationSpider.parse_candidate"><code class="name flex">
-<span>def <span class="ident">parse_candidate</span></span>(<span>self, response, **kwargs)</span>
+<span>def <span class="ident">parse_candidate</span></span>(<span>self, response)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>This method tries to extract Organization instances from the given response page</p>
 <h2 id="args">Args</h2>
 <p>response:
-**kwargs:
-Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_candidate(self,response,**kwargs):
-    &#34;&#34;&#34;
-    This method tries to extract Organization instances from the given response page
-    Args:
-        response:
-        **kwargs:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    self.generate_page_header(response, prune_tree=False)
-    pipeline = PageFeaturesPipeline(self.program_state)
-    page_type = pipeline.execute()
-    if page_type != PAGE_TYPE.PAGE_ORGANIZATIONS:
-        return
-    #save_graph(self.program_state.get_page(&#34;tree&#34;),self.program_state.get_page(&#34;title&#34;)+&#34;.gexf&#34;)
-    candidate = {
-        &#34;page_type&#34;:page_type,
-        &#34;state&#34;:self.program_state,
-    }
-    instances =self.scraper.scrape(candidate)
-    if len(instances)&gt;0:
-        internal_instances = instances.get(&#34;internal&#34;)
-        for instance in internal_instances:
-            yield SplashRequest(instance.url, self.look_for_subdomain_link, args={&#34;wait&#34;:1.5}, meta={&#34;instance&#34;:instance})
-        children_instances = instances.get(&#34;children&#34;)
-        for instance in children_instances:
-            yield {&#39;instance&#39;:instance, &#39;type&#39;:&#39;ORGANIZATION&#39;, &#39;status&#39;:&#39;FULL&#39;}</code></pre>
-</details>
+**kwargs:</p></div>
 </dd>
 <dt id="academic_crawler.spiders.organization_spider.OrganizationSpider.parse_home"><code class="name flex">
 <span>def <span class="ident">parse_home</span></span>(<span>self, response, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_home(self, response, **kwargs):
-    logging.info(f&#34;Starting to scrape home page of domain{ self.allowed_domains[0]}&#34;)
-    managers = self.get_page_links(response,{})
-    candidates = []
-    for manager in managers:
-        if manager.keyword_entity_match(self.detectors.get(&#39;keyword_category&#39;),&#34;keywords_org_structure&#34;):
-            if len(manager.get_referer_text_tokens()) &lt;=5:
-                candidates.append(manager)
-
-    if len(candidates)&gt;0:
-        self.next_state()
-        i = len(candidates) +1
-        for manager in candidates:
-            i -=1
-            yield SplashRequest(manager.link.url,self.get_state_callback(),args={&#39;wait&#39;: 1.5},priority=i)
-    else:
-        self.next_state(False)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.organization_spider.OrganizationSpider.setup_state_callback_map"><code class="name flex">
 <span>def <span class="ident">setup_state_callback_map</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def setup_state_callback_map(self):
-    self.state_callback_map = {
-        StatesOrganization.PARSE_HOME_LINKS:self.parse_home,
-        StatesOrganization.PARSE_CANDIDATES:self.parse_candidate,
-
-    }</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.organization_spider.OrganizationSpider.start_requests"><code class="name flex">
 <span>def <span class="ident">start_requests</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def start_requests(self):
-    if len(self.start_urls) == 0:
-        return []
-    url = self.start_urls[0]
-    yield SplashRequest(url, self.get_state_callback(), args={&#39;wait&#39;: 1.5})</code></pre>
-</details>
 </dd>
 </dl>
 <h3>Inherited members</h3>

@@ -22,106 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.strategies.single_person</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import logging
-from pprint import pprint
-
-from . import BaseScrapingStrategy
-from ..operations.people import confirm_name_on_single_page, extract_affiliations_candidates_from_single_page, \
-    filter_affiliation_candidates, extract_affiliation_elements, get_siblings_for_tag
-from ...config.page_types import PAGE_TYPE
-from ...config.utils import get_relabeled_tree
-from ..operations import op_success
-from ...heuristics.tree import SemanticNode
-
-
-class SinglePersonStrategy(BaseScrapingStrategy):
-
-
-    def __init__(self,input_data,patterns) -&gt; None:
-        super().__init__()
-        self.patterns = patterns
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.page_type: PAGE_TYPE = input_data.get(&#34;page_type&#34;)
-        # self.parent_org: input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-        self.organization =input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.person = input_data.get(&#34;person&#34;)
-        self.vocab_manager = input_data.get(&#34;state&#34;).get(&#34;vocab_manager&#34;)
-    def run(self):
-        #TODO ADD EMAIL
-        relabeled_tree = get_relabeled_tree(self.tree)
-        op_res = confirm_name_on_single_page(relabeled_tree,self.person)
-        if not op_success(op_res):
-            logging.error(&#34;Could not confirm name on single page&#34;)
-        name_nodes = op_res.data
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            op_res = extract_affiliations_candidates_from_single_page(leaf, self.person, name_nodes)
-            if not op_success(op_res):
-                logging.error(&#34;Could not extract affiliations candidates from tree leaf&#34;)
-            else:
-                candidates = op_res.data
-                op_res = filter_affiliation_candidates(relabeled_tree, self.person, candidates,self.vocab_manager)
-                if not op_success(op_res):
-                    logging.error(&#34;Could not filter affiliations candidates from tree leaf&#34;)
-                    continue
-                affiliations = op_res.data
-                for affiliation in affiliations:
-                    self.person.add_affiliation(affiliation[0],affiliation[1])
-        return self.person
-
-
-
-    def run_alternative(self):
-        relabeled_tree = get_relabeled_tree(self.tree)
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            op_res = extract_affiliation_elements(leaf, self.person,vocab_manager=self.vocab_manager)
-            if op_success(op_res):
-                affiliations,patterns = op_res.data
-                self.patterns += patterns
-                for affiliation in affiliations:
-                    self.person.add_affiliation(affiliation.division, affiliation.position)
-        return self.person
-
-    def run_patterns(self):
-        relabeled_tree = get_relabeled_tree(self.tree)
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            self.extract_affiliations_from_patterns(leaf,self.person)
-        return self.person
-
-
-    def _match_sibling(self,filter_siblings,pattern_path):
-        for siblings in filter_siblings:
-            for sibling in siblings:
-                path = sibling.get(&#34;doc_path&#34;)
-                if path == pattern_path:
-                    return sibling
-    def extract_affiliations_from_patterns(self,leaf,person):
-        limit = 1
-        for tag in leaf.tags:
-            doc_path = tag.get(&#34;doc_path&#34;)
-            for pattern in self.patterns:
-                pattern_type,pattern_paths = pattern
-                is_value = len(pattern_paths)&gt;1 and doc_path == pattern_paths[1]
-                if is_value and pattern_type == &#34;key_value&#34;:
-                    pre_siblings, post_sibling = get_siblings_for_tag(tag)
-                    filter_siblings = [pre_siblings[:limit], post_sibling[:limit]]
-                    matched_sibling = self._match_sibling(filter_siblings,pattern_paths[0])
-                    if matched_sibling:
-                        person.add_affiliation(tag.get_text(strip=True),matched_sibling.get_text(strip=True))
-                        break
-
-
-
-    def extract_template_instances(self) -&gt; list:
-        pass</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -139,94 +39,6 @@ class SinglePersonStrategy(BaseScrapingStrategy):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class SinglePersonStrategy(BaseScrapingStrategy):
-
-
-    def __init__(self,input_data,patterns) -&gt; None:
-        super().__init__()
-        self.patterns = patterns
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.page_type: PAGE_TYPE = input_data.get(&#34;page_type&#34;)
-        # self.parent_org: input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-        self.organization =input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.person = input_data.get(&#34;person&#34;)
-        self.vocab_manager = input_data.get(&#34;state&#34;).get(&#34;vocab_manager&#34;)
-    def run(self):
-        #TODO ADD EMAIL
-        relabeled_tree = get_relabeled_tree(self.tree)
-        op_res = confirm_name_on_single_page(relabeled_tree,self.person)
-        if not op_success(op_res):
-            logging.error(&#34;Could not confirm name on single page&#34;)
-        name_nodes = op_res.data
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            op_res = extract_affiliations_candidates_from_single_page(leaf, self.person, name_nodes)
-            if not op_success(op_res):
-                logging.error(&#34;Could not extract affiliations candidates from tree leaf&#34;)
-            else:
-                candidates = op_res.data
-                op_res = filter_affiliation_candidates(relabeled_tree, self.person, candidates,self.vocab_manager)
-                if not op_success(op_res):
-                    logging.error(&#34;Could not filter affiliations candidates from tree leaf&#34;)
-                    continue
-                affiliations = op_res.data
-                for affiliation in affiliations:
-                    self.person.add_affiliation(affiliation[0],affiliation[1])
-        return self.person
-
-
-
-    def run_alternative(self):
-        relabeled_tree = get_relabeled_tree(self.tree)
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            op_res = extract_affiliation_elements(leaf, self.person,vocab_manager=self.vocab_manager)
-            if op_success(op_res):
-                affiliations,patterns = op_res.data
-                self.patterns += patterns
-                for affiliation in affiliations:
-                    self.person.add_affiliation(affiliation.division, affiliation.position)
-        return self.person
-
-    def run_patterns(self):
-        relabeled_tree = get_relabeled_tree(self.tree)
-        leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-        for leaf in leafs:
-            self.extract_affiliations_from_patterns(leaf,self.person)
-        return self.person
-
-
-    def _match_sibling(self,filter_siblings,pattern_path):
-        for siblings in filter_siblings:
-            for sibling in siblings:
-                path = sibling.get(&#34;doc_path&#34;)
-                if path == pattern_path:
-                    return sibling
-    def extract_affiliations_from_patterns(self,leaf,person):
-        limit = 1
-        for tag in leaf.tags:
-            doc_path = tag.get(&#34;doc_path&#34;)
-            for pattern in self.patterns:
-                pattern_type,pattern_paths = pattern
-                is_value = len(pattern_paths)&gt;1 and doc_path == pattern_paths[1]
-                if is_value and pattern_type == &#34;key_value&#34;:
-                    pre_siblings, post_sibling = get_siblings_for_tag(tag)
-                    filter_siblings = [pre_siblings[:limit], post_sibling[:limit]]
-                    matched_sibling = self._match_sibling(filter_siblings,pattern_paths[0])
-                    if matched_sibling:
-                        person.add_affiliation(tag.get_text(strip=True),matched_sibling.get_text(strip=True))
-                        break
-
-
-
-    def extract_template_instances(self) -&gt; list:
-        pass</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.scrapers.strategies.BaseScrapingStrategy" href="index.html#academic_crawler.scrapers.strategies.BaseScrapingStrategy">BaseScrapingStrategy</a></li>
@@ -234,115 +46,17 @@ inheritance.</p></div>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_affiliations_from_patterns"><code class="name flex">
-<span>def <span class="ident">extract_affiliations_from_patterns</span></span>(<span>self, leaf, person)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_affiliations_from_patterns(self,leaf,person):
-    limit = 1
-    for tag in leaf.tags:
-        doc_path = tag.get(&#34;doc_path&#34;)
-        for pattern in self.patterns:
-            pattern_type,pattern_paths = pattern
-            is_value = len(pattern_paths)&gt;1 and doc_path == pattern_paths[1]
-            if is_value and pattern_type == &#34;key_value&#34;:
-                pre_siblings, post_sibling = get_siblings_for_tag(tag)
-                filter_siblings = [pre_siblings[:limit], post_sibling[:limit]]
-                matched_sibling = self._match_sibling(filter_siblings,pattern_paths[0])
-                if matched_sibling:
-                    person.add_affiliation(tag.get_text(strip=True),matched_sibling.get_text(strip=True))
-                    break</code></pre>
-</details>
-</dd>
 <dt id="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_template_instances"><code class="name flex">
 <span>def <span class="ident">extract_template_instances</span></span>(<span>self) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_template_instances(self) -&gt; list:
-    pass</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run(self):
-    #TODO ADD EMAIL
-    relabeled_tree = get_relabeled_tree(self.tree)
-    op_res = confirm_name_on_single_page(relabeled_tree,self.person)
-    if not op_success(op_res):
-        logging.error(&#34;Could not confirm name on single page&#34;)
-    name_nodes = op_res.data
-    leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-    for leaf in leafs:
-        op_res = extract_affiliations_candidates_from_single_page(leaf, self.person, name_nodes)
-        if not op_success(op_res):
-            logging.error(&#34;Could not extract affiliations candidates from tree leaf&#34;)
-        else:
-            candidates = op_res.data
-            op_res = filter_affiliation_candidates(relabeled_tree, self.person, candidates,self.vocab_manager)
-            if not op_success(op_res):
-                logging.error(&#34;Could not filter affiliations candidates from tree leaf&#34;)
-                continue
-            affiliations = op_res.data
-            for affiliation in affiliations:
-                self.person.add_affiliation(affiliation[0],affiliation[1])
-    return self.person</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_alternative"><code class="name flex">
 <span>def <span class="ident">run_alternative</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run_alternative(self):
-    relabeled_tree = get_relabeled_tree(self.tree)
-    leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-    for leaf in leafs:
-        op_res = extract_affiliation_elements(leaf, self.person,vocab_manager=self.vocab_manager)
-        if op_success(op_res):
-            affiliations,patterns = op_res.data
-            self.patterns += patterns
-            for affiliation in affiliations:
-                self.person.add_affiliation(affiliation.division, affiliation.position)
-    return self.person</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_patterns"><code class="name flex">
-<span>def <span class="ident">run_patterns</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run_patterns(self):
-    relabeled_tree = get_relabeled_tree(self.tree)
-    leafs: list[SemanticNode] = relabeled_tree.nodes[0][&#39;leafs&#39;]
-    for leaf in leafs:
-        self.extract_affiliations_from_patterns(leaf,self.person)
-    return self.person</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -365,11 +79,8 @@ inheritance.</p></div>
 <li>
 <h4><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy">SinglePersonStrategy</a></code></h4>
 <ul class="">
-<li><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_affiliations_from_patterns" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_affiliations_from_patterns">extract_affiliations_from_patterns</a></code></li>
 <li><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_template_instances" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.extract_template_instances">extract_template_instances</a></code></li>
-<li><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run">run</a></code></li>
 <li><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_alternative" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_alternative">run_alternative</a></code></li>
-<li><code><a title="academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_patterns" href="#academic_crawler.scrapers.strategies.single_person.SinglePersonStrategy.run_patterns">run_patterns</a></code></li>
 </ul>
 </li>
 </ul>

@@ -22,44 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_features</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from abc import ABC,abstractmethod
-import bs4
-from networkx import DiGraph
-
-from academic_crawler.heuristics.tree import HTMLTreeGenerator
-
-
-class AbstractPageFeatureExtractor(ABC):
-
-
-
-#TODO PASS TREE AS ARGUMENT
-    def __init__(self,state) -&gt; None:
-        super().__init__()
-        parser = &#39;html.parser&#39;
-        #self.source = source
-        #self.soup = bs4.BeautifulSoup(source, parser, from_encoding=&#34;utf-8&#34;) # add soup as param to build tree
-        #self.html_generator = HTMLTreeGenerator()
-        #self.tree = self.html_generator.build_page_tree(source)
-        self.state = state
-        self.tree: DiGraph = state.get_page(&#34;tree&#34;)
-
-    @abstractmethod
-    def extract_features(self):
-        pass
-    @abstractmethod
-    def extract_title_features(self):
-        pass
-
-
-    def get_tag_only_text(self,tag: bs4.Tag,recursive=False):
-        res = tag.find_all(text=True, recursive=recursive)
-        return &#39; &#39;.join(res)</code></pre>
-</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -92,37 +54,6 @@ class AbstractPageFeatureExtractor(ABC):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AbstractPageFeatureExtractor(ABC):
-
-
-
-#TODO PASS TREE AS ARGUMENT
-    def __init__(self,state) -&gt; None:
-        super().__init__()
-        parser = &#39;html.parser&#39;
-        #self.source = source
-        #self.soup = bs4.BeautifulSoup(source, parser, from_encoding=&#34;utf-8&#34;) # add soup as param to build tree
-        #self.html_generator = HTMLTreeGenerator()
-        #self.tree = self.html_generator.build_page_tree(source)
-        self.state = state
-        self.tree: DiGraph = state.get_page(&#34;tree&#34;)
-
-    @abstractmethod
-    def extract_features(self):
-        pass
-    @abstractmethod
-    def extract_title_features(self):
-        pass
-
-
-    def get_tag_only_text(self,tag: bs4.Tag,recursive=False):
-        res = tag.find_all(text=True, recursive=recursive)
-        return &#39; &#39;.join(res)</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>abc.ABC</li>
@@ -139,42 +70,18 @@ inheritance.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def extract_features(self):
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor.extract_title_features"><code class="name flex">
 <span>def <span class="ident">extract_title_features</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def extract_title_features(self):
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor.get_tag_only_text"><code class="name flex">
 <span>def <span class="ident">get_tag_only_text</span></span>(<span>self, tag: bs4.element.Tag, recursive=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_tag_only_text(self,tag: bs4.Tag,recursive=False):
-    res = tag.find_all(text=True, recursive=recursive)
-    return &#39; &#39;.join(res)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

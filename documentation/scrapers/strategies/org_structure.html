@@ -22,78 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.strategies.org_structure</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from academic_crawler.config.enums import OperationStatus
-from academic_crawler.heuristics.tree import EntityNode
-from academic_crawler.scrapers.strategies import BaseScrapingStrategy
-from academic_crawler.scrapers.operations.general import remove_not_tagged,save_graph,extract_data_from_links
-from academic_crawler.config.utils import get_relabeled_tree
-from academic_crawler.scrapers.operations.org_structure import identify_sections
-from pprint import pprint
-
-from academic_crawler.scrapers.templates import Organization
-
-
-class OrgStructureStrategy(BaseScrapingStrategy):
-    def __init__(self,input_data) -&gt; None:
-        super().__init__()
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.parent_org:Organization = input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-
-    def run(self):
-        op_res = remove_not_tagged(self.tree,&#39;body&#39;)
-        relabeled_tree = get_relabeled_tree(op_res.data)
-        #save_graph(relabeled_tree,&#39;cvut_graph.svg&#39;)
-        op_res = extract_data_from_links(relabeled_tree,&#39;org_structure&#39;)
-        if op_res.message.status is OperationStatus.SUCCESS:
-            template_instances_dict = self.extract_template_instances(op_res.data)
-            if template_instances_dict.get(&#34;total&#34;)&gt;0:
-                return template_instances_dict
-        return None
-
-
-
-
-        pass
-
-    def extract_sections(self) -&gt; tuple[EntityNode]:
-
-        pass
-
-    def parse_sections(self) -&gt; dict:
-        pass
-
-
-
-    def extract_template_instances(self,records:list):
-        result = dict(internal=[],children=[],total=0)
-        pprint(records)
-        total = 0
-        used_urls = {self.parent_org.url}
-        for record in records:
-            href = record.get(&#34;attributes&#34;).get(&#34;href&#34;,None)
-            if href:
-                fixed_href = self.page_header.get(&#39;response&#39;).urljoin(href)
-                url,type_ = self.parent_org.fix_url(fixed_href)
-                if url.url in used_urls:
-                    continue
-                if type_ == &#34;external&#34;:
-                    continue
-                item = Organization(name=record.get(&#34;value&#34;), domain=url.host, url=url.url, parent=self.parent_org)
-                used_urls.add(item.url)
-                if type_ == &#34;subdomain&#34;:
-                    result[&#39;children&#39;].append(item) # TODO children of children?
-                else:
-                    result[&#39;internal&#39;].append(item)
-                total +=1
-        pprint(result)
-        result[&#39;total&#39;] = total
-        return result</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -111,67 +39,6 @@ class OrgStructureStrategy(BaseScrapingStrategy):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OrgStructureStrategy(BaseScrapingStrategy):
-    def __init__(self,input_data) -&gt; None:
-        super().__init__()
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.parent_org:Organization = input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-
-    def run(self):
-        op_res = remove_not_tagged(self.tree,&#39;body&#39;)
-        relabeled_tree = get_relabeled_tree(op_res.data)
-        #save_graph(relabeled_tree,&#39;cvut_graph.svg&#39;)
-        op_res = extract_data_from_links(relabeled_tree,&#39;org_structure&#39;)
-        if op_res.message.status is OperationStatus.SUCCESS:
-            template_instances_dict = self.extract_template_instances(op_res.data)
-            if template_instances_dict.get(&#34;total&#34;)&gt;0:
-                return template_instances_dict
-        return None
-
-
-
-
-        pass
-
-    def extract_sections(self) -&gt; tuple[EntityNode]:
-
-        pass
-
-    def parse_sections(self) -&gt; dict:
-        pass
-
-
-
-    def extract_template_instances(self,records:list):
-        result = dict(internal=[],children=[],total=0)
-        pprint(records)
-        total = 0
-        used_urls = {self.parent_org.url}
-        for record in records:
-            href = record.get(&#34;attributes&#34;).get(&#34;href&#34;,None)
-            if href:
-                fixed_href = self.page_header.get(&#39;response&#39;).urljoin(href)
-                url,type_ = self.parent_org.fix_url(fixed_href)
-                if url.url in used_urls:
-                    continue
-                if type_ == &#34;external&#34;:
-                    continue
-                item = Organization(name=record.get(&#34;value&#34;), domain=url.host, url=url.url, parent=self.parent_org)
-                used_urls.add(item.url)
-                if type_ == &#34;subdomain&#34;:
-                    result[&#39;children&#39;].append(item) # TODO children of children?
-                else:
-                    result[&#39;internal&#39;].append(item)
-                total +=1
-        pprint(result)
-        result[&#39;total&#39;] = total
-        return result</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.scrapers.strategies.BaseScrapingStrategy" href="index.html#academic_crawler.scrapers.strategies.BaseScrapingStrategy">BaseScrapingStrategy</a></li>
@@ -184,88 +51,24 @@ inheritance.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_sections(self) -&gt; tuple[EntityNode]:
-
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.org_structure.OrgStructureStrategy.extract_template_instances"><code class="name flex">
 <span>def <span class="ident">extract_template_instances</span></span>(<span>self, records: list)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_template_instances(self,records:list):
-    result = dict(internal=[],children=[],total=0)
-    pprint(records)
-    total = 0
-    used_urls = {self.parent_org.url}
-    for record in records:
-        href = record.get(&#34;attributes&#34;).get(&#34;href&#34;,None)
-        if href:
-            fixed_href = self.page_header.get(&#39;response&#39;).urljoin(href)
-            url,type_ = self.parent_org.fix_url(fixed_href)
-            if url.url in used_urls:
-                continue
-            if type_ == &#34;external&#34;:
-                continue
-            item = Organization(name=record.get(&#34;value&#34;), domain=url.host, url=url.url, parent=self.parent_org)
-            used_urls.add(item.url)
-            if type_ == &#34;subdomain&#34;:
-                result[&#39;children&#39;].append(item) # TODO children of children?
-            else:
-                result[&#39;internal&#39;].append(item)
-            total +=1
-    pprint(result)
-    result[&#39;total&#39;] = total
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.org_structure.OrgStructureStrategy.parse_sections"><code class="name flex">
 <span>def <span class="ident">parse_sections</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_sections(self) -&gt; dict:
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.org_structure.OrgStructureStrategy.run"><code class="name flex">
 <span>def <span class="ident">run</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run(self):
-    op_res = remove_not_tagged(self.tree,&#39;body&#39;)
-    relabeled_tree = get_relabeled_tree(op_res.data)
-    #save_graph(relabeled_tree,&#39;cvut_graph.svg&#39;)
-    op_res = extract_data_from_links(relabeled_tree,&#39;org_structure&#39;)
-    if op_res.message.status is OperationStatus.SUCCESS:
-        template_instances_dict = self.extract_template_instances(op_res.data)
-        if template_instances_dict.get(&#34;total&#34;)&gt;0:
-            return template_instances_dict
-    return None
-
-
-
-
-    pass</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

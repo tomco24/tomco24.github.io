@@ -22,57 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.templates.websites</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from academic_crawler.helpers.mock import get_mock_organization
-from academic_crawler.heuristics.page_config import ConfTag
-from academic_crawler.scrapers.templates import Organization
-
-configs=[
-    {
-        &#34;domain&#34;: &#34;www.fit.cvut.cz&#34;,
-        &#34;parent_organization&#34;: get_mock_organization(0)[1],
-        &#34;departments_url&#34;: &#34;&#34;,
-        &#34;people_url&#34;: &#34;https://fit.cvut.cz/en/faculty/people&#34;,
-        &#34;people_tags_locations&#34;: {
-            &#34;person_url&#34;: [ConfTag(&#34;div&#34;, {&#34;class&#34;: &#34;persons-category&#34;}), ConfTag(&#34;a&#34;, {&#34;class&#34;: &#34;person&#34;}),
-                           ConfTag(&#34;href&#34;, {})],
-            &#34;person_name&#34;: [ConfTag(&#34;div&#34;, {&#34;class&#34;: &#34;persons-category&#34;}), ConfTag(&#34;h3&#34;, {&#34;class&#34;: &#34;person-name&#34;}),
-                            ConfTag(&#34;text&#34;, {})],
-        },
-        &#34;single_person_tags_locations&#34;: {
-            &#34;affiliation_container&#34;: ConfTag(&#34;table&#34;, {&#34;class&#34;: &#34;positions&#34;}),
-            &#34;affiliation_division&#34;: ConfTag(&#34;td&#34;, {&#34;position&#34;: 1}),
-            &#34;affiliation_position&#34;: ConfTag(&#34;td&#34;, {&#34;position&#34;: 0}),
-
-        }
-    },
-    {
-        &#34;domain&#34;: &#34;fa.cvut.cz&#34;,
-        &#34;parent_organization&#34;: Organization(name=&#34;Faculty of Architecture&#34;,
-                                            domain=&#34;fa.cvut.cz&#34;,
-                                            abbreviation=&#34;Fa&#34;,
-                                            url=&#34;https://www.fa.cvut.cz/en&#34;,
-                                            parent=None,
-                                            ),
-        &#34;departments_url&#34;: &#34;https://www.fa.cvut.cz/en/faculty/departments&#34;,
-        &#34;people_url&#34;: &#34;https://www.fa.cvut.cz/en/faculty/people&#34;,
-        &#34;people_tags_locations&#34;: {
-            &#34;person_url&#34;: [ConfTag(&#34;div&#34;, {&#34;class&#34;: &#34;persons-wrapper&#34;}), ConfTag(&#34;a&#34;, {&#34;class&#34;: &#34;person&#34;})],
-            &#34;person_name&#34;: [ConfTag(&#34;div&#34;, {&#34;class&#34;: &#34;persons-wrapper&#34;}), ConfTag(&#34;h3&#34;, {&#34;class&#34;: &#34;person-name&#34;})],
-        },
-        &#34;single_person_tags_locations&#34;:{
-            &#34;email&#34;: ConfTag(&#34;table&#34;, {&#34;class&#34;: &#34;positions&#34;}),
-            &#34;affiliation_division&#34;: ConfTag(&#34;td&#34;, {&#34;position&#34;: 1}),
-            &#34;affiliation_position&#34;: ConfTag(&#34;td&#34;, {&#34;position&#34;: 0}),
-
-        }
-    },
-
-]</code></pre>
-</details>
 </section>
 <section>
 </section>

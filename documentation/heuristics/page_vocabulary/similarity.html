@@ -22,104 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_vocabulary.similarity</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from typing import Any
-
-from numba import jit
-import numpy as np
-from academic_crawler.config.singleton import NlpSingleton
-from academic_crawler.config.predefined import keywords_map
-from academic_crawler.heuristics.page_vocabulary.vocabulary import DomainVocabulary
-from academic_crawler.ml.trf_vectors import Tensor2Attr
-from sentence_transformers import SentenceTransformer
-
-
-@jit(nopython=True)
-def cosine_similarity_numba(u: np.ndarray, v: np.ndarray):
-    assert (u.shape[0] == v.shape[0])
-    uv = 0
-    uu = 0
-    vv = 0
-    for i in range(u.shape[0]):
-        uv += u[i] * v[i]
-        uu += u[i] * u[i]
-        vv += v[i] * v[i]
-    cos_theta = 1
-    if uu != 0 and vv != 0:
-        cos_theta = uv / np.sqrt(uu * vv)
-    return cos_theta
-
-
-class VocabSimilarityManager:
-
-    def __init__(self,vocabulary:DomainVocabulary) -&gt; None:
-        super().__init__()
-        self.vocab = vocabulary
-        self.nlp = self.vocab.nlp
-        self.history = {}
-
-    def get_max_category(self, categories_similarity: dict):
-        return max(categories_similarity, key=categories_similarity.get)
-
-    def get_categories_similarity(self,word:str):
-        word = word.lower() if word.islower() else word
-        if word in self.history:
-            return self.history[word]
-        vector = self.nlp(word).vector
-        all_zeros = not np.any(vector)
-        if all_zeros:
-            res = {category:0 for category in self.vocab.categories.keys()}
-        else:
-            res = {value.name: cosine_similarity_numba(vector, value.vector) for value in
-                                    self.vocab.categories.values()}
-
-        self.history.update({word:res})
-        return res
-
-    def get_keyword_category(self, word) -&gt; tuple[Any, float]:
-        word = word.lower() if word.islower() else word
-        vector = self.nlp(word).vector
-        categories_similarity = self.get_categories_similarity(word)
-        max_category = self.get_max_category(categories_similarity)
-        print(f&#34;word: {word}&#34;)
-        print(f&#34;categories_similarity: {categories_similarity}&#34;)
-        print(f&#34;max_category: {max_category}&#34;)
-        print(f&#34;top_n_similar: {self.get_category_top_n_similar(word, max_category)}&#34;)
-        #take the max category and get top n similar words from that category
-        if categories_similarity[max_category]&lt;0.5:
-            return None,0
-        top_n_similar = self.get_category_top_n_similar(word, max_category)
-        if top_n_similar[0][1]&lt;0.35:
-            return None,0
-        return self.vocab.categories[max_category].name,top_n_similar[0][1]
-
-    def get_category_top_n_similar(self, word, category, n=5):
-        vector = self.nlp(word).vector
-        all_zeros = not np.any(vector)
-        if all_zeros:
-            return [(&#39;NOT IN VOCAB&#39;,0)]
-        similarities = [(word, cosine_similarity_numba(vector, self.nlp(word).vector)) for word in
-                        self.vocab.categories[category].elements]
-        top_n = sorted(similarities, key=lambda x: x[1], reverse=True)[:n]
-        return top_n
-
-
-
-if __name__ == &#39;__main__&#39;:
-    nlp = NlpSingleton.get_instance(embeddings=True)
-    vocab = DomainVocabulary(nlp)
-    manager = VocabSimilarityManager(vocab)
-    # manager.get_keyword_category(&#34;Vice-dean&#34;)
-    # manager.get_keyword_category(&#34;Committee for IT Strategy&#34;)
-    # manager.get_keyword_category(&#34;Vice-Dean&#34;)
-    # manager.get_keyword_category(&#34;publications&#34;)
-    # manager.get_keyword_category(str.lower(&#34;Department&#34;))
-    # manager.get_keyword_category(&#39;Department of Computer Science&#39;)
-    manager.get_keyword_category(&#39;Jehlík&#39;)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -133,25 +35,6 @@ if __name__ == &#39;__main__&#39;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@jit(nopython=True)
-def cosine_similarity_numba(u: np.ndarray, v: np.ndarray):
-    assert (u.shape[0] == v.shape[0])
-    uv = 0
-    uu = 0
-    vv = 0
-    for i in range(u.shape[0]):
-        uv += u[i] * v[i]
-        uu += u[i] * u[i]
-        vv += v[i] * v[i]
-    cos_theta = 1
-    if uu != 0 and vv != 0:
-        cos_theta = uv / np.sqrt(uu * vv)
-    return cos_theta</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -164,149 +47,31 @@ def cosine_similarity_numba(u: np.ndarray, v: np.ndarray):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class VocabSimilarityManager:
-
-    def __init__(self,vocabulary:DomainVocabulary) -&gt; None:
-        super().__init__()
-        self.vocab = vocabulary
-        self.nlp = self.vocab.nlp
-        self.history = {}
-
-    def get_max_category(self, categories_similarity: dict):
-        return max(categories_similarity, key=categories_similarity.get)
-
-    def get_categories_similarity(self,word:str):
-        word = word.lower() if word.islower() else word
-        if word in self.history:
-            return self.history[word]
-        vector = self.nlp(word).vector
-        all_zeros = not np.any(vector)
-        if all_zeros:
-            res = {category:0 for category in self.vocab.categories.keys()}
-        else:
-            res = {value.name: cosine_similarity_numba(vector, value.vector) for value in
-                                    self.vocab.categories.values()}
-
-        self.history.update({word:res})
-        return res
-
-    def get_keyword_category(self, word) -&gt; tuple[Any, float]:
-        word = word.lower() if word.islower() else word
-        vector = self.nlp(word).vector
-        categories_similarity = self.get_categories_similarity(word)
-        max_category = self.get_max_category(categories_similarity)
-        print(f&#34;word: {word}&#34;)
-        print(f&#34;categories_similarity: {categories_similarity}&#34;)
-        print(f&#34;max_category: {max_category}&#34;)
-        print(f&#34;top_n_similar: {self.get_category_top_n_similar(word, max_category)}&#34;)
-        #take the max category and get top n similar words from that category
-        if categories_similarity[max_category]&lt;0.5:
-            return None,0
-        top_n_similar = self.get_category_top_n_similar(word, max_category)
-        if top_n_similar[0][1]&lt;0.35:
-            return None,0
-        return self.vocab.categories[max_category].name,top_n_similar[0][1]
-
-    def get_category_top_n_similar(self, word, category, n=5):
-        vector = self.nlp(word).vector
-        all_zeros = not np.any(vector)
-        if all_zeros:
-            return [(&#39;NOT IN VOCAB&#39;,0)]
-        similarities = [(word, cosine_similarity_numba(vector, self.nlp(word).vector)) for word in
-                        self.vocab.categories[category].elements]
-        top_n = sorted(similarities, key=lambda x: x[1], reverse=True)[:n]
-        return top_n</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_vocabulary.similarity.VocabSimilarityManager.get_categories_similarity"><code class="name flex">
-<span>def <span class="ident">get_categories_similarity</span></span>(<span>self, word: str)</span>
+<span>def <span class="ident">get_categories_similarity</span></span>(<span>self, word: str) ‑> dict</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_categories_similarity(self,word:str):
-    word = word.lower() if word.islower() else word
-    if word in self.history:
-        return self.history[word]
-    vector = self.nlp(word).vector
-    all_zeros = not np.any(vector)
-    if all_zeros:
-        res = {category:0 for category in self.vocab.categories.keys()}
-    else:
-        res = {value.name: cosine_similarity_numba(vector, value.vector) for value in
-                                self.vocab.categories.values()}
-
-    self.history.update({word:res})
-    return res</code></pre>
-</details>
+<div class="desc"><p>Get the similarity of a word to all categories in the vocabulary</p></div>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.similarity.VocabSimilarityManager.get_category_top_n_similar"><code class="name flex">
-<span>def <span class="ident">get_category_top_n_similar</span></span>(<span>self, word, category, n=5)</span>
+<span>def <span class="ident">get_category_top_n_similar</span></span>(<span>self, word: str, category: str, n=5) ‑> list[tuple[str, float]]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_category_top_n_similar(self, word, category, n=5):
-    vector = self.nlp(word).vector
-    all_zeros = not np.any(vector)
-    if all_zeros:
-        return [(&#39;NOT IN VOCAB&#39;,0)]
-    similarities = [(word, cosine_similarity_numba(vector, self.nlp(word).vector)) for word in
-                    self.vocab.categories[category].elements]
-    top_n = sorted(similarities, key=lambda x: x[1], reverse=True)[:n]
-    return top_n</code></pre>
-</details>
+<div class="desc"><p>Get the top n similar words to a word in a category</p></div>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.similarity.VocabSimilarityManager.get_keyword_category"><code class="name flex">
-<span>def <span class="ident">get_keyword_category</span></span>(<span>self, word) ‑> tuple[typing.Any, float]</span>
+<span>def <span class="ident">get_keyword_category</span></span>(<span>self, word: str) ‑> tuple[typing.Any, float]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_keyword_category(self, word) -&gt; tuple[Any, float]:
-    word = word.lower() if word.islower() else word
-    vector = self.nlp(word).vector
-    categories_similarity = self.get_categories_similarity(word)
-    max_category = self.get_max_category(categories_similarity)
-    print(f&#34;word: {word}&#34;)
-    print(f&#34;categories_similarity: {categories_similarity}&#34;)
-    print(f&#34;max_category: {max_category}&#34;)
-    print(f&#34;top_n_similar: {self.get_category_top_n_similar(word, max_category)}&#34;)
-    #take the max category and get top n similar words from that category
-    if categories_similarity[max_category]&lt;0.5:
-        return None,0
-    top_n_similar = self.get_category_top_n_similar(word, max_category)
-    if top_n_similar[0][1]&lt;0.35:
-        return None,0
-    return self.vocab.categories[max_category].name,top_n_similar[0][1]</code></pre>
-</details>
+<div class="desc"><p>Get the category of a word and the confidence of the category</p></div>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.similarity.VocabSimilarityManager.get_max_category"><code class="name flex">
-<span>def <span class="ident">get_max_category</span></span>(<span>self, categories_similarity: dict)</span>
+<span>def <span class="ident">get_max_category</span></span>(<span>self, categories_similarity: dict) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_max_category(self, categories_similarity: dict):
-    return max(categories_similarity, key=categories_similarity.get)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

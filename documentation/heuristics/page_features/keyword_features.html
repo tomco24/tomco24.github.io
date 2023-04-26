@@ -22,69 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_features.keyword_features</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from . import AbstractPageFeatureExtractor
-from ..detectors import KeywordDetector
-from ..tree import SemanticNode
-from ...config.predefined import keywords_map
-from ...config.utils import clean_text
-
-
-class KeywordPageFeatureExtractor(AbstractPageFeatureExtractor):
-    keyword_detector: KeywordDetector
-
-    def __init__(self,state) -&gt; None:
-        super().__init__(state)
-        self.keyword_detector = KeywordDetector()
-        self.keywords_stats = {_:0 for _ in keywords_map.keys()}
-        self.title_keywords = None
-        self.num_leaf_nodes = 0
-
-    def extract_features(self):
-        self.tree_keyword_search()
-        self.extract_title_features()
-        return {
-            &#34;has_keyword_position_match&#34;: self.keywords_stats.get(&#39;keywords_work_position&#39;)&gt;0,
-            &#34;has_keyword_org_match&#34;: self.keywords_stats.get(&#39;keywords_org_structure&#39;)&gt;0,
-            &#34;has_keyword_title_org_match&#34;:len(self.title_keywords.get(&#39;keywords_org_structure&#39;,{})) &gt; 0,
-            &#34;num_leaf_nodes&#34;: self.num_leaf_nodes,
-        }
-
-    def tree_keyword_search(self):
-        for node in self.tree.nodes(data=True):
-            data_node:SemanticNode = node[1].get(&#39;data&#39;)
-            if data_node.leaf: #TODO check category if needed
-                self.num_leaf_nodes += 1
-                self.node_keyword_search(data_node)
-
-    def node_keyword_search(self, node:SemanticNode):
-        node.entity.setup_keyword_structure()
-        i = 0
-        for value in node.entity.values:
-            result_keyword = self.text_keyword_search(value)
-            node.entity.add_keyword_match(i,result_keyword)
-            i += 1
-        if node.entity.keyword_tag:
-            self.update_keyword_status(node)
-
-    def update_keyword_status(self, node:SemanticNode):
-            self.keywords_stats[node.entity.keyword_tag] += 1
-
-    def text_keyword_search(self, text):
-
-        result = self.keyword_detector.extract_keyword(text)
-        return result
-
-    def extract_title_features(self):
-        title = self.state.get_page(&#34;title&#34;)
-        title = clean_text(title)
-        result = self.keyword_detector.extract_keyword(title)
-        self.title_keywords = result
-        return len(result)&gt;0</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -102,62 +39,6 @@ class KeywordPageFeatureExtractor(AbstractPageFeatureExtractor):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class KeywordPageFeatureExtractor(AbstractPageFeatureExtractor):
-    keyword_detector: KeywordDetector
-
-    def __init__(self,state) -&gt; None:
-        super().__init__(state)
-        self.keyword_detector = KeywordDetector()
-        self.keywords_stats = {_:0 for _ in keywords_map.keys()}
-        self.title_keywords = None
-        self.num_leaf_nodes = 0
-
-    def extract_features(self):
-        self.tree_keyword_search()
-        self.extract_title_features()
-        return {
-            &#34;has_keyword_position_match&#34;: self.keywords_stats.get(&#39;keywords_work_position&#39;)&gt;0,
-            &#34;has_keyword_org_match&#34;: self.keywords_stats.get(&#39;keywords_org_structure&#39;)&gt;0,
-            &#34;has_keyword_title_org_match&#34;:len(self.title_keywords.get(&#39;keywords_org_structure&#39;,{})) &gt; 0,
-            &#34;num_leaf_nodes&#34;: self.num_leaf_nodes,
-        }
-
-    def tree_keyword_search(self):
-        for node in self.tree.nodes(data=True):
-            data_node:SemanticNode = node[1].get(&#39;data&#39;)
-            if data_node.leaf: #TODO check category if needed
-                self.num_leaf_nodes += 1
-                self.node_keyword_search(data_node)
-
-    def node_keyword_search(self, node:SemanticNode):
-        node.entity.setup_keyword_structure()
-        i = 0
-        for value in node.entity.values:
-            result_keyword = self.text_keyword_search(value)
-            node.entity.add_keyword_match(i,result_keyword)
-            i += 1
-        if node.entity.keyword_tag:
-            self.update_keyword_status(node)
-
-    def update_keyword_status(self, node:SemanticNode):
-            self.keywords_stats[node.entity.keyword_tag] += 1
-
-    def text_keyword_search(self, text):
-
-        result = self.keyword_detector.extract_keyword(text)
-        return result
-
-    def extract_title_features(self):
-        title = self.state.get_page(&#34;title&#34;)
-        title = clean_text(title)
-        result = self.keyword_detector.extract_keyword(title)
-        self.title_keywords = result
-        return len(result)&gt;0</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor" href="index.html#academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor">AbstractPageFeatureExtractor</a></li>
@@ -177,102 +58,36 @@ inheritance.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_features(self):
-    self.tree_keyword_search()
-    self.extract_title_features()
-    return {
-        &#34;has_keyword_position_match&#34;: self.keywords_stats.get(&#39;keywords_work_position&#39;)&gt;0,
-        &#34;has_keyword_org_match&#34;: self.keywords_stats.get(&#39;keywords_org_structure&#39;)&gt;0,
-        &#34;has_keyword_title_org_match&#34;:len(self.title_keywords.get(&#39;keywords_org_structure&#39;,{})) &gt; 0,
-        &#34;num_leaf_nodes&#34;: self.num_leaf_nodes,
-    }</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.keyword_features.KeywordPageFeatureExtractor.extract_title_features"><code class="name flex">
 <span>def <span class="ident">extract_title_features</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_title_features(self):
-    title = self.state.get_page(&#34;title&#34;)
-    title = clean_text(title)
-    result = self.keyword_detector.extract_keyword(title)
-    self.title_keywords = result
-    return len(result)&gt;0</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.keyword_features.KeywordPageFeatureExtractor.node_keyword_search"><code class="name flex">
 <span>def <span class="ident">node_keyword_search</span></span>(<span>self, node: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def node_keyword_search(self, node:SemanticNode):
-    node.entity.setup_keyword_structure()
-    i = 0
-    for value in node.entity.values:
-        result_keyword = self.text_keyword_search(value)
-        node.entity.add_keyword_match(i,result_keyword)
-        i += 1
-    if node.entity.keyword_tag:
-        self.update_keyword_status(node)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.keyword_features.KeywordPageFeatureExtractor.text_keyword_search"><code class="name flex">
 <span>def <span class="ident">text_keyword_search</span></span>(<span>self, text)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def text_keyword_search(self, text):
-
-    result = self.keyword_detector.extract_keyword(text)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.keyword_features.KeywordPageFeatureExtractor.tree_keyword_search"><code class="name flex">
 <span>def <span class="ident">tree_keyword_search</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def tree_keyword_search(self):
-    for node in self.tree.nodes(data=True):
-        data_node:SemanticNode = node[1].get(&#39;data&#39;)
-        if data_node.leaf: #TODO check category if needed
-            self.num_leaf_nodes += 1
-            self.node_keyword_search(data_node)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.keyword_features.KeywordPageFeatureExtractor.update_keyword_status"><code class="name flex">
 <span>def <span class="ident">update_keyword_status</span></span>(<span>self, node: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_keyword_status(self, node:SemanticNode):
-        self.keywords_stats[node.entity.keyword_tag] += 1</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

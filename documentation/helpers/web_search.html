@@ -22,69 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.web_search</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import Counter
-from time import sleep
-
-import tldextract
-from duckduckgo_search import ddg
-from furl import furl
-
-
-def get_search_query_domains(keywords) -&gt; Counter:
-    res = ddg(keywords, max_results=20,download=False)
-    res = [furl(item[&#39;href&#39;]) for item in res]
-    print(res)
-    domains = [tldextract.extract(item.url) for item in res]
-    subdomains = []
-    for domain in domains:
-        splits = domain.subdomain.split(&#39;.&#39;)
-        if splits[0] == &#39;www&#39;:
-            splits = splits[1:]
-        splits_len = len(splits)
-        while splits_len &gt;= 1:
-            subdomains.append(&#39;.&#39;.join(splits)+&#39;.&#39;+domain.domain+&#39;.&#39;+domain.suffix)
-            splits = splits[1:]
-            splits_len -= 1
-
-    counter = Counter(subdomains)
-
-    return counter
-
-def get_search_query_urls(query) -&gt; set:
-    res = ddg(query, max_results=5,download=False)
-    res = [item[&#39;href&#39;] for pos,item in enumerate(res)]
-    print(res)
-    return res
-
-
-
-if __name__ == &#34;__main__&#34;:
-    from academic_crawler.config.predefined import keywords_map
-
-    keywords = keywords_map[&#39;keywords_org_structure&#39;]
-    results = []
-    for keyword in keywords:
-        query = f&#39;Czech Techncial University - Faculty of Architecture {keyword}s&#39;
-        sleep(1/10)
-        res = get_search_query_urls(query)
-        results.append(res)
-    ratings = {}
-    for res in results:
-        for pos,item in enumerate(res):
-            if item not in ratings:
-                ratings[item] = [10-pos]
-            else:
-                ratings[item].append(10-pos)
-    ratings = {key:sum(value)/len(value) for key,value in ratings.items()}
-
-    #keywords = &#39;Czech Techncial University - Faculty of Architecture&#39;
-
-    print(ratings)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -94,50 +31,19 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="academic_crawler.helpers.web_search.get_search_query_domains"><code class="name flex">
-<span>def <span class="ident">get_search_query_domains</span></span>(<span>keywords) ‑> collections.Counter</span>
+<span>def <span class="ident">get_search_query_domains</span></span>(<span>keywords: str) ‑> collections.Counter</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_search_query_domains(keywords) -&gt; Counter:
-    res = ddg(keywords, max_results=20,download=False)
-    res = [furl(item[&#39;href&#39;]) for item in res]
-    print(res)
-    domains = [tldextract.extract(item.url) for item in res]
-    subdomains = []
-    for domain in domains:
-        splits = domain.subdomain.split(&#39;.&#39;)
-        if splits[0] == &#39;www&#39;:
-            splits = splits[1:]
-        splits_len = len(splits)
-        while splits_len &gt;= 1:
-            subdomains.append(&#39;.&#39;.join(splits)+&#39;.&#39;+domain.domain+&#39;.&#39;+domain.suffix)
-            splits = splits[1:]
-            splits_len -= 1
-
-    counter = Counter(subdomains)
-
-    return counter</code></pre>
-</details>
+<div class="desc"><p>This method returns a Counter object with the domains found in the search query</p>
+<h2 id="args">Args</h2>
+<p>keywords:
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.helpers.web_search.get_search_query_urls"><code class="name flex">
 <span>def <span class="ident">get_search_query_urls</span></span>(<span>query) ‑> set</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_search_query_urls(query) -&gt; set:
-    res = ddg(query, max_results=5,download=False)
-    res = [item[&#39;href&#39;] for pos,item in enumerate(res)]
-    print(res)
-    return res</code></pre>
-</details>
 </dd>
 </dl>
 </section>

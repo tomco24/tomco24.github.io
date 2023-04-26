@@ -22,223 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.evaluation</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import pprint
-from collections import defaultdict
-
-import numpy as np
-
-from academic_crawler.config.utils import flatten
-from academic_crawler.helpers.loaders import read_jsonlines_file
-from academic_crawler.scrapers.templates import Person, Organization
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
-
-class Evaluator:
-    def __init__(self,results_file,reference_file) -&gt; None:
-        super().__init__()
-        self.data_result = self.load_result_file(results_file)
-        self.data_reference = self.load_result_file(reference_file)
-        self.matches = None
-
-
-    def load_result_file(self,fname):
-        data = read_jsonlines_file(fname)
-        data = flatten(data)
-        data = Person.schema().load(data,many=True)
-        data_sorted = sorted(data,key=lambda x: x.name)
-        return data_sorted
-
-    def evaluate_found_people(self):
-        matches = []
-        for person in self.data_result:
-            person_ref = self.person_in_reference(person)
-            if person_ref is not None:
-                matches.append((person,person_ref))
-        precision = len(matches)/len(self.data_result)
-        recall = len(matches)/len(self.data_reference)
-        f1 = 2*precision*recall/(precision+recall)
-        self.matches = matches
-        return {&#34;precision&#34;:precision,&#34;recall&#34;:recall,&#34;f1&#34;:f1,&#34;matches&#34;:matches}
-
-    def evaluate_matches(self,matches=None):
-        if not matches:
-            matches = self.matches
-        results = []
-        for person,person_ref in matches:
-            divison_matches,full_matches = self.affiliations_in_reference(person,person_ref)
-            divisions_ref = set([aff.division for aff in person_ref.affiliations])
-            not_found = set(person_ref.affiliations).difference(full_matches)
-            item = {
-                &#34;person&#34;:person.name,
-                &#34;affiliations&#34;:person.affiliations,
-                &#34;affiliations_ref&#34;:person_ref.affiliations,
-                &#34;divison_matches&#34;:divison_matches,
-                &#34;full_matches&#34;:full_matches,
-                &#34;not_found&#34;:not_found,
-                &#34;precision&#34;: len(full_matches)/len(person.affiliations),
-                &#34;recall&#34;: len(full_matches)/len(person_ref.affiliations),
-                &#34;precision_division&#34;: len(divison_matches)/len(person.affiliations),
-                &#34;recall_division&#34;: len(divison_matches)/len(divisions_ref),
-            }
-            results.append(item)
-        return results
-
-    def affiliations_in_reference(self,person,person_ref):
-        matches_division_position = set()
-        divisions = set([aff.division for aff in person.affiliations])
-        divisions_ref = set([aff.division for aff in person_ref.affiliations])
-        matches_division = divisions.intersection(divisions_ref)
-        for affiliation in person.affiliations:
-            for affiliation_ref in person_ref.affiliations:
-                if affiliation.division == affiliation_ref.division and affiliation.position == affiliation_ref.position:
-                    matches_division_position.add(affiliation)
-        return matches_division,matches_division_position
-
-
-
-    def person_in_reference(self,person:Person):
-        for i,person_ref in enumerate(self.data_reference):
-            if person_ref.name == person.name:
-                return person_ref
-            elif person_ref.url == person.url:
-                return person_ref
-        return None
-
-    def build_hierachical_tree(self,data:list[Person],main_org:Organization):
-        tree_dict = defaultdict(set)
-
-        for person in data:
-            person.add_implicit_affiliations()
-            parent = person.organization.parent
-            org = person.organization
-            while parent:
-                tree_dict[parent.name].add(org.name)
-                org = parent
-                parent = parent.parent
-            for affiliation in person.affiliations:
-                parent = person.organization
-                org = Organization(name=affiliation.division,url=parent.url,parent=parent,domain=parent.domain)
-                if org.name != parent.name:
-                    tree_dict[parent.name].add(org.name)
-        return tree_dict
-
-    def build_levels(self, tree,root):
-        result = list()
-        result.append([root])
-        node = root
-        level = 0
-        print(result[level])
-
-        while len(result[level]) &gt; 0:
-            result.append([])
-            for node in result[level]:
-                print(node)
-                for child in tree[node]:
-                    result[level+1].append(child)
-            level += 1
-        return result
-
-
-
-
-    def compare_levels(self,levels_res, tree_ref):
-        min_length = min(len(levels_res),len(tree_ref))
-        max_length = max(len(levels_res),len(tree_ref))
-        res = []
-        for i in range(min_length):
-            res.append(levels_res[i].intersection(tree_ref[i]))
-
-        for i in range(min_length,max_length):
-            res.append(set())
-        return res
-
-class EntityInstanceMatcher:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.instances = []
-        self.ref_instances =[]
-
-    def add_instances(self,instances,ref_instances):
-        self.instances = instances
-        self.ref_instances = ref_instances
-        self.matched_idxs = set()
-
-    def compare_orgs(self):
-        matches = []
-        for i,instance in enumerate(self.instances):
-            res = self.match_org(instance,i)
-            if res[1] != -1:
-                self.ref_instances.pop(res[1])
-            matches.append(res)
-
-        result = self.generate_confusion_matrix(matches)
-        pprint.pprint(result)
-        return result
-
-
-    def match_org(self,org,index=-1):
-        for i,org_ref in enumerate(self.ref_instances):
-            if fuzz.partial_token_sort_ratio(org.name,org_ref.name) &gt; 80:
-                return index,i
-            elif fuzz.partial_token_sort_ratio(org.url,org_ref.url) &gt; 80:
-                return index,i
-        return index,-1
-
-    def filter_people(self):
-        url_set = set()
-        result = []
-        for i in range(len(self.instances)):
-            if self.instances[i].url not in url_set:
-                url_set.add(self.instances[i].url)
-                result.append(self.instances[i])
-        self.instances = result
-        return True
-    def compare_people(self):
-        matches = []
-        self.filter_people()
-        for i,instance in enumerate(self.instances):
-            res = self.match_person(instance,i)
-            if res[1] != -1:
-                self.ref_instances.pop(res[1])
-            matches.append(res)
-        result = self.generate_confusion_matrix(matches)
-        pprint.pprint(result)
-        return result
-
-    def match_person(self,person,index=-1):
-        for i,person_ref in enumerate(self.ref_instances):
-            if fuzz.partial_token_sort_ratio(person.url, person_ref.url) &gt; 80:
-                return index,i
-            elif fuzz.partial_token_sort_ratio(person.name,person_ref.name) &gt; 80:
-                return index,i
-        return index,-1
-    def compare_affiliations(self):
-        pass
-
-    def generate_confusion_matrix(self,matches):
-        TP = 0
-        FP = 0
-        used_reference = set()
-        for match in matches:
-            if match[1] != -1:
-                TP += 1
-                used_reference.add(match[1])
-            else:
-                FP += 1
-        #remaining_reference = set([i for i in range(len(self.ref_instances))]).difference(used_reference)
-        FN = len(self.ref_instances)
-        confusion_matrix = np.array([[TP, FP], [FN, 0]])
-        precision = TP / (TP + FP)
-        recall = TP / (TP + FN)
-        f1 = 2 * (precision * recall) / (precision + recall)
-
-        return {&#39;confusion_matrix&#39;: confusion_matrix, &#39;precision&#39;: precision, &#39;recall&#39;: recall, &#39;f1&#39;: f1}</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -254,93 +37,6 @@ class EntityInstanceMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class EntityInstanceMatcher:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.instances = []
-        self.ref_instances =[]
-
-    def add_instances(self,instances,ref_instances):
-        self.instances = instances
-        self.ref_instances = ref_instances
-        self.matched_idxs = set()
-
-    def compare_orgs(self):
-        matches = []
-        for i,instance in enumerate(self.instances):
-            res = self.match_org(instance,i)
-            if res[1] != -1:
-                self.ref_instances.pop(res[1])
-            matches.append(res)
-
-        result = self.generate_confusion_matrix(matches)
-        pprint.pprint(result)
-        return result
-
-
-    def match_org(self,org,index=-1):
-        for i,org_ref in enumerate(self.ref_instances):
-            if fuzz.partial_token_sort_ratio(org.name,org_ref.name) &gt; 80:
-                return index,i
-            elif fuzz.partial_token_sort_ratio(org.url,org_ref.url) &gt; 80:
-                return index,i
-        return index,-1
-
-    def filter_people(self):
-        url_set = set()
-        result = []
-        for i in range(len(self.instances)):
-            if self.instances[i].url not in url_set:
-                url_set.add(self.instances[i].url)
-                result.append(self.instances[i])
-        self.instances = result
-        return True
-    def compare_people(self):
-        matches = []
-        self.filter_people()
-        for i,instance in enumerate(self.instances):
-            res = self.match_person(instance,i)
-            if res[1] != -1:
-                self.ref_instances.pop(res[1])
-            matches.append(res)
-        result = self.generate_confusion_matrix(matches)
-        pprint.pprint(result)
-        return result
-
-    def match_person(self,person,index=-1):
-        for i,person_ref in enumerate(self.ref_instances):
-            if fuzz.partial_token_sort_ratio(person.url, person_ref.url) &gt; 80:
-                return index,i
-            elif fuzz.partial_token_sort_ratio(person.name,person_ref.name) &gt; 80:
-                return index,i
-        return index,-1
-    def compare_affiliations(self):
-        pass
-
-    def generate_confusion_matrix(self,matches):
-        TP = 0
-        FP = 0
-        used_reference = set()
-        for match in matches:
-            if match[1] != -1:
-                TP += 1
-                used_reference.add(match[1])
-            else:
-                FP += 1
-        #remaining_reference = set([i for i in range(len(self.ref_instances))]).difference(used_reference)
-        FN = len(self.ref_instances)
-        confusion_matrix = np.array([[TP, FP], [FN, 0]])
-        precision = TP / (TP + FP)
-        recall = TP / (TP + FN)
-        f1 = 2 * (precision * recall) / (precision + recall)
-
-        return {&#39;confusion_matrix&#39;: confusion_matrix, &#39;precision&#39;: precision, &#39;recall&#39;: recall, &#39;f1&#39;: f1}</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.add_instances"><code class="name flex">
@@ -348,157 +44,48 @@ class EntityInstanceMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_instances(self,instances,ref_instances):
-    self.instances = instances
-    self.ref_instances = ref_instances
-    self.matched_idxs = set()</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.compare_affiliations"><code class="name flex">
 <span>def <span class="ident">compare_affiliations</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compare_affiliations(self):
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.compare_orgs"><code class="name flex">
 <span>def <span class="ident">compare_orgs</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compare_orgs(self):
-    matches = []
-    for i,instance in enumerate(self.instances):
-        res = self.match_org(instance,i)
-        if res[1] != -1:
-            self.ref_instances.pop(res[1])
-        matches.append(res)
-
-    result = self.generate_confusion_matrix(matches)
-    pprint.pprint(result)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.compare_people"><code class="name flex">
 <span>def <span class="ident">compare_people</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compare_people(self):
-    matches = []
-    self.filter_people()
-    for i,instance in enumerate(self.instances):
-        res = self.match_person(instance,i)
-        if res[1] != -1:
-            self.ref_instances.pop(res[1])
-        matches.append(res)
-    result = self.generate_confusion_matrix(matches)
-    pprint.pprint(result)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.filter_people"><code class="name flex">
 <span>def <span class="ident">filter_people</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def filter_people(self):
-    url_set = set()
-    result = []
-    for i in range(len(self.instances)):
-        if self.instances[i].url not in url_set:
-            url_set.add(self.instances[i].url)
-            result.append(self.instances[i])
-    self.instances = result
-    return True</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.generate_confusion_matrix"><code class="name flex">
 <span>def <span class="ident">generate_confusion_matrix</span></span>(<span>self, matches)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def generate_confusion_matrix(self,matches):
-    TP = 0
-    FP = 0
-    used_reference = set()
-    for match in matches:
-        if match[1] != -1:
-            TP += 1
-            used_reference.add(match[1])
-        else:
-            FP += 1
-    #remaining_reference = set([i for i in range(len(self.ref_instances))]).difference(used_reference)
-    FN = len(self.ref_instances)
-    confusion_matrix = np.array([[TP, FP], [FN, 0]])
-    precision = TP / (TP + FP)
-    recall = TP / (TP + FN)
-    f1 = 2 * (precision * recall) / (precision + recall)
-
-    return {&#39;confusion_matrix&#39;: confusion_matrix, &#39;precision&#39;: precision, &#39;recall&#39;: recall, &#39;f1&#39;: f1}</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.match_org"><code class="name flex">
 <span>def <span class="ident">match_org</span></span>(<span>self, org, index=-1)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def match_org(self,org,index=-1):
-    for i,org_ref in enumerate(self.ref_instances):
-        if fuzz.partial_token_sort_ratio(org.name,org_ref.name) &gt; 80:
-            return index,i
-        elif fuzz.partial_token_sort_ratio(org.url,org_ref.url) &gt; 80:
-            return index,i
-    return index,-1</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.EntityInstanceMatcher.match_person"><code class="name flex">
 <span>def <span class="ident">match_person</span></span>(<span>self, person, index=-1)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def match_person(self,person,index=-1):
-    for i,person_ref in enumerate(self.ref_instances):
-        if fuzz.partial_token_sort_ratio(person.url, person_ref.url) &gt; 80:
-            return index,i
-        elif fuzz.partial_token_sort_ratio(person.name,person_ref.name) &gt; 80:
-            return index,i
-    return index,-1</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -508,129 +95,6 @@ class EntityInstanceMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Evaluator:
-    def __init__(self,results_file,reference_file) -&gt; None:
-        super().__init__()
-        self.data_result = self.load_result_file(results_file)
-        self.data_reference = self.load_result_file(reference_file)
-        self.matches = None
-
-
-    def load_result_file(self,fname):
-        data = read_jsonlines_file(fname)
-        data = flatten(data)
-        data = Person.schema().load(data,many=True)
-        data_sorted = sorted(data,key=lambda x: x.name)
-        return data_sorted
-
-    def evaluate_found_people(self):
-        matches = []
-        for person in self.data_result:
-            person_ref = self.person_in_reference(person)
-            if person_ref is not None:
-                matches.append((person,person_ref))
-        precision = len(matches)/len(self.data_result)
-        recall = len(matches)/len(self.data_reference)
-        f1 = 2*precision*recall/(precision+recall)
-        self.matches = matches
-        return {&#34;precision&#34;:precision,&#34;recall&#34;:recall,&#34;f1&#34;:f1,&#34;matches&#34;:matches}
-
-    def evaluate_matches(self,matches=None):
-        if not matches:
-            matches = self.matches
-        results = []
-        for person,person_ref in matches:
-            divison_matches,full_matches = self.affiliations_in_reference(person,person_ref)
-            divisions_ref = set([aff.division for aff in person_ref.affiliations])
-            not_found = set(person_ref.affiliations).difference(full_matches)
-            item = {
-                &#34;person&#34;:person.name,
-                &#34;affiliations&#34;:person.affiliations,
-                &#34;affiliations_ref&#34;:person_ref.affiliations,
-                &#34;divison_matches&#34;:divison_matches,
-                &#34;full_matches&#34;:full_matches,
-                &#34;not_found&#34;:not_found,
-                &#34;precision&#34;: len(full_matches)/len(person.affiliations),
-                &#34;recall&#34;: len(full_matches)/len(person_ref.affiliations),
-                &#34;precision_division&#34;: len(divison_matches)/len(person.affiliations),
-                &#34;recall_division&#34;: len(divison_matches)/len(divisions_ref),
-            }
-            results.append(item)
-        return results
-
-    def affiliations_in_reference(self,person,person_ref):
-        matches_division_position = set()
-        divisions = set([aff.division for aff in person.affiliations])
-        divisions_ref = set([aff.division for aff in person_ref.affiliations])
-        matches_division = divisions.intersection(divisions_ref)
-        for affiliation in person.affiliations:
-            for affiliation_ref in person_ref.affiliations:
-                if affiliation.division == affiliation_ref.division and affiliation.position == affiliation_ref.position:
-                    matches_division_position.add(affiliation)
-        return matches_division,matches_division_position
-
-
-
-    def person_in_reference(self,person:Person):
-        for i,person_ref in enumerate(self.data_reference):
-            if person_ref.name == person.name:
-                return person_ref
-            elif person_ref.url == person.url:
-                return person_ref
-        return None
-
-    def build_hierachical_tree(self,data:list[Person],main_org:Organization):
-        tree_dict = defaultdict(set)
-
-        for person in data:
-            person.add_implicit_affiliations()
-            parent = person.organization.parent
-            org = person.organization
-            while parent:
-                tree_dict[parent.name].add(org.name)
-                org = parent
-                parent = parent.parent
-            for affiliation in person.affiliations:
-                parent = person.organization
-                org = Organization(name=affiliation.division,url=parent.url,parent=parent,domain=parent.domain)
-                if org.name != parent.name:
-                    tree_dict[parent.name].add(org.name)
-        return tree_dict
-
-    def build_levels(self, tree,root):
-        result = list()
-        result.append([root])
-        node = root
-        level = 0
-        print(result[level])
-
-        while len(result[level]) &gt; 0:
-            result.append([])
-            for node in result[level]:
-                print(node)
-                for child in tree[node]:
-                    result[level+1].append(child)
-            level += 1
-        return result
-
-
-
-
-    def compare_levels(self,levels_res, tree_ref):
-        min_length = min(len(levels_res),len(tree_ref))
-        max_length = max(len(levels_res),len(tree_ref))
-        res = []
-        for i in range(min_length):
-            res.append(levels_res[i].intersection(tree_ref[i]))
-
-        for i in range(min_length,max_length):
-            res.append(set())
-        return res</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.affiliations_in_reference"><code class="name flex">
@@ -638,186 +102,48 @@ class EntityInstanceMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def affiliations_in_reference(self,person,person_ref):
-    matches_division_position = set()
-    divisions = set([aff.division for aff in person.affiliations])
-    divisions_ref = set([aff.division for aff in person_ref.affiliations])
-    matches_division = divisions.intersection(divisions_ref)
-    for affiliation in person.affiliations:
-        for affiliation_ref in person_ref.affiliations:
-            if affiliation.division == affiliation_ref.division and affiliation.position == affiliation_ref.position:
-                matches_division_position.add(affiliation)
-    return matches_division,matches_division_position</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.build_hierachical_tree"><code class="name flex">
 <span>def <span class="ident">build_hierachical_tree</span></span>(<span>self, data: list[<a title="academic_crawler.scrapers.templates.Person" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>], main_org: <a title="academic_crawler.scrapers.templates.Organization" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Organization">Organization</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def build_hierachical_tree(self,data:list[Person],main_org:Organization):
-    tree_dict = defaultdict(set)
-
-    for person in data:
-        person.add_implicit_affiliations()
-        parent = person.organization.parent
-        org = person.organization
-        while parent:
-            tree_dict[parent.name].add(org.name)
-            org = parent
-            parent = parent.parent
-        for affiliation in person.affiliations:
-            parent = person.organization
-            org = Organization(name=affiliation.division,url=parent.url,parent=parent,domain=parent.domain)
-            if org.name != parent.name:
-                tree_dict[parent.name].add(org.name)
-    return tree_dict</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.build_levels"><code class="name flex">
 <span>def <span class="ident">build_levels</span></span>(<span>self, tree, root)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def build_levels(self, tree,root):
-    result = list()
-    result.append([root])
-    node = root
-    level = 0
-    print(result[level])
-
-    while len(result[level]) &gt; 0:
-        result.append([])
-        for node in result[level]:
-            print(node)
-            for child in tree[node]:
-                result[level+1].append(child)
-        level += 1
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.compare_levels"><code class="name flex">
 <span>def <span class="ident">compare_levels</span></span>(<span>self, levels_res, tree_ref)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compare_levels(self,levels_res, tree_ref):
-    min_length = min(len(levels_res),len(tree_ref))
-    max_length = max(len(levels_res),len(tree_ref))
-    res = []
-    for i in range(min_length):
-        res.append(levels_res[i].intersection(tree_ref[i]))
-
-    for i in range(min_length,max_length):
-        res.append(set())
-    return res</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.evaluate_found_people"><code class="name flex">
 <span>def <span class="ident">evaluate_found_people</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def evaluate_found_people(self):
-    matches = []
-    for person in self.data_result:
-        person_ref = self.person_in_reference(person)
-        if person_ref is not None:
-            matches.append((person,person_ref))
-    precision = len(matches)/len(self.data_result)
-    recall = len(matches)/len(self.data_reference)
-    f1 = 2*precision*recall/(precision+recall)
-    self.matches = matches
-    return {&#34;precision&#34;:precision,&#34;recall&#34;:recall,&#34;f1&#34;:f1,&#34;matches&#34;:matches}</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.evaluate_matches"><code class="name flex">
 <span>def <span class="ident">evaluate_matches</span></span>(<span>self, matches=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def evaluate_matches(self,matches=None):
-    if not matches:
-        matches = self.matches
-    results = []
-    for person,person_ref in matches:
-        divison_matches,full_matches = self.affiliations_in_reference(person,person_ref)
-        divisions_ref = set([aff.division for aff in person_ref.affiliations])
-        not_found = set(person_ref.affiliations).difference(full_matches)
-        item = {
-            &#34;person&#34;:person.name,
-            &#34;affiliations&#34;:person.affiliations,
-            &#34;affiliations_ref&#34;:person_ref.affiliations,
-            &#34;divison_matches&#34;:divison_matches,
-            &#34;full_matches&#34;:full_matches,
-            &#34;not_found&#34;:not_found,
-            &#34;precision&#34;: len(full_matches)/len(person.affiliations),
-            &#34;recall&#34;: len(full_matches)/len(person_ref.affiliations),
-            &#34;precision_division&#34;: len(divison_matches)/len(person.affiliations),
-            &#34;recall_division&#34;: len(divison_matches)/len(divisions_ref),
-        }
-        results.append(item)
-    return results</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.load_result_file"><code class="name flex">
 <span>def <span class="ident">load_result_file</span></span>(<span>self, fname)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_result_file(self,fname):
-    data = read_jsonlines_file(fname)
-    data = flatten(data)
-    data = Person.schema().load(data,many=True)
-    data_sorted = sorted(data,key=lambda x: x.name)
-    return data_sorted</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.evaluation.Evaluator.person_in_reference"><code class="name flex">
 <span>def <span class="ident">person_in_reference</span></span>(<span>self, person: <a title="academic_crawler.scrapers.templates.Person" href="../scrapers/templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def person_in_reference(self,person:Person):
-    for i,person_ref in enumerate(self.data_reference):
-        if person_ref.name == person.name:
-            return person_ref
-        elif person_ref.url == person.url:
-            return person_ref
-    return None</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

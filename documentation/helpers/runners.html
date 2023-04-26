@@ -22,94 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.runners</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import logging
-
-from _cffi_backend import callback
-from scrapy import signals
-from scrapy.crawler import CrawlerRunner
-from scrapy.utils.log import configure_logging
-from twisted.internet import reactor
-
-from academic_crawler.config.state import ProgramState
-from academic_crawler.helpers.processing import process_scraped_org_structure_items
-from academic_crawler.spiders.organization_spider import OrganizationSpider
-from academic_crawler.spiders.people_spider import PeopleSpider
-from academic_crawler.spiders.people_spider_alternative import PeopleSpiderAlt
-
-
-class AcademicCrawlerRunner(CrawlerRunner):
-    &#34;&#34;&#34;
-    Crawler object that collects items and returns output after finishing crawl.
-    &#34;&#34;&#34;
-    def crawl(self, crawler_or_spidercls, *args, **kwargs):
-        self.items = []
-
-        crawler = self.create_crawler(crawler_or_spidercls)
-
-        crawler.signals.connect(self.item_scraped, signals.item_scraped)
-
-        dfd = self._crawl(crawler, *args, **kwargs)
-
-        dfd.addCallback(self.return_items)
-        return dfd
-
-    def item_scraped(self, item, response, spider):
-        self.items.append(item)
-
-    def return_items(self, result):
-        return self.items
-
-def run_spider_org_structure(program_state:ProgramState):
-    &#34;&#34;&#34;
-    Runs the organization spider and returns the scraped items.
-    :param program_state: ProgramState object
-    :return:
-    &#34;&#34;&#34;
-    logging.basicConfig(filename=&#39;app2_org.log&#39;, filemode=&#39;w&#39;, format=&#39;%(name)s - %(levelname)s - %(message)s&#39;)
-    logging.info(&#34;Start of log!&#34;)
-   # configure_logging()
-
-    organization = program_state.get_domain(&#34;organization&#34;)
-    controller = program_state.controller
-    spider_args =dict(allowed_domains=[organization.domain],
-                      start_urls=[organization.url],
-                      name=organization.name,
-                      controller=controller,
-                      program_state=program_state)
-
-    runner = AcademicCrawlerRunner()
-    crawler = runner.create_crawler(OrganizationSpider)
-    deferred = runner.crawl(crawler, **spider_args)
-    return deferred
-
-def run_spider_people(program_state:ProgramState):
-    &#34;&#34;&#34;
-    Runs the people spider and returns the scraped items.
-    :param program_state:
-    :return:
-    &#34;&#34;&#34;
-    logging.basicConfig(filename=&#39;app2.log&#39;, filemode=&#39;w&#39;, format=&#39;%(name)s - %(levelname)s - %(message)s&#39;)
-    logging.info(&#34;Start of log!&#34;)
-    #configure_logging()
-
-    organization = program_state.get_domain(&#34;organization&#34;)
-    controller = program_state.controller
-    spider_args =dict(allowed_domains=[organization.domain],
-                      start_urls=[organization.url],
-                      name=organization.name,
-                      controller=controller,
-                      program_state=program_state)
-
-    runner = AcademicCrawlerRunner()
-
-    crawler = runner.create_crawler(PeopleSpiderAlt)
-    deferred = runner.crawl(crawler, **spider_args)
-    return deferred</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -122,36 +34,7 @@ def run_spider_people(program_state:ProgramState):
 <span>def <span class="ident">run_spider_org_structure</span></span>(<span>program_state: <a title="academic_crawler.config.state.ProgramState" href="../config/state.html#academic_crawler.config.state.ProgramState">ProgramState</a>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Runs the organization spider and returns the scraped items.
-:param program_state: ProgramState object
-:return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run_spider_org_structure(program_state:ProgramState):
-    &#34;&#34;&#34;
-    Runs the organization spider and returns the scraped items.
-    :param program_state: ProgramState object
-    :return:
-    &#34;&#34;&#34;
-    logging.basicConfig(filename=&#39;app2_org.log&#39;, filemode=&#39;w&#39;, format=&#39;%(name)s - %(levelname)s - %(message)s&#39;)
-    logging.info(&#34;Start of log!&#34;)
-   # configure_logging()
-
-    organization = program_state.get_domain(&#34;organization&#34;)
-    controller = program_state.controller
-    spider_args =dict(allowed_domains=[organization.domain],
-                      start_urls=[organization.url],
-                      name=organization.name,
-                      controller=controller,
-                      program_state=program_state)
-
-    runner = AcademicCrawlerRunner()
-    crawler = runner.create_crawler(OrganizationSpider)
-    deferred = runner.crawl(crawler, **spider_args)
-    return deferred</code></pre>
-</details>
+<div class="desc"><p>Runs the organization spider and returns the scraped items.</p></div>
 </dd>
 <dt id="academic_crawler.helpers.runners.run_spider_people"><code class="name flex">
 <span>def <span class="ident">run_spider_people</span></span>(<span>program_state: <a title="academic_crawler.config.state.ProgramState" href="../config/state.html#academic_crawler.config.state.ProgramState">ProgramState</a>)</span>
@@ -160,34 +43,6 @@ def run_spider_people(program_state:ProgramState):
 <div class="desc"><p>Runs the people spider and returns the scraped items.
 :param program_state:
 :return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run_spider_people(program_state:ProgramState):
-    &#34;&#34;&#34;
-    Runs the people spider and returns the scraped items.
-    :param program_state:
-    :return:
-    &#34;&#34;&#34;
-    logging.basicConfig(filename=&#39;app2.log&#39;, filemode=&#39;w&#39;, format=&#39;%(name)s - %(levelname)s - %(message)s&#39;)
-    logging.info(&#34;Start of log!&#34;)
-    #configure_logging()
-
-    organization = program_state.get_domain(&#34;organization&#34;)
-    controller = program_state.controller
-    spider_args =dict(allowed_domains=[organization.domain],
-                      start_urls=[organization.url],
-                      name=organization.name,
-                      controller=controller,
-                      program_state=program_state)
-
-    runner = AcademicCrawlerRunner()
-
-    crawler = runner.create_crawler(PeopleSpiderAlt)
-    deferred = runner.crawl(crawler, **spider_args)
-    return deferred</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -200,32 +55,6 @@ def run_spider_people(program_state:ProgramState):
 </code></dt>
 <dd>
 <div class="desc"><p>Crawler object that collects items and returns output after finishing crawl.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AcademicCrawlerRunner(CrawlerRunner):
-    &#34;&#34;&#34;
-    Crawler object that collects items and returns output after finishing crawl.
-    &#34;&#34;&#34;
-    def crawl(self, crawler_or_spidercls, *args, **kwargs):
-        self.items = []
-
-        crawler = self.create_crawler(crawler_or_spidercls)
-
-        crawler.signals.connect(self.item_scraped, signals.item_scraped)
-
-        dfd = self._crawl(crawler, *args, **kwargs)
-
-        dfd.addCallback(self.return_items)
-        return dfd
-
-    def item_scraped(self, item, response, spider):
-        self.items.append(item)
-
-    def return_items(self, result):
-        return self.items</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scrapy.crawler.CrawlerRunner</li>
@@ -249,48 +78,18 @@ or spider's name inside the project to create it
 :class:<code>~scrapy.spiders.Spider</code> subclass or string</p>
 <p>:param args: arguments to initialize the spider</p>
 <p>:param kwargs: keyword arguments to initialize the spider</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def crawl(self, crawler_or_spidercls, *args, **kwargs):
-    self.items = []
-
-    crawler = self.create_crawler(crawler_or_spidercls)
-
-    crawler.signals.connect(self.item_scraped, signals.item_scraped)
-
-    dfd = self._crawl(crawler, *args, **kwargs)
-
-    dfd.addCallback(self.return_items)
-    return dfd</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.runners.AcademicCrawlerRunner.item_scraped"><code class="name flex">
 <span>def <span class="ident">item_scraped</span></span>(<span>self, item, response, spider)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def item_scraped(self, item, response, spider):
-    self.items.append(item)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.runners.AcademicCrawlerRunner.return_items"><code class="name flex">
 <span>def <span class="ident">return_items</span></span>(<span>self, result)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def return_items(self, result):
-    return self.items</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

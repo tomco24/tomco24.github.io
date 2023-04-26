@@ -22,47 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_config</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from academic_crawler.scrapers.templates import Organization
-from academic_crawler.heuristics.page_config.tag_entity_location import *
-from academic_crawler.helpers.mock import get_mock_organization
-from academic_crawler.heuristics.page_config.tag import *
-
-class PageConfig():
-    def __init__(self,**kw) -&gt; None:
-        super().__init__()
-        self.domain = kw.get(&#34;domain&#34;)
-        self.parent_organization:Organization = kw.get(&#34;parent_organization&#34;)
-        self.departments_url = kw.get(&#34;departments_url&#34;)
-        self.people_url = kw.get(&#34;people_url&#34;)
-        self.people_tags_locations:TagsLocationsPeople = TagsLocationsPeople(**kw.get(&#34;people_tags_locations&#34;))
-        #self.departments_tags_locations:TagsLocationsDepartments = TagsLocationsDepartments(**kw.get(&#34;departments_tags_locations&#34;))
-        self.single_person_tags_locations:TagsLocationsSinglePerson = TagsLocationsSinglePerson(**kw.get(&#34;single_person_tags_locations&#34;))
-
-if __name__ == &#34;__main__&#34;:
-    config = {
-        &#34;domain&#34;:&#34;www.ub.edu&#34;,
-        &#34;parent_organization&#34;:get_mock_organization(0)[1],
-        &#34;departments_url&#34;:&#34;&#34;,
-        &#34;people_url&#34;:&#34;https://fit.cvut.cz/en/faculty/people&#34;,
-        &#34;people_tags_locations&#34;:{
-            &#34;person_url&#34;:[ConfTag(&#34;div&#34;,{&#34;class&#34;:&#34;persons_category&#34;}),ConfTag(&#34;a&#34;,{&#34;class&#34;:&#34;person&#34;}),ConfTag(&#34;href&#34;,{})],
-            &#34;person_name&#34;:[ConfTag(&#34;div&#34;,{&#34;class&#34;:&#34;persons_category&#34;}),ConfTag(&#34;h3&#34;,{&#34;class&#34;:&#34;person-name&#34;}),ConfTag(&#34;text&#34;,{})],
-        },
-        &#34;single_person_tags_locations&#34;:{
-            &#34;affiliation_container&#34;:ConfTag(&#34;table&#34;,{&#34;class&#34;:&#34;positions&#34;}),
-            &#34;affiliation_division&#34;:ConfTag(&#34;td&#34;,{&#34;position&#34;:1}),
-            &#34;affiliation_position&#34;:ConfTag(&#34;td&#34;,{&#34;position&#34;:0}),
-
-
-        }
-
-    }
-    page_config = PageConfig(**config)</code></pre>
-</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -90,21 +49,6 @@ if __name__ == &#34;__main__&#34;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PageConfig():
-    def __init__(self,**kw) -&gt; None:
-        super().__init__()
-        self.domain = kw.get(&#34;domain&#34;)
-        self.parent_organization:Organization = kw.get(&#34;parent_organization&#34;)
-        self.departments_url = kw.get(&#34;departments_url&#34;)
-        self.people_url = kw.get(&#34;people_url&#34;)
-        self.people_tags_locations:TagsLocationsPeople = TagsLocationsPeople(**kw.get(&#34;people_tags_locations&#34;))
-        #self.departments_tags_locations:TagsLocationsDepartments = TagsLocationsDepartments(**kw.get(&#34;departments_tags_locations&#34;))
-        self.single_person_tags_locations:TagsLocationsSinglePerson = TagsLocationsSinglePerson(**kw.get(&#34;single_person_tags_locations&#34;))</code></pre>
-</details>
 </dd>
 </dl>
 </section>

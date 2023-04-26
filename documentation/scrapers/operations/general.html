@@ -22,66 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.operations.general</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from . import create_operation_result
-from . import OperationType, OperationStatus, OperationResult
-import networkx as nx
-from academic_crawler.config.utils import get_tree_data_node, save_graph
-from ...helpers.node_data import NodeDataExtractionHelper
-from ...heuristics.tree import SemanticNode
-category_dict ={
-    &#34;people&#34;: (&#34;PERSON&#34;,&#34;keywords_people_page&#34;,OperationType.EXTRACT_DATA_FROM_LINKS_PEOPLE),
-    &#34;org_structure&#34;: (&#34;ORG&#34;,&#34;keywords_org_structure&#34;,OperationType.EXTRACT_DATA_FROM_LINKS_ORG_STRUCTURE),
-}
-
-@create_operation_result
-def remove_not_tagged(G: nx.DiGraph, start: str) -&gt; OperationResult:
-    reverse_top_sort = reversed(list(nx.topological_sort(G)))
-    for node in reverse_top_sort:
-        if G.out_degree(node) == 0:
-            if not is_tagged(get_tree_data_node(G, node)):
-                G.remove_node(node)
-    return G, OperationType.REMOVE_NOT_TAGGED, OperationStatus.SUCCESS
-
-
-
-def is_tagged(node: SemanticNode):
-    return node.leaf and node.entity.ner_tag
-
-
-@create_operation_result
-def extract_data_from_links(G:nx.DiGraph,category:str,need_links=True):
-    &#34;&#34;&#34;
-    This operation extracts data from links in the tree. It is used for extracting data from people and organization pages.
-    Args:
-        G:
-        category:
-        need_links:
-
-    Returns:
-
-    &#34;&#34;&#34;
-
-    ner_type,keyword,op_type = category_dict[category]
-    helper = NodeDataExtractionHelper()
-    results = []
-    section_parent = get_tree_data_node(G,0)
-    succesors = nx.dfs_preorder_nodes(G,0)
-    nodes = [get_tree_data_node(G,_) for _ in succesors]
-    if need_links:
-        for node in nodes:
-            if node.is_link_descendant():
-                res = helper.extract_data_from_node(node,ner_type,keyword)
-                results += res
-    else:
-        for node in nodes:
-            res = helper.extract_data_from_node(node,ner_type,keyword)
-            results += res
-    return results,op_type,OperationStatus.SUCCESS</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -100,72 +40,18 @@ def extract_data_from_links(G:nx.DiGraph,category:str,need_links=True):
 category:
 need_links:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def extract_data_from_links(G:nx.DiGraph,category:str,need_links=True):
-    &#34;&#34;&#34;
-    This operation extracts data from links in the tree. It is used for extracting data from people and organization pages.
-    Args:
-        G:
-        category:
-        need_links:
-
-    Returns:
-
-    &#34;&#34;&#34;
-
-    ner_type,keyword,op_type = category_dict[category]
-    helper = NodeDataExtractionHelper()
-    results = []
-    section_parent = get_tree_data_node(G,0)
-    succesors = nx.dfs_preorder_nodes(G,0)
-    nodes = [get_tree_data_node(G,_) for _ in succesors]
-    if need_links:
-        for node in nodes:
-            if node.is_link_descendant():
-                res = helper.extract_data_from_node(node,ner_type,keyword)
-                results += res
-    else:
-        for node in nodes:
-            res = helper.extract_data_from_node(node,ner_type,keyword)
-            results += res
-    return results,op_type,OperationStatus.SUCCESS</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.general.is_tagged"><code class="name flex">
 <span>def <span class="ident">is_tagged</span></span>(<span>node: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_tagged(node: SemanticNode):
-    return node.leaf and node.entity.ner_tag</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.general.remove_not_tagged"><code class="name flex">
 <span>def <span class="ident">remove_not_tagged</span></span>(<span>G: networkx.classes.digraph.DiGraph, start: str) ‑> <a title="academic_crawler.scrapers.operations.OperationResult" href="index.html#academic_crawler.scrapers.operations.OperationResult">OperationResult</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def remove_not_tagged(G: nx.DiGraph, start: str) -&gt; OperationResult:
-    reverse_top_sort = reversed(list(nx.topological_sort(G)))
-    for node in reverse_top_sort:
-        if G.out_degree(node) == 0:
-            if not is_tagged(get_tree_data_node(G, node)):
-                G.remove_node(node)
-    return G, OperationType.REMOVE_NOT_TAGGED, OperationStatus.SUCCESS</code></pre>
-</details>
 </dd>
 </dl>
 </section>

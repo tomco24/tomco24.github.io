@@ -22,165 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.utils</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import pickle
-import re
-from html import unescape
-from urllib.parse import urlparse
-
-import networkx as nx
-import nltk
-from urlmatch import urlmatch
-
-
-def in_domain(link, domain):
-    link = urlparse(link)
-    if domain not in link.netloc:
-        return False
-    return True
-
-
-def parse_path(path):
-    result = []
-
-    parts = str(path).split(&#39;/&#39;)
-    if len(parts[0]) == 0:
-        parts = parts[1:]
-    # parts = [unquote(x) for x in parts]
-    # parts = [str(x).replace(&#39;-&#39;,&#39; &#39;) for x in parts]
-    return parts
-
-
-def mergedict(args):
-    output = {}
-    for arg in args:
-        output.update(arg)
-    return output
-
-
-def simple_word_tokenization(sentence, remove_stop=False):
-    splits = nltk.word_tokenize(sentence)
-    tokens = [word.lower() for word in splits if word.isalpha()]
-    if remove_stop:
-        stop_words = set(nltk.corpus.stopwords.words(&#39;english&#39;))
-        tokens = [word for word in tokens if word not in stop_words]
-    return tokens
-
-
-def clean_text(text):
-    text = re.sub(&#39;[\r\n\t]+&#39;, &#39;&#39;, text)
-    text = unescape(text)
-    return text
-
-
-def flatten(list_of_lists):
-    if len(list_of_lists) == 0:
-        return list_of_lists
-    if isinstance(list_of_lists[0], list):
-        return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
-    return list_of_lists[:1] + flatten(list_of_lists[1:])
-
-def find_with_regex(text, to_find):
-    pattern = re.compile(to_find, re.I)
-    match = pattern.search(text)
-    if match:
-        return True
-    else:
-        return False
-
-
-def split_string(string, chunk_size=100000):
-    chunks = []
-    for i in range(0, len(string), chunk_size):
-        chunks.append(string[i:i+chunk_size])
-    return chunks
-
-def save_to_pickle(variable, filename):
-    with open(filename, &#39;wb&#39;) as f:
-        pickle.dump(variable, f)
-
-def load_from_pickle(filename):
-    with open(filename, &#39;rb&#39;) as f:
-        variable = pickle.load(f)
-    return variable
-
-def save_graph(G:nx.DiGraph,fname=&#34;graph.svg&#34;):
-    A = nx.nx_agraph.to_agraph(G)
-    A.graph_attr.update( {&#39;rankdir&#39;: &#39;LR&#39;,&#39;splines&#39;:&#39;ortho&#39;,&#39;shape&#39;:&#39;box&#39;})
-    A.layout(&#39;dot&#39;)
-    A.draw(fname)
-
-def get_tree_data_node(G:nx.DiGraph,node) -&gt; &#34;SemanticNode&#34;:
-    return G.nodes.get(node).get(&#34;data&#34;)
-
-def get_tree_root(G:nx.DiGraph): # TODO FASTER?
-    return next(iter(nx.topological_sort(G)))
-
-def get_relabeled_tree(G:nx.DiGraph) -&gt; nx.DiGraph :
-    &#34;&#34;&#34;
-    This operation relabels the nodes of the tree with integers starting from 0.
-    Args:
-        G:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    result = nx.convert_node_labels_to_integers(G,label_attribute=&#34;full_id&#34;)
-    for id in range(len(G)):
-        data_node = get_tree_data_node(result,id)
-        data_node.id = id
-    return result
-
-def node_has_links_in_children(G:nx.DiGraph,node:str):
-    descendants = nx.descendants(G,node)
-    for descendant in descendants:
-        data_node = get_tree_data_node(G,descendant)
-        if data_node.label == &#39;a&#39; and len(data_node.tags)&gt;1:
-            return True
-    return False
-
-
-def exclude_items_in_intervals(items, intervals):
-    exclude_indices = set()
-    for interval in intervals:
-        exclude_indices.update(range(interval[0], interval[1] + 1))
-
-    new_items = [item for i, item in enumerate(items) if i not in exclude_indices]
-    return new_items
-
-def get_max_key_in_int_dict(d):
-    return max(d, key=d.get)
-
-def get_parent_by_level(tag, level: int):
-        &#34;&#34;&#34;
-        Returns the `level`-th parent of `tag`.
-        If `tag` does not have `level`-th parent, returns `None`.
-        &#34;&#34;&#34;
-        parent = tag
-        for i in range(level):
-            parent = parent.parent
-            if parent is None:
-                return None
-        return parent
-
-def get_noun_phrases_from_text(doc):
-    noun_phrases = set()
-    for nc in doc.noun_chunks:
-        for np in [nc, doc[nc.root.left_edge.i:nc.root.right_edge.i + 1]]:
-            noun_phrases.add(np.text)
-    nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;)]
-    noun_phrases.update(nouns)
-    return noun_phrases
-
-def url_match(url,pattern):
-    if pattern is None:
-        return False
-    res = urlmatch(pattern,url)
-    return res</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -194,100 +35,36 @@ def url_match(url,pattern):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def clean_text(text):
-    text = re.sub(&#39;[\r\n\t]+&#39;, &#39;&#39;, text)
-    text = unescape(text)
-    return text</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.exclude_items_in_intervals"><code class="name flex">
 <span>def <span class="ident">exclude_items_in_intervals</span></span>(<span>items, intervals)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def exclude_items_in_intervals(items, intervals):
-    exclude_indices = set()
-    for interval in intervals:
-        exclude_indices.update(range(interval[0], interval[1] + 1))
-
-    new_items = [item for i, item in enumerate(items) if i not in exclude_indices]
-    return new_items</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.find_with_regex"><code class="name flex">
 <span>def <span class="ident">find_with_regex</span></span>(<span>text, to_find)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def find_with_regex(text, to_find):
-    pattern = re.compile(to_find, re.I)
-    match = pattern.search(text)
-    if match:
-        return True
-    else:
-        return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.flatten"><code class="name flex">
 <span>def <span class="ident">flatten</span></span>(<span>list_of_lists)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def flatten(list_of_lists):
-    if len(list_of_lists) == 0:
-        return list_of_lists
-    if isinstance(list_of_lists[0], list):
-        return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
-    return list_of_lists[:1] + flatten(list_of_lists[1:])</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_max_key_in_int_dict"><code class="name flex">
 <span>def <span class="ident">get_max_key_in_int_dict</span></span>(<span>d)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_max_key_in_int_dict(d):
-    return max(d, key=d.get)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_noun_phrases_from_text"><code class="name flex">
 <span>def <span class="ident">get_noun_phrases_from_text</span></span>(<span>doc)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_noun_phrases_from_text(doc):
-    noun_phrases = set()
-    for nc in doc.noun_chunks:
-        for np in [nc, doc[nc.root.left_edge.i:nc.root.right_edge.i + 1]]:
-            noun_phrases.add(np.text)
-    nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;)]
-    noun_phrases.update(nouns)
-    return noun_phrases</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_parent_by_level"><code class="name flex">
 <span>def <span class="ident">get_parent_by_level</span></span>(<span>tag, level: int)</span>
@@ -295,22 +72,6 @@ def url_match(url,pattern):
 <dd>
 <div class="desc"><p>Returns the <code>level</code>-th parent of <code>tag</code>.
 If <code>tag</code> does not have <code>level</code>-th parent, returns <code>None</code>.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_parent_by_level(tag, level: int):
-        &#34;&#34;&#34;
-        Returns the `level`-th parent of `tag`.
-        If `tag` does not have `level`-th parent, returns `None`.
-        &#34;&#34;&#34;
-        parent = tag
-        for i in range(level):
-            parent = parent.parent
-            if parent is None:
-                return None
-        return parent</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_relabeled_tree"><code class="name flex">
 <span>def <span class="ident">get_relabeled_tree</span></span>(<span>G: networkx.classes.digraph.DiGraph) ‑> networkx.classes.digraph.DiGraph</span>
@@ -320,216 +81,78 @@ If <code>tag</code> does not have <code>level</code>-th parent, returns <code>No
 <h2 id="args">Args</h2>
 <p>G:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_relabeled_tree(G:nx.DiGraph) -&gt; nx.DiGraph :
-    &#34;&#34;&#34;
-    This operation relabels the nodes of the tree with integers starting from 0.
-    Args:
-        G:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    result = nx.convert_node_labels_to_integers(G,label_attribute=&#34;full_id&#34;)
-    for id in range(len(G)):
-        data_node = get_tree_data_node(result,id)
-        data_node.id = id
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_tree_data_node"><code class="name flex">
 <span>def <span class="ident">get_tree_data_node</span></span>(<span>G: networkx.classes.digraph.DiGraph, node) ‑> SemanticNode</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_tree_data_node(G:nx.DiGraph,node) -&gt; &#34;SemanticNode&#34;:
-    return G.nodes.get(node).get(&#34;data&#34;)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.get_tree_root"><code class="name flex">
 <span>def <span class="ident">get_tree_root</span></span>(<span>G: networkx.classes.digraph.DiGraph)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_tree_root(G:nx.DiGraph): # TODO FASTER?
-    return next(iter(nx.topological_sort(G)))</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.in_domain"><code class="name flex">
 <span>def <span class="ident">in_domain</span></span>(<span>link, domain)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def in_domain(link, domain):
-    link = urlparse(link)
-    if domain not in link.netloc:
-        return False
-    return True</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.load_from_pickle"><code class="name flex">
 <span>def <span class="ident">load_from_pickle</span></span>(<span>filename)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_from_pickle(filename):
-    with open(filename, &#39;rb&#39;) as f:
-        variable = pickle.load(f)
-    return variable</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.mergedict"><code class="name flex">
 <span>def <span class="ident">mergedict</span></span>(<span>args)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def mergedict(args):
-    output = {}
-    for arg in args:
-        output.update(arg)
-    return output</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.node_has_links_in_children"><code class="name flex">
 <span>def <span class="ident">node_has_links_in_children</span></span>(<span>G: networkx.classes.digraph.DiGraph, node: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def node_has_links_in_children(G:nx.DiGraph,node:str):
-    descendants = nx.descendants(G,node)
-    for descendant in descendants:
-        data_node = get_tree_data_node(G,descendant)
-        if data_node.label == &#39;a&#39; and len(data_node.tags)&gt;1:
-            return True
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.parse_path"><code class="name flex">
 <span>def <span class="ident">parse_path</span></span>(<span>path)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_path(path):
-    result = []
-
-    parts = str(path).split(&#39;/&#39;)
-    if len(parts[0]) == 0:
-        parts = parts[1:]
-    # parts = [unquote(x) for x in parts]
-    # parts = [str(x).replace(&#39;-&#39;,&#39; &#39;) for x in parts]
-    return parts</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.save_graph"><code class="name flex">
 <span>def <span class="ident">save_graph</span></span>(<span>G: networkx.classes.digraph.DiGraph, fname='graph.svg')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def save_graph(G:nx.DiGraph,fname=&#34;graph.svg&#34;):
-    A = nx.nx_agraph.to_agraph(G)
-    A.graph_attr.update( {&#39;rankdir&#39;: &#39;LR&#39;,&#39;splines&#39;:&#39;ortho&#39;,&#39;shape&#39;:&#39;box&#39;})
-    A.layout(&#39;dot&#39;)
-    A.draw(fname)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.save_to_pickle"><code class="name flex">
 <span>def <span class="ident">save_to_pickle</span></span>(<span>variable, filename)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def save_to_pickle(variable, filename):
-    with open(filename, &#39;wb&#39;) as f:
-        pickle.dump(variable, f)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.simple_word_tokenization"><code class="name flex">
 <span>def <span class="ident">simple_word_tokenization</span></span>(<span>sentence, remove_stop=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def simple_word_tokenization(sentence, remove_stop=False):
-    splits = nltk.word_tokenize(sentence)
-    tokens = [word.lower() for word in splits if word.isalpha()]
-    if remove_stop:
-        stop_words = set(nltk.corpus.stopwords.words(&#39;english&#39;))
-        tokens = [word for word in tokens if word not in stop_words]
-    return tokens</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.split_string"><code class="name flex">
 <span>def <span class="ident">split_string</span></span>(<span>string, chunk_size=100000)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def split_string(string, chunk_size=100000):
-    chunks = []
-    for i in range(0, len(string), chunk_size):
-        chunks.append(string[i:i+chunk_size])
-    return chunks</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.utils.url_match"><code class="name flex">
 <span>def <span class="ident">url_match</span></span>(<span>url, pattern)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def url_match(url,pattern):
-    if pattern is None:
-        return False
-    res = urlmatch(pattern,url)
-    return res</code></pre>
-</details>
 </dd>
 </dl>
 </section>

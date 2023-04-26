@@ -22,87 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.people</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import defaultdict
-from pprint import pprint
-
-from academic_crawler.config.utils import url_match
-from academic_crawler.scrapers.base import BaseScraper
-from academic_crawler.scrapers.strategies.people import PeopleStrategy
-from academic_crawler.scrapers.strategies.single_person import SinglePersonStrategy
-from academic_crawler.scrapers.templates import Person
-
-
-class PeopleScraper(BaseScraper):
-
-        def __init__(self) -&gt; None:
-            super().__init__()
-            self.patterns = []
-
-        def scrape(self, input_data):
-            strategy = PeopleStrategy(input_data)
-            results = strategy.run()
-            if not results:
-                return [], &#39;empty&#39;
-            if len(results[&#39;full&#39;])&gt;0 and len(results[&#39;partial&#39;])==0:
-                return results[&#39;full&#39;], &#39;full&#39;
-            elif len(results[&#39;partial&#39;])&gt;0 and len(results[&#39;full&#39;])&lt;5:
-                filtered = self.filter_and_merge_duplicates(results[&#39;partial&#39;])
-                self.instances = filtered
-                return filtered,&#39;partial&#39;
-            else:
-                return results[&#39;full&#39;] + results[&#39;partial&#39;], &#39;joined&#39;
-
-
-
-        def get_instances(self):
-            return self.instances
-
-        def scrape_single_person(self, input_data:dict):
-            strategy = SinglePersonStrategy(input_data,patterns=self.patterns)
-            person = strategy.run_alternative()
-            #self.patterns += strategy.patterns
-            #if len(person.affiliations) == 0:
-            #    person = strategy.run_patterns()
-            return person
-
-        def get_pattern_instances(self, managers, pattern, parent_org):
-            instances = []
-            for manager in managers:
-                if url_match(manager.link.url, pattern):
-                    instance = Person(
-                       name = manager.referer_text,
-                       url = manager.link.url,
-                       organization = parent_org,
-                   )
-                    instances.append(instance)
-            return instances
-
-        def filter_and_merge_duplicates(self, instances: list[Person]) -&gt; list[Person]:
-            &#34;&#34;&#34;
-            This method filters out duplicates and merges them into one instance.
-            Args:
-                instances:
-
-            Returns:
-
-            &#34;&#34;&#34;
-            duplicates = defaultdict(list)
-            result =  []
-            for item in instances:
-                duplicates[item.url].append(item)
-            for url, items in duplicates.items():
-                if len(items) &gt; 1:
-                    new_name = &#34; &#34;.join([item.name for item in items])
-                    new_item = Person(name=new_name, organization=items[0].organization, url=url)
-                    result.append(new_item)
-                else:
-                    result.append(items[0])
-            return result</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -117,79 +36,7 @@ class PeopleScraper(BaseScraper):
 <span>class <span class="ident">PeopleScraper</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PeopleScraper(BaseScraper):
-
-        def __init__(self) -&gt; None:
-            super().__init__()
-            self.patterns = []
-
-        def scrape(self, input_data):
-            strategy = PeopleStrategy(input_data)
-            results = strategy.run()
-            if not results:
-                return [], &#39;empty&#39;
-            if len(results[&#39;full&#39;])&gt;0 and len(results[&#39;partial&#39;])==0:
-                return results[&#39;full&#39;], &#39;full&#39;
-            elif len(results[&#39;partial&#39;])&gt;0 and len(results[&#39;full&#39;])&lt;5:
-                filtered = self.filter_and_merge_duplicates(results[&#39;partial&#39;])
-                self.instances = filtered
-                return filtered,&#39;partial&#39;
-            else:
-                return results[&#39;full&#39;] + results[&#39;partial&#39;], &#39;joined&#39;
-
-
-
-        def get_instances(self):
-            return self.instances
-
-        def scrape_single_person(self, input_data:dict):
-            strategy = SinglePersonStrategy(input_data,patterns=self.patterns)
-            person = strategy.run_alternative()
-            #self.patterns += strategy.patterns
-            #if len(person.affiliations) == 0:
-            #    person = strategy.run_patterns()
-            return person
-
-        def get_pattern_instances(self, managers, pattern, parent_org):
-            instances = []
-            for manager in managers:
-                if url_match(manager.link.url, pattern):
-                    instance = Person(
-                       name = manager.referer_text,
-                       url = manager.link.url,
-                       organization = parent_org,
-                   )
-                    instances.append(instance)
-            return instances
-
-        def filter_and_merge_duplicates(self, instances: list[Person]) -&gt; list[Person]:
-            &#34;&#34;&#34;
-            This method filters out duplicates and merges them into one instance.
-            Args:
-                instances:
-
-            Returns:
-
-            &#34;&#34;&#34;
-            duplicates = defaultdict(list)
-            result =  []
-            for item in instances:
-                duplicates[item.url].append(item)
-            for url, items in duplicates.items():
-                if len(items) &gt; 1:
-                    new_name = &#34; &#34;.join([item.name for item in items])
-                    new_item = Person(name=new_name, organization=items[0].organization, url=url)
-                    result.append(new_item)
-                else:
-                    result.append(items[0])
-            return result</code></pre>
-</details>
+<div class="desc"><p>This class is responsible for extracting people information from a given page.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.scrapers.base.BaseScraper" href="base.html#academic_crawler.scrapers.base.BaseScraper">BaseScraper</a></li>
@@ -205,109 +52,30 @@ inheritance.</p></div>
 <h2 id="args">Args</h2>
 <p>instances:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def filter_and_merge_duplicates(self, instances: list[Person]) -&gt; list[Person]:
-    &#34;&#34;&#34;
-    This method filters out duplicates and merges them into one instance.
-    Args:
-        instances:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    duplicates = defaultdict(list)
-    result =  []
-    for item in instances:
-        duplicates[item.url].append(item)
-    for url, items in duplicates.items():
-        if len(items) &gt; 1:
-            new_name = &#34; &#34;.join([item.name for item in items])
-            new_item = Person(name=new_name, organization=items[0].organization, url=url)
-            result.append(new_item)
-        else:
-            result.append(items[0])
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.people.PeopleScraper.get_instances"><code class="name flex">
 <span>def <span class="ident">get_instances</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_instances(self):
-    return self.instances</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.scrapers.people.PeopleScraper.get_pattern_instances"><code class="name flex">
-<span>def <span class="ident">get_pattern_instances</span></span>(<span>self, managers, pattern, parent_org)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_pattern_instances(self, managers, pattern, parent_org):
-    instances = []
-    for manager in managers:
-        if url_match(manager.link.url, pattern):
-            instance = Person(
-               name = manager.referer_text,
-               url = manager.link.url,
-               organization = parent_org,
-           )
-            instances.append(instance)
-    return instances</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.people.PeopleScraper.scrape"><code class="name flex">
-<span>def <span class="ident">scrape</span></span>(<span>self, input_data)</span>
+<span>def <span class="ident">scrape</span></span>(<span>self, input_data: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape(self, input_data):
-    strategy = PeopleStrategy(input_data)
-    results = strategy.run()
-    if not results:
-        return [], &#39;empty&#39;
-    if len(results[&#39;full&#39;])&gt;0 and len(results[&#39;partial&#39;])==0:
-        return results[&#39;full&#39;], &#39;full&#39;
-    elif len(results[&#39;partial&#39;])&gt;0 and len(results[&#39;full&#39;])&lt;5:
-        filtered = self.filter_and_merge_duplicates(results[&#39;partial&#39;])
-        self.instances = filtered
-        return filtered,&#39;partial&#39;
-    else:
-        return results[&#39;full&#39;] + results[&#39;partial&#39;], &#39;joined&#39;</code></pre>
-</details>
+<div class="desc"><p>Scraping using PeopleStrategy</p>
+<h2 id="args">Args</h2>
+<p>input_data:
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.scrapers.people.PeopleScraper.scrape_single_person"><code class="name flex">
 <span>def <span class="ident">scrape_single_person</span></span>(<span>self, input_data: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape_single_person(self, input_data:dict):
-    strategy = SinglePersonStrategy(input_data,patterns=self.patterns)
-    person = strategy.run_alternative()
-    #self.patterns += strategy.patterns
-    #if len(person.affiliations) == 0:
-    #    person = strategy.run_patterns()
-    return person</code></pre>
-</details>
+<div class="desc"><p>Scraping using SinglePersonStrategy</p>
+<h2 id="args">Args</h2>
+<p>input_data:
+Returns:</p></div>
 </dd>
 </dl>
 </dd>
@@ -332,7 +100,6 @@ Returns:</p></div>
 <ul class="">
 <li><code><a title="academic_crawler.scrapers.people.PeopleScraper.filter_and_merge_duplicates" href="#academic_crawler.scrapers.people.PeopleScraper.filter_and_merge_duplicates">filter_and_merge_duplicates</a></code></li>
 <li><code><a title="academic_crawler.scrapers.people.PeopleScraper.get_instances" href="#academic_crawler.scrapers.people.PeopleScraper.get_instances">get_instances</a></code></li>
-<li><code><a title="academic_crawler.scrapers.people.PeopleScraper.get_pattern_instances" href="#academic_crawler.scrapers.people.PeopleScraper.get_pattern_instances">get_pattern_instances</a></code></li>
 <li><code><a title="academic_crawler.scrapers.people.PeopleScraper.scrape" href="#academic_crawler.scrapers.people.PeopleScraper.scrape">scrape</a></code></li>
 <li><code><a title="academic_crawler.scrapers.people.PeopleScraper.scrape_single_person" href="#academic_crawler.scrapers.people.PeopleScraper.scrape_single_person">scrape_single_person</a></code></li>
 </ul>

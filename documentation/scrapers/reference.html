@@ -22,124 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.reference</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from time import sleep
-
-from academic_crawler.helpers.mock import get_mock_organization
-from academic_crawler.heuristics.page_config import PageConfig, ConfTag
-from academic_crawler.scrapers.templates import Person
-import requests
-from bs4 import BeautifulSoup,Tag
-from academic_crawler.scrapers.templates.websites import configs
-
-
-class ReferenceScraper:
-
-    def __init__(self,page_config:PageConfig) -&gt; None:
-        super().__init__()
-        self.page_config:PageConfig = page_config
-
-    def save_people(self,people):
-        with open(&#34;./FIT_reference_people.jsonl&#34;,&#39;w&#39;) as f:
-            for person in people:
-                line = person.to_json() + &#34;\n&#34;
-                f.write(line)
-        return True
-
-    def scrape(self):
-        people = self.scrape_people()
-        full_people = self.scrape_single_persons(people)
-        self.save_people(full_people)
-
-
-
-
-
-
-    def scrape_people(self):
-        people = []
-        url = self.page_config.people_url
-        response = requests.get(url)
-        sleep(1)
-        organization = self.page_config.parent_organization
-        soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-        locations = self.page_config.people_tags_locations
-        if locations.person_name[0] != locations.person_url[0]:
-            raise Exception(&#34;Person name and url must be in the same tag&#34;)
-        tag = locations.person_name[0]
-        for container in soup.find_all(tag.name,tag.attrs):
-            names = container.find_all(locations.person_name[1].name,locations.person_name[1].attrs)
-            hrefs = container.find_all(locations.person_url[1].name,locations.person_url[1].attrs)
-            if len(names)  != len(hrefs):
-                raise Exception(&#34;Number of names and hrefs must be the same&#34;)
-            for i in range(len(names)):
-                hrefs[i] = hrefs[i].get(&#39;href&#39;)
-                name = names[i].get_text(strip=True)
-                url, type_ = organization.fix_url(hrefs[i])
-                if type_ == &#34;external&#34;:
-                    continue
-                person = Person(name=name,url=url.url,organization=organization)
-                people.append(person)
-        return people
-
-
-    def get_name_from_people(self,tag:Tag,locations):
-        i = 0
-        name_tag =tag
-        for location in locations:
-            if location.closing:
-                return name_tag.get_text(strip=True)
-            name_tag = name_tag.find(location.name,location.attrs)
-            if name_tag is None:
-                return None
-
-    def get_url_from_people(self, tag: Tag, locations):
-        i = 0
-        name_tag = tag
-        for location in locations:
-            if location.closing:
-                return name_tag.get(&#39;href&#39;)
-            name_tag = name_tag.find(location.name, location.attrs)
-            if name_tag is None:
-                return None
-
-    def scrape_single_persons(self, people):
-        single_person_locations = self.page_config.single_person_tags_locations
-        container = single_person_locations.affiliation_container
-        division_location = single_person_locations.affiliation_division
-        position_location = single_person_locations.affiliation_position
-        for person in people:
-            response = requests.get(person.url)
-            soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-            try:
-                tag_container = soup.find(container.name,container.attrs)
-                if container.name == &#34;table&#34;:
-                    self.scrape_table(person,tag_container,division_location,position_location)
-                print(person)
-            except Exception as e:
-                print(e)
-                print(person)
-        return people
-    def scrape_table(self, person, tag_container, division_location, position_location):
-        for row in tag_container.find_all(&#34;tr&#34;):
-            columns = row.find_all(&#34;td&#34;)
-            if len(columns) &lt; 2:
-                continue
-            division = columns[division_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-            position = columns[position_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-            person.add_affiliation(division,position)
-
-
-
-if __name__ == &#34;__main__&#34;:
-    config = configs[1]
-    page_config = PageConfig(**config)
-    scraper = ReferenceScraper(page_config)
-    scraper.scrape()</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -156,106 +38,6 @@ if __name__ == &#34;__main__&#34;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ReferenceScraper:
-
-    def __init__(self,page_config:PageConfig) -&gt; None:
-        super().__init__()
-        self.page_config:PageConfig = page_config
-
-    def save_people(self,people):
-        with open(&#34;./FIT_reference_people.jsonl&#34;,&#39;w&#39;) as f:
-            for person in people:
-                line = person.to_json() + &#34;\n&#34;
-                f.write(line)
-        return True
-
-    def scrape(self):
-        people = self.scrape_people()
-        full_people = self.scrape_single_persons(people)
-        self.save_people(full_people)
-
-
-
-
-
-
-    def scrape_people(self):
-        people = []
-        url = self.page_config.people_url
-        response = requests.get(url)
-        sleep(1)
-        organization = self.page_config.parent_organization
-        soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-        locations = self.page_config.people_tags_locations
-        if locations.person_name[0] != locations.person_url[0]:
-            raise Exception(&#34;Person name and url must be in the same tag&#34;)
-        tag = locations.person_name[0]
-        for container in soup.find_all(tag.name,tag.attrs):
-            names = container.find_all(locations.person_name[1].name,locations.person_name[1].attrs)
-            hrefs = container.find_all(locations.person_url[1].name,locations.person_url[1].attrs)
-            if len(names)  != len(hrefs):
-                raise Exception(&#34;Number of names and hrefs must be the same&#34;)
-            for i in range(len(names)):
-                hrefs[i] = hrefs[i].get(&#39;href&#39;)
-                name = names[i].get_text(strip=True)
-                url, type_ = organization.fix_url(hrefs[i])
-                if type_ == &#34;external&#34;:
-                    continue
-                person = Person(name=name,url=url.url,organization=organization)
-                people.append(person)
-        return people
-
-
-    def get_name_from_people(self,tag:Tag,locations):
-        i = 0
-        name_tag =tag
-        for location in locations:
-            if location.closing:
-                return name_tag.get_text(strip=True)
-            name_tag = name_tag.find(location.name,location.attrs)
-            if name_tag is None:
-                return None
-
-    def get_url_from_people(self, tag: Tag, locations):
-        i = 0
-        name_tag = tag
-        for location in locations:
-            if location.closing:
-                return name_tag.get(&#39;href&#39;)
-            name_tag = name_tag.find(location.name, location.attrs)
-            if name_tag is None:
-                return None
-
-    def scrape_single_persons(self, people):
-        single_person_locations = self.page_config.single_person_tags_locations
-        container = single_person_locations.affiliation_container
-        division_location = single_person_locations.affiliation_division
-        position_location = single_person_locations.affiliation_position
-        for person in people:
-            response = requests.get(person.url)
-            soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-            try:
-                tag_container = soup.find(container.name,container.attrs)
-                if container.name == &#34;table&#34;:
-                    self.scrape_table(person,tag_container,division_location,position_location)
-                print(person)
-            except Exception as e:
-                print(e)
-                print(person)
-        return people
-    def scrape_table(self, person, tag_container, division_location, position_location):
-        for row in tag_container.find_all(&#34;tr&#34;):
-            columns = row.find_all(&#34;td&#34;)
-            if len(columns) &lt; 2:
-                continue
-            division = columns[division_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-            position = columns[position_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-            person.add_affiliation(division,position)</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.get_name_from_people"><code class="name flex">
@@ -263,155 +45,42 @@ if __name__ == &#34;__main__&#34;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_name_from_people(self,tag:Tag,locations):
-    i = 0
-    name_tag =tag
-    for location in locations:
-        if location.closing:
-            return name_tag.get_text(strip=True)
-        name_tag = name_tag.find(location.name,location.attrs)
-        if name_tag is None:
-            return None</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.get_url_from_people"><code class="name flex">
 <span>def <span class="ident">get_url_from_people</span></span>(<span>self, tag: bs4.element.Tag, locations)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_url_from_people(self, tag: Tag, locations):
-    i = 0
-    name_tag = tag
-    for location in locations:
-        if location.closing:
-            return name_tag.get(&#39;href&#39;)
-        name_tag = name_tag.find(location.name, location.attrs)
-        if name_tag is None:
-            return None</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.save_people"><code class="name flex">
 <span>def <span class="ident">save_people</span></span>(<span>self, people)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def save_people(self,people):
-    with open(&#34;./FIT_reference_people.jsonl&#34;,&#39;w&#39;) as f:
-        for person in people:
-            line = person.to_json() + &#34;\n&#34;
-            f.write(line)
-    return True</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.scrape"><code class="name flex">
 <span>def <span class="ident">scrape</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape(self):
-    people = self.scrape_people()
-    full_people = self.scrape_single_persons(people)
-    self.save_people(full_people)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.scrape_people"><code class="name flex">
 <span>def <span class="ident">scrape_people</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape_people(self):
-    people = []
-    url = self.page_config.people_url
-    response = requests.get(url)
-    sleep(1)
-    organization = self.page_config.parent_organization
-    soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-    locations = self.page_config.people_tags_locations
-    if locations.person_name[0] != locations.person_url[0]:
-        raise Exception(&#34;Person name and url must be in the same tag&#34;)
-    tag = locations.person_name[0]
-    for container in soup.find_all(tag.name,tag.attrs):
-        names = container.find_all(locations.person_name[1].name,locations.person_name[1].attrs)
-        hrefs = container.find_all(locations.person_url[1].name,locations.person_url[1].attrs)
-        if len(names)  != len(hrefs):
-            raise Exception(&#34;Number of names and hrefs must be the same&#34;)
-        for i in range(len(names)):
-            hrefs[i] = hrefs[i].get(&#39;href&#39;)
-            name = names[i].get_text(strip=True)
-            url, type_ = organization.fix_url(hrefs[i])
-            if type_ == &#34;external&#34;:
-                continue
-            person = Person(name=name,url=url.url,organization=organization)
-            people.append(person)
-    return people</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.scrape_single_persons"><code class="name flex">
 <span>def <span class="ident">scrape_single_persons</span></span>(<span>self, people)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape_single_persons(self, people):
-    single_person_locations = self.page_config.single_person_tags_locations
-    container = single_person_locations.affiliation_container
-    division_location = single_person_locations.affiliation_division
-    position_location = single_person_locations.affiliation_position
-    for person in people:
-        response = requests.get(person.url)
-        soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
-        try:
-            tag_container = soup.find(container.name,container.attrs)
-            if container.name == &#34;table&#34;:
-                self.scrape_table(person,tag_container,division_location,position_location)
-            print(person)
-        except Exception as e:
-            print(e)
-            print(person)
-    return people</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.reference.ReferenceScraper.scrape_table"><code class="name flex">
 <span>def <span class="ident">scrape_table</span></span>(<span>self, person, tag_container, division_location, position_location)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def scrape_table(self, person, tag_container, division_location, position_location):
-    for row in tag_container.find_all(&#34;tr&#34;):
-        columns = row.find_all(&#34;td&#34;)
-        if len(columns) &lt; 2:
-            continue
-        division = columns[division_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-        position = columns[position_location.attrs.get(&#39;position&#39;)].get_text(strip=True)
-        person.add_affiliation(division,position)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

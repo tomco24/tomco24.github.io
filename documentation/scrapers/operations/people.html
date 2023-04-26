@@ -22,395 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.operations.people</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import re
-from pprint import pprint
-
-import bs4
-import networkx as nx
-from nltk.metrics.distance import edit_distance
-from . import create_operation_result, OperationType, OperationStatus, OperationResult
-from ..templates import Person, Affiliation
-from ...config.singleton import NlpSingleton
-from ...config.utils import simple_word_tokenization
-from ...heuristics.detectors import KeywordDetector
-from ...heuristics.tree import SemanticNode, EntityNode
-from collections import Counter
-from inscriptis import ParserConfig, get_annotated_text, get_text
-
-
-@create_operation_result
-def split_page_to_single_pages(G: nx.DiGraph):
-    pass
-
-
-@create_operation_result
-def confirm_name_on_single_page(G: nx.DiGraph, person: Person) -&gt; OperationResult:
-    leafs: list[SemanticNode] = G.nodes[0][&#39;leafs&#39;]
-    result = []
-    name_tokens = simple_word_tokenization(person.name)
-    for leaf in leafs:
-        search_result = leaf.entity.search_in_values(person.name)
-        print(search_result)
-        if len(search_result) &gt; 0:
-            result.append((leaf, search_result))
-    return result, OperationType.CONFIRM_NAME_ON_SINGLE_PAGE
-
-
-def extract_neigborhood(fulltext: str, ner_entity, size=100):
-    if len(ner_entity) == 1:
-        ner_entity = ner_entity[0]
-        ner_start = fulltext.find(ner_entity.text)
-        ner_end = ner_start + len(ner_entity.text)
-        neighborhood = fulltext[max(0, ner_start - size):min(len(fulltext), ner_end + size)]
-        return neighborhood
-    else:
-        # TODO handle multiple entities
-        return fulltext
-
-
-def get_ner_noun_split(value, ner_entity=None):
-    nlp = NlpSingleton.get_instance()
-    result = []
-    doc = nlp(value)
-    noun_phrases = set()
-    for nc in doc.noun_chunks:
-        for np in [nc, doc[nc.root.left_edge.i:nc.root.right_edge.i + 1]]:
-            if not ner_entity:
-                noun_phrases.add(np.text.lower())
-                continue
-            if not any(token.text in ner_entity.text for token in np):
-                # TODO faster using tokens
-                # TODO add preposition
-                noun_phrases.add(np.text)
-    if ner_entity:
-        nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;) and token.text not in ner_entity.text]
-    else:
-        nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;)]
-    noun_phrases.update(nouns)
-    return noun_phrases
-
-
-def extract_ner_candidates_joined(values, position_set, keyword_set):
-    nlp = NlpSingleton.get_instance()
-    result = {}
-    # tag_stats = Counter([node.get_full_tag_path(item[0]) for item in position_set])
-    # most_common_tag = tag_stats.most_common(1)[0][0]
-    for i, text in position_set:
-        value = values[i]
-        doc = nlp(value)
-        noun_phrases = set()
-        for entity in text:
-            noun_phrases = noun_phrases.union(get_ner_noun_split(value, entity))
-        kw_intersect = set.intersection(keyword_set, noun_phrases)
-        if len(kw_intersect) &gt; 0:
-            noun_phrases = kw_intersect
-        result[(i, text)] = noun_phrases
-    # pprint(result)
-    return result
-
-
-def get_siblings_for_tag(tag):
-    tag: bs4.Tag = tag
-    original_tag = dict(idx=0, tag=tag)
-    n = 1
-    while n &gt; 0:
-        new_tags = []
-        if isinstance(tag, list):
-            break
-        parent = tag.parent
-        if parent:
-            children = [child for child in parent.children if child.name]
-            original_idx = children.index(original_tag[&#39;tag&#39;])
-            original_tag[&#39;idx&#39;] = original_idx
-            if len(children) == 1:
-                tag = parent
-                original_tag[&#39;tag&#39;] = parent
-            elif len(children) &gt; 1:
-                new_tags = children
-                tag = new_tags
-                original_tag[&#39;tag&#39;] = children[original_idx]
-                n -= 1
-    pre_tags = [sibling for idx, sibling in enumerate(tag) if idx &lt; original_tag[&#39;idx&#39;]]
-    post_tags = [sibling for idx, sibling in enumerate(tag) if idx &gt; original_tag[&#39;idx&#39;]]
-    return pre_tags, post_tags
-
-
-def get_sibling_tags(node: SemanticNode):
-    tags: bs4.Tag = [node.tags[item[0]] for item in position_set]
-    original_tags = [dict(idx=0, tag=tag) for tag in tags]
-    found_enough = False
-    n = len(tags)
-    while n &gt; 0:
-        for i in range(len(tags)):
-            new_tags = []
-            tag = tags[i]
-            if isinstance(tag, list):
-                continue
-            parent = tag.parent
-            if parent:
-                children = [child for child in parent.children if child.name]
-                original_idx = children.index(original_tags[i][&#39;tag&#39;])
-                original_tags[i][&#39;idx&#39;] = original_idx
-                if len(children) == 1:
-                    tags[i] = parent
-                    original_tags[i][&#39;tag&#39;] = parent
-                elif len(children) &gt; 1:
-                    tags_in_node = [node.tags.index(child) for child in children if child in node.tags]
-                    new_tags = children
-                    tags[i] = new_tags
-                    original_tags[i][&#39;tag&#39;] = children[original_idx]
-                    n -= 1
-    return tags, original_tags
-
-
-def extract_ner_candidates_key_value(node, position_set):
-    nlp = NlpSingleton.get_instance()
-    result = []
-    tags, original_tags = get_sibling_tags(node)
-    result = {}
-    for i, tag_list in enumerate(tags):
-        texts = [str(tag.get_text(strip=True)).lower() for tag in tag_list]
-        # pre_text = ([tag.get_text(strip=True) for j,tag in enumerate(tag_list) if j &lt; original_tags[i][&#39;idx&#39;] ])
-        # suff_text = ([tag.get_text(strip=True) for j,tag in enumerate(tag_list) if j &gt; original_tags[i][&#39;idx&#39;] ])
-        pre_nouns = [[tag_list[j], get_ner_noun_split(text)] for j, text in enumerate(texts) if
-                     j &lt; original_tags[i][&#39;idx&#39;]]
-        suff_nouns = [[tag_list[j], get_ner_noun_split(text)] for j, text in enumerate(texts) if
-                      j &gt; original_tags[i][&#39;idx&#39;]]
-        # text =extract_neigborhood(text,position_set[i][1])
-        result[position_set[i]] = {&#39;pre&#39;: pre_nouns[:2], &#39;suff&#39;: suff_nouns[:2]}
-
-    return result
-
-    pass
-
-
-@create_operation_result
-def extract_affiliations_candidates_from_single_page(leaf: SemanticNode, person: Person, name_nodes) -&gt; OperationResult:
-    &#34;&#34;&#34;
-    Extracts affiliation candidates from a single page
-    Args:
-        leaf:
-        person:
-        name_nodes:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    result = []
-    keyword_set = set()
-    ner_set = list()
-    for i, value in enumerate(leaf.entity.values):
-        features = leaf.entity.features(i)
-        keywords_work_position = features.get(&#39;keywords&#39;).get(&#34;keywords_work_position&#34;, [])
-        keywords_org_structure = features.get(&#39;keywords&#39;).get(&#34;keywords_org_structure&#34;, [])
-        ner_organization = features.get(&#39;ner&#39;).get(&#34;ORG&#34;, [])
-        if len(keywords_work_position) &gt; 0:
-            keyword_set |= set(keywords_work_position)
-        if len(ner_organization) &gt; 0:
-            ner_set.append((i, tuple(ner_organization)))
-    # print(f&#34;keyword_set: {keyword_set} and ner_set: {ner_set}&#34;)
-    # position_set = set.intersection(keyword_set,ner_set)
-    if len(ner_set) &gt; 0:
-        candidates_join = extract_ner_candidates_joined(leaf.entity.values, ner_set, keyword_set)
-        candidates_key_value = extract_ner_candidates_key_value(leaf, ner_set)
-        print(f&#34;candidates_join: {candidates_join} and \n candidates_key_value: {candidates_key_value}&#34;)
-        # result = result + candidates_join + candidates_key_value
-
-        return (candidates_join, candidates_key_value), OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE
-    return None, OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE, OperationStatus.FAILED
-
-
-def filter_candidates_join(person, candidates):
-    detector = KeywordDetector()
-    for key, terms in candidates.items():
-        new_terms = {term for term in terms if detector.is_keyword(term)}
-        if len(new_terms) &gt; 0:
-            candidates[key] = new_terms
-        else:
-            terms.clear()
-    return candidates
-
-    pass
-
-
-def filter_candidates_key_value(person, candidates, vocab_manager):
-    detector = KeywordDetector(vocab_manager)
-    for key, item in candidates.items():
-        pre_items = item[&#39;pre&#39;]
-        suff_items = item[&#39;suff&#39;]
-        for i, pre_item in enumerate(pre_items):
-            new_pre_terms = {term for term in pre_item[1] if detector.is_possible_keyword(term)}
-            if len(new_pre_terms) &gt; 0:
-                pre_items[i][1] = new_pre_terms
-            else:
-                pre_items[i][1].clear()
-        for i, suff_item in enumerate(suff_items):
-            new_suff_terms = {term for term in suff_item[1] if detector.is_possible_keyword(term)}
-            if len(new_suff_terms) &gt; 0:
-                suff_items[i][1] = new_suff_terms
-            else:
-                suff_items[i][1].clear()
-    return candidates
-
-
-@create_operation_result
-def filter_affiliation_candidates(G: nx.DiGraph, person: Person, candidates, vocab_manager):
-    def convert_key_to_str(key):
-        res = &#34;&#34;
-        for item in key:
-            res += str(item)
-        return res
-
-    result = []
-    candidates_join = candidates[0]
-    candidates_key_value = candidates[1]
-    candidates_join = filter_candidates_join(person, candidates_join)
-    candidates_key_value = filter_candidates_key_value(person, candidates_key_value, vocab_manager)
-    for key in candidates_join:
-        key_str = convert_key_to_str(key[1])
-        terms_join = candidates_join[key]
-        if len(terms_join) == 1:
-            result.append((key_str, terms_join.pop()))
-        elif len(terms_join) &gt; 1 or len(terms_join) == 0:
-            item_key_value = candidates_key_value.get(key)
-            terms_kv = set()
-            for lst in item_key_value.values():
-                for item in lst:
-                    terms_kv |= item[1]
-
-            if len(terms_kv) == 1:
-                result.append((key_str, terms_kv.pop()))
-            else:
-                result.append((key_str, None))
-
-    return result, OperationType.FILTER_AFFILIATION_CANDIDATES
-
-
-@create_operation_result
-def extract_affiliation_elements(leaf: SemanticNode, person: Person, vocab_manager:&#34;OrgVocabularyManager&#34;):
-    &#34;&#34;&#34;
-    Extracts affiliation elements from a single page with PAGE_SINGLE_PERSON tag
-    Args:
-        leaf:
-        person:
-        vocab_manager:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    results = []
-    patterns = []
-    KEYWORD_MATCH_THRESHOLD = 0.3
-    for i, value in enumerate(leaf.entity.values):
-        if len(value) &gt; 50:
-            continue
-        features = leaf.entity.features(i)
-        ner_organization = features.get(&#39;ner&#39;).get(&#34;ORG&#34;, [])
-        for org in ner_organization:
-            print(f&#34;org: {org}&#34;)
-            aff = Affiliation(org.text)
-            # joined
-            if org.text != value:
-                noun_phrases = get_ner_noun_split(value, org)
-                if len(noun_phrases) &gt; 0:
-                    matches = vocab_manager.get_noun_phrases_rating(noun_phrases, &#39;position&#39;)
-                    print(f&#34;matches: {matches}&#34;)
-                    if len(matches) &gt; 0 and matches[0][1] &gt; KEYWORD_MATCH_THRESHOLD:  # TODO THRESHOLD
-                        aff.position = matches[0][0]
-                        results.append(aff)
-                        patterns.append((&#39;joined&#39;, (leaf.tags[i].get(&#34;doc_path&#34;))))
-                        continue
-            pre_siblings, post_sibling = get_siblings_for_tag(leaf.tags[i])
-            limit = 1
-            filter_siblings = [pre_siblings[:limit], post_sibling[:limit]]
-            # key value
-            for siblings in filter_siblings:
-                for sibling in siblings:
-                    path = sibling.get(&#34;doc_path&#34;)
-                    sibling_text = sibling.get_text(strip=True)
-                    print(f&#34;sibling_text: {sibling_text} and path: {path}&#34;)
-                    if len(sibling_text) &gt; 50:
-                        continue
-                    if len(sibling_text) &gt; 0:
-                        noun_phrases = get_ner_noun_split(sibling_text, org)
-                        if len(noun_phrases) &gt; 0:
-                            matches = vocab_manager.get_noun_phrases_rating(noun_phrases, &#39;position&#39;)
-                            print(f&#34;matches: {matches}&#34;)
-                            if len(matches) &gt; 0 and matches[0][1] &gt; KEYWORD_MATCH_THRESHOLD:
-                                patterns.append((&#39;key_value&#39;, (path, leaf.tags[i].get(&#34;doc_path&#34;))))
-                                aff.position = matches[0][0]
-                                results.append(aff)
-                                break
-            # single
-            patterns.append((&#39;single&#39;, (leaf.tags[i].get(&#34;doc_path&#34;))))
-            results.append(aff)
-
-    print(f&#34;extract_affiliation_elements: {results}&#34;)
-    return (results, patterns), OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE, OperationStatus.SUCCESS
-
-
-@create_operation_result
-def extract_data_from_page(G: nx.DiGraph):
-    &#34;&#34;&#34;
-    Extract person data from page
-    Args:
-        G:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    leafs = G.nodes[0][&#39;leafs&#39;]
-    result = []
-    for leaf in leafs:
-        entity: EntityNode = leaf.entity
-        if entity.ner_stats[&#39;EMAIL&#39;] &gt; 0 or entity.ner_stats[&#39;PERSON&#39;] &gt; 0:
-            print(f&#34;##################&#34;)
-            tags = set()
-            for i, tag in enumerate(leaf.tags):
-                pre_tags, post_tags = get_siblings_for_tag(tag)
-                tags |= set(pre_tags)
-                tags |= set(post_tags)
-            full_html = &#34;\n&#34;.join([str(tag) for tag in tags])
-            text = get_text(full_html)
-            lines = text.split(&#34;\n&#34;)
-            for line in lines:
-                print(f&#34;line: {line}&#34;)
-            print(f&#34;##################&#34;)
-            result.append(lines)
-    return result, OperationType.EXTRACT_PERSON_DATA_FROM_TREE
-
-
-@create_operation_result
-def annotate_person_data(lines, detector: &#34;NERDetector&#34;, organization: &#34;Organization&#34;):
-    data = dict(name=&#34;&#34;, orgs=[], emails=[])
-    for line in lines:
-        if len(line)&gt;50:
-            continue
-        ner_result = detector.extract_ner_single(line)
-        if 0 &lt; len(ner_result[&#39;PERSON&#39;]) &lt;= 2:
-            for person in ner_result[&#39;PERSON&#39;]:
-                data[&#39;name&#39;] += str(person) + &#34; &#34;
-        if len(ner_result[&#39;ORG&#39;]) &gt; 0:
-            for org in ner_result[&#39;ORG&#39;]:
-                data[&#39;orgs&#39;].append(str(org))
-        if len(ner_result[&#39;EMAIL&#39;]) &gt; 0:
-            data[&#39;emails&#39;].append(line.strip())
-    if data[&#39;name&#39;] is not None:
-        email = data[&#39;emails&#39;][0] if len(data[&#39;emails&#39;]) &gt; 0 else &#34;&#34;
-        name = str(data[&#39;name&#39;]).strip()
-        affiliations = []
-        if len(data[&#39;orgs&#39;]) &gt; 0:
-            for org in data[&#39;orgs&#39;]:
-                affiliations.append(Affiliation(org))
-        if len(name)&gt;0:
-            person = Person(organization=organization, name=name, email=email, affiliations=affiliations)
-            return person, OperationType.ANNOTATE_PERSON_DATA, OperationStatus.SUCCESS
-    return None, OperationType.ANNOTATE_PERSON_DATA, OperationStatus.FAILED</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -420,63 +31,21 @@ def annotate_person_data(lines, detector: &#34;NERDetector&#34;, organization: &
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="academic_crawler.scrapers.operations.people.annotate_person_data"><code class="name flex">
-<span>def <span class="ident">annotate_person_data</span></span>(<span>lines, detector: NERDetector, organization: Organization)</span>
+<span>def <span class="ident">annotate_person_data</span></span>(<span>lines: list[str], detector: NERDetector, organization: Organization)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def annotate_person_data(lines, detector: &#34;NERDetector&#34;, organization: &#34;Organization&#34;):
-    data = dict(name=&#34;&#34;, orgs=[], emails=[])
-    for line in lines:
-        if len(line)&gt;50:
-            continue
-        ner_result = detector.extract_ner_single(line)
-        if 0 &lt; len(ner_result[&#39;PERSON&#39;]) &lt;= 2:
-            for person in ner_result[&#39;PERSON&#39;]:
-                data[&#39;name&#39;] += str(person) + &#34; &#34;
-        if len(ner_result[&#39;ORG&#39;]) &gt; 0:
-            for org in ner_result[&#39;ORG&#39;]:
-                data[&#39;orgs&#39;].append(str(org))
-        if len(ner_result[&#39;EMAIL&#39;]) &gt; 0:
-            data[&#39;emails&#39;].append(line.strip())
-    if data[&#39;name&#39;] is not None:
-        email = data[&#39;emails&#39;][0] if len(data[&#39;emails&#39;]) &gt; 0 else &#34;&#34;
-        name = str(data[&#39;name&#39;]).strip()
-        affiliations = []
-        if len(data[&#39;orgs&#39;]) &gt; 0:
-            for org in data[&#39;orgs&#39;]:
-                affiliations.append(Affiliation(org))
-        if len(name)&gt;0:
-            person = Person(organization=organization, name=name, email=email, affiliations=affiliations)
-            return person, OperationType.ANNOTATE_PERSON_DATA, OperationStatus.SUCCESS
-    return None, OperationType.ANNOTATE_PERSON_DATA, OperationStatus.FAILED</code></pre>
-</details>
+<div class="desc"><p>Annotates input lines with person attributes</p>
+<h2 id="args">Args</h2>
+<p>lines:
+detector:
+organization:
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.confirm_name_on_single_page"><code class="name flex">
 <span>def <span class="ident">confirm_name_on_single_page</span></span>(<span>G: networkx.classes.digraph.DiGraph, person: <a title="academic_crawler.scrapers.templates.Person" href="../templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>) ‑> <a title="academic_crawler.scrapers.operations.OperationResult" href="index.html#academic_crawler.scrapers.operations.OperationResult">OperationResult</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def confirm_name_on_single_page(G: nx.DiGraph, person: Person) -&gt; OperationResult:
-    leafs: list[SemanticNode] = G.nodes[0][&#39;leafs&#39;]
-    result = []
-    name_tokens = simple_word_tokenization(person.name)
-    for leaf in leafs:
-        search_result = leaf.entity.search_in_values(person.name)
-        print(search_result)
-        if len(search_result) &gt; 0:
-            result.append((leaf, search_result))
-    return result, OperationType.CONFIRM_NAME_ON_SINGLE_PAGE</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_affiliation_elements"><code class="name flex">
 <span>def <span class="ident">extract_affiliation_elements</span></span>(<span>leaf: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>, person: <a title="academic_crawler.scrapers.templates.Person" href="../templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>, vocab_manager: OrgVocabularyManager)</span>
@@ -488,72 +57,6 @@ def confirm_name_on_single_page(G: nx.DiGraph, person: Person) -&gt; OperationRe
 person:
 vocab_manager:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def extract_affiliation_elements(leaf: SemanticNode, person: Person, vocab_manager:&#34;OrgVocabularyManager&#34;):
-    &#34;&#34;&#34;
-    Extracts affiliation elements from a single page with PAGE_SINGLE_PERSON tag
-    Args:
-        leaf:
-        person:
-        vocab_manager:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    results = []
-    patterns = []
-    KEYWORD_MATCH_THRESHOLD = 0.3
-    for i, value in enumerate(leaf.entity.values):
-        if len(value) &gt; 50:
-            continue
-        features = leaf.entity.features(i)
-        ner_organization = features.get(&#39;ner&#39;).get(&#34;ORG&#34;, [])
-        for org in ner_organization:
-            print(f&#34;org: {org}&#34;)
-            aff = Affiliation(org.text)
-            # joined
-            if org.text != value:
-                noun_phrases = get_ner_noun_split(value, org)
-                if len(noun_phrases) &gt; 0:
-                    matches = vocab_manager.get_noun_phrases_rating(noun_phrases, &#39;position&#39;)
-                    print(f&#34;matches: {matches}&#34;)
-                    if len(matches) &gt; 0 and matches[0][1] &gt; KEYWORD_MATCH_THRESHOLD:  # TODO THRESHOLD
-                        aff.position = matches[0][0]
-                        results.append(aff)
-                        patterns.append((&#39;joined&#39;, (leaf.tags[i].get(&#34;doc_path&#34;))))
-                        continue
-            pre_siblings, post_sibling = get_siblings_for_tag(leaf.tags[i])
-            limit = 1
-            filter_siblings = [pre_siblings[:limit], post_sibling[:limit]]
-            # key value
-            for siblings in filter_siblings:
-                for sibling in siblings:
-                    path = sibling.get(&#34;doc_path&#34;)
-                    sibling_text = sibling.get_text(strip=True)
-                    print(f&#34;sibling_text: {sibling_text} and path: {path}&#34;)
-                    if len(sibling_text) &gt; 50:
-                        continue
-                    if len(sibling_text) &gt; 0:
-                        noun_phrases = get_ner_noun_split(sibling_text, org)
-                        if len(noun_phrases) &gt; 0:
-                            matches = vocab_manager.get_noun_phrases_rating(noun_phrases, &#39;position&#39;)
-                            print(f&#34;matches: {matches}&#34;)
-                            if len(matches) &gt; 0 and matches[0][1] &gt; KEYWORD_MATCH_THRESHOLD:
-                                patterns.append((&#39;key_value&#39;, (path, leaf.tags[i].get(&#34;doc_path&#34;))))
-                                aff.position = matches[0][0]
-                                results.append(aff)
-                                break
-            # single
-            patterns.append((&#39;single&#39;, (leaf.tags[i].get(&#34;doc_path&#34;))))
-            results.append(aff)
-
-    print(f&#34;extract_affiliation_elements: {results}&#34;)
-    return (results, patterns), OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE, OperationStatus.SUCCESS</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_affiliations_candidates_from_single_page"><code class="name flex">
 <span>def <span class="ident">extract_affiliations_candidates_from_single_page</span></span>(<span>leaf: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>, person: <a title="academic_crawler.scrapers.templates.Person" href="../templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>, name_nodes) ‑> <a title="academic_crawler.scrapers.operations.OperationResult" href="index.html#academic_crawler.scrapers.operations.OperationResult">OperationResult</a></span>
@@ -565,45 +68,6 @@ def extract_affiliation_elements(leaf: SemanticNode, person: Person, vocab_manag
 person:
 name_nodes:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def extract_affiliations_candidates_from_single_page(leaf: SemanticNode, person: Person, name_nodes) -&gt; OperationResult:
-    &#34;&#34;&#34;
-    Extracts affiliation candidates from a single page
-    Args:
-        leaf:
-        person:
-        name_nodes:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    result = []
-    keyword_set = set()
-    ner_set = list()
-    for i, value in enumerate(leaf.entity.values):
-        features = leaf.entity.features(i)
-        keywords_work_position = features.get(&#39;keywords&#39;).get(&#34;keywords_work_position&#34;, [])
-        keywords_org_structure = features.get(&#39;keywords&#39;).get(&#34;keywords_org_structure&#34;, [])
-        ner_organization = features.get(&#39;ner&#39;).get(&#34;ORG&#34;, [])
-        if len(keywords_work_position) &gt; 0:
-            keyword_set |= set(keywords_work_position)
-        if len(ner_organization) &gt; 0:
-            ner_set.append((i, tuple(ner_organization)))
-    # print(f&#34;keyword_set: {keyword_set} and ner_set: {ner_set}&#34;)
-    # position_set = set.intersection(keyword_set,ner_set)
-    if len(ner_set) &gt; 0:
-        candidates_join = extract_ner_candidates_joined(leaf.entity.values, ner_set, keyword_set)
-        candidates_key_value = extract_ner_candidates_key_value(leaf, ner_set)
-        print(f&#34;candidates_join: {candidates_join} and \n candidates_key_value: {candidates_key_value}&#34;)
-        # result = result + candidates_join + candidates_key_value
-
-        return (candidates_join, candidates_key_value), OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE
-    return None, OperationType.EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE, OperationStatus.FAILED</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_data_from_page"><code class="name flex">
 <span>def <span class="ident">extract_data_from_page</span></span>(<span>G: networkx.classes.digraph.DiGraph)</span>
@@ -613,329 +77,72 @@ def extract_affiliations_candidates_from_single_page(leaf: SemanticNode, person:
 <h2 id="args">Args</h2>
 <p>G:
 Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def extract_data_from_page(G: nx.DiGraph):
-    &#34;&#34;&#34;
-    Extract person data from page
-    Args:
-        G:
-
-    Returns:
-
-    &#34;&#34;&#34;
-    leafs = G.nodes[0][&#39;leafs&#39;]
-    result = []
-    for leaf in leafs:
-        entity: EntityNode = leaf.entity
-        if entity.ner_stats[&#39;EMAIL&#39;] &gt; 0 or entity.ner_stats[&#39;PERSON&#39;] &gt; 0:
-            print(f&#34;##################&#34;)
-            tags = set()
-            for i, tag in enumerate(leaf.tags):
-                pre_tags, post_tags = get_siblings_for_tag(tag)
-                tags |= set(pre_tags)
-                tags |= set(post_tags)
-            full_html = &#34;\n&#34;.join([str(tag) for tag in tags])
-            text = get_text(full_html)
-            lines = text.split(&#34;\n&#34;)
-            for line in lines:
-                print(f&#34;line: {line}&#34;)
-            print(f&#34;##################&#34;)
-            result.append(lines)
-    return result, OperationType.EXTRACT_PERSON_DATA_FROM_TREE</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_neigborhood"><code class="name flex">
 <span>def <span class="ident">extract_neigborhood</span></span>(<span>fulltext: str, ner_entity, size=100)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_neigborhood(fulltext: str, ner_entity, size=100):
-    if len(ner_entity) == 1:
-        ner_entity = ner_entity[0]
-        ner_start = fulltext.find(ner_entity.text)
-        ner_end = ner_start + len(ner_entity.text)
-        neighborhood = fulltext[max(0, ner_start - size):min(len(fulltext), ner_end + size)]
-        return neighborhood
-    else:
-        # TODO handle multiple entities
-        return fulltext</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_ner_candidates_joined"><code class="name flex">
 <span>def <span class="ident">extract_ner_candidates_joined</span></span>(<span>values, position_set, keyword_set)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_ner_candidates_joined(values, position_set, keyword_set):
-    nlp = NlpSingleton.get_instance()
-    result = {}
-    # tag_stats = Counter([node.get_full_tag_path(item[0]) for item in position_set])
-    # most_common_tag = tag_stats.most_common(1)[0][0]
-    for i, text in position_set:
-        value = values[i]
-        doc = nlp(value)
-        noun_phrases = set()
-        for entity in text:
-            noun_phrases = noun_phrases.union(get_ner_noun_split(value, entity))
-        kw_intersect = set.intersection(keyword_set, noun_phrases)
-        if len(kw_intersect) &gt; 0:
-            noun_phrases = kw_intersect
-        result[(i, text)] = noun_phrases
-    # pprint(result)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.extract_ner_candidates_key_value"><code class="name flex">
 <span>def <span class="ident">extract_ner_candidates_key_value</span></span>(<span>node, position_set)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_ner_candidates_key_value(node, position_set):
-    nlp = NlpSingleton.get_instance()
-    result = []
-    tags, original_tags = get_sibling_tags(node)
-    result = {}
-    for i, tag_list in enumerate(tags):
-        texts = [str(tag.get_text(strip=True)).lower() for tag in tag_list]
-        # pre_text = ([tag.get_text(strip=True) for j,tag in enumerate(tag_list) if j &lt; original_tags[i][&#39;idx&#39;] ])
-        # suff_text = ([tag.get_text(strip=True) for j,tag in enumerate(tag_list) if j &gt; original_tags[i][&#39;idx&#39;] ])
-        pre_nouns = [[tag_list[j], get_ner_noun_split(text)] for j, text in enumerate(texts) if
-                     j &lt; original_tags[i][&#39;idx&#39;]]
-        suff_nouns = [[tag_list[j], get_ner_noun_split(text)] for j, text in enumerate(texts) if
-                      j &gt; original_tags[i][&#39;idx&#39;]]
-        # text =extract_neigborhood(text,position_set[i][1])
-        result[position_set[i]] = {&#39;pre&#39;: pre_nouns[:2], &#39;suff&#39;: suff_nouns[:2]}
-
-    return result
-
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.filter_affiliation_candidates"><code class="name flex">
 <span>def <span class="ident">filter_affiliation_candidates</span></span>(<span>G: networkx.classes.digraph.DiGraph, person: <a title="academic_crawler.scrapers.templates.Person" href="../templates/index.html#academic_crawler.scrapers.templates.Person">Person</a>, candidates, vocab_manager)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def filter_affiliation_candidates(G: nx.DiGraph, person: Person, candidates, vocab_manager):
-    def convert_key_to_str(key):
-        res = &#34;&#34;
-        for item in key:
-            res += str(item)
-        return res
-
-    result = []
-    candidates_join = candidates[0]
-    candidates_key_value = candidates[1]
-    candidates_join = filter_candidates_join(person, candidates_join)
-    candidates_key_value = filter_candidates_key_value(person, candidates_key_value, vocab_manager)
-    for key in candidates_join:
-        key_str = convert_key_to_str(key[1])
-        terms_join = candidates_join[key]
-        if len(terms_join) == 1:
-            result.append((key_str, terms_join.pop()))
-        elif len(terms_join) &gt; 1 or len(terms_join) == 0:
-            item_key_value = candidates_key_value.get(key)
-            terms_kv = set()
-            for lst in item_key_value.values():
-                for item in lst:
-                    terms_kv |= item[1]
-
-            if len(terms_kv) == 1:
-                result.append((key_str, terms_kv.pop()))
-            else:
-                result.append((key_str, None))
-
-    return result, OperationType.FILTER_AFFILIATION_CANDIDATES</code></pre>
-</details>
+<div class="desc"><p>Filters affiliation candidates (not used)</p>
+<h2 id="args">Args</h2>
+<p>G:
+person:
+candidates:
+vocab_manager:
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.filter_candidates_join"><code class="name flex">
 <span>def <span class="ident">filter_candidates_join</span></span>(<span>person, candidates)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def filter_candidates_join(person, candidates):
-    detector = KeywordDetector()
-    for key, terms in candidates.items():
-        new_terms = {term for term in terms if detector.is_keyword(term)}
-        if len(new_terms) &gt; 0:
-            candidates[key] = new_terms
-        else:
-            terms.clear()
-    return candidates
-
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.filter_candidates_key_value"><code class="name flex">
 <span>def <span class="ident">filter_candidates_key_value</span></span>(<span>person, candidates, vocab_manager)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def filter_candidates_key_value(person, candidates, vocab_manager):
-    detector = KeywordDetector(vocab_manager)
-    for key, item in candidates.items():
-        pre_items = item[&#39;pre&#39;]
-        suff_items = item[&#39;suff&#39;]
-        for i, pre_item in enumerate(pre_items):
-            new_pre_terms = {term for term in pre_item[1] if detector.is_possible_keyword(term)}
-            if len(new_pre_terms) &gt; 0:
-                pre_items[i][1] = new_pre_terms
-            else:
-                pre_items[i][1].clear()
-        for i, suff_item in enumerate(suff_items):
-            new_suff_terms = {term for term in suff_item[1] if detector.is_possible_keyword(term)}
-            if len(new_suff_terms) &gt; 0:
-                suff_items[i][1] = new_suff_terms
-            else:
-                suff_items[i][1].clear()
-    return candidates</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.get_ner_noun_split"><code class="name flex">
 <span>def <span class="ident">get_ner_noun_split</span></span>(<span>value, ner_entity=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_ner_noun_split(value, ner_entity=None):
-    nlp = NlpSingleton.get_instance()
-    result = []
-    doc = nlp(value)
-    noun_phrases = set()
-    for nc in doc.noun_chunks:
-        for np in [nc, doc[nc.root.left_edge.i:nc.root.right_edge.i + 1]]:
-            if not ner_entity:
-                noun_phrases.add(np.text.lower())
-                continue
-            if not any(token.text in ner_entity.text for token in np):
-                # TODO faster using tokens
-                # TODO add preposition
-                noun_phrases.add(np.text)
-    if ner_entity:
-        nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;) and token.text not in ner_entity.text]
-    else:
-        nouns = [token.text for token in doc if token.pos_ in (&#34;NOUN&#34;, &#34;PROPN&#34;)]
-    noun_phrases.update(nouns)
-    return noun_phrases</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.get_sibling_tags"><code class="name flex">
 <span>def <span class="ident">get_sibling_tags</span></span>(<span>node: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_sibling_tags(node: SemanticNode):
-    tags: bs4.Tag = [node.tags[item[0]] for item in position_set]
-    original_tags = [dict(idx=0, tag=tag) for tag in tags]
-    found_enough = False
-    n = len(tags)
-    while n &gt; 0:
-        for i in range(len(tags)):
-            new_tags = []
-            tag = tags[i]
-            if isinstance(tag, list):
-                continue
-            parent = tag.parent
-            if parent:
-                children = [child for child in parent.children if child.name]
-                original_idx = children.index(original_tags[i][&#39;tag&#39;])
-                original_tags[i][&#39;idx&#39;] = original_idx
-                if len(children) == 1:
-                    tags[i] = parent
-                    original_tags[i][&#39;tag&#39;] = parent
-                elif len(children) &gt; 1:
-                    tags_in_node = [node.tags.index(child) for child in children if child in node.tags]
-                    new_tags = children
-                    tags[i] = new_tags
-                    original_tags[i][&#39;tag&#39;] = children[original_idx]
-                    n -= 1
-    return tags, original_tags</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.get_siblings_for_tag"><code class="name flex">
 <span>def <span class="ident">get_siblings_for_tag</span></span>(<span>tag)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_siblings_for_tag(tag):
-    tag: bs4.Tag = tag
-    original_tag = dict(idx=0, tag=tag)
-    n = 1
-    while n &gt; 0:
-        new_tags = []
-        if isinstance(tag, list):
-            break
-        parent = tag.parent
-        if parent:
-            children = [child for child in parent.children if child.name]
-            original_idx = children.index(original_tag[&#39;tag&#39;])
-            original_tag[&#39;idx&#39;] = original_idx
-            if len(children) == 1:
-                tag = parent
-                original_tag[&#39;tag&#39;] = parent
-            elif len(children) &gt; 1:
-                new_tags = children
-                tag = new_tags
-                original_tag[&#39;tag&#39;] = children[original_idx]
-                n -= 1
-    pre_tags = [sibling for idx, sibling in enumerate(tag) if idx &lt; original_tag[&#39;idx&#39;]]
-    post_tags = [sibling for idx, sibling in enumerate(tag) if idx &gt; original_tag[&#39;idx&#39;]]
-    return pre_tags, post_tags</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.people.split_page_to_single_pages"><code class="name flex">
 <span>def <span class="ident">split_page_to_single_pages</span></span>(<span>G: networkx.classes.digraph.DiGraph)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def split_page_to_single_pages(G: nx.DiGraph):
-    pass</code></pre>
-</details>
 </dd>
 </dl>
 </section>

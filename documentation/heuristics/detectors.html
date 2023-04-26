@@ -22,300 +22,22 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.detectors</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import re
-import spacy
-from spacy import displacy
-from collections import defaultdict
-
-from academic_crawler.config.singleton import Singleton,NlpSingleton
-from academic_crawler.config.predefined import keywords_map
-from academic_crawler.config.utils import simple_word_tokenization
-from nltk.stem.snowball import SnowballStemmer
-import time
-
-
-class AcademicAbbreviationDetector():
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.degrees = [&#39;Bc.&#39;, &#39;Mgr.&#39;, &#39;Ing.&#39;, &#34;Ph.D.&#34;, &#39;CSc.&#39;, &#39;RNDR.&#39;, &#39;MUDR.&#39;, &#34;PhDr.&#34;]
-        self.degrees_lower = [x.lower() for x in self.degrees]
-
-    def is_academic_degree(self, text: str):
-        r = re.compile(text, re.I)
-        for degree in self.degrees:
-            res = r.search(degree)
-            if res:
-                return True
-        return False
-
-    def is_degree_in_text(self, text):
-        for degree in self.degrees:
-            r = re.compile(degree, re.I)
-            res = r.search(text)
-            if res:
-                return True
-        return False
-
-
-def is_email(text):
-    r = re.compile(r&#34;^\S+@\S+\.\S+$&#34;)
-    if r.search(text):
-        return True
-    return False
-
-
-@Singleton
-class NERDetector:
-    def __init__(self,types:set) -&gt; None:
-        super().__init__()
-        self.types = types
-        self.nlp = NlpSingleton.get_instance()
-        self.has_email =&#39;EMAIL&#39; in types
-        self.search_email = self._search_email if self.has_email else lambda x, y, z:None
-
-
-
-
-    def extract_ner_single(self,text):
-        entities = [defaultdict(list)]
-        doc = self.nlp(text)
-        for entity in doc.ents:
-            if entity.label_ in self.types:
-                entities[0][entity.label_].append(entity)
-        entities,total_email = self.search_email(doc, 0,entities)
-        return entities[0]
-    def extract_ner(self, texts, intervals=None):
-        entities =[ defaultdict(list) for _ in range(len(texts))]
-        max_length = max([len(item) for item in texts])
-        self.nlp.max_length = max_length + 100
-        i = 0
-        total_found = 0
-        for doc in self.nlp.pipe(texts,disable=[&#34;tok2vec&#34;, &#34;tagger&#34;, &#34;parser&#34;, &#34;attribute_ruler&#34;, &#34;lemmatizer&#34;]):
-            for entity in doc.ents:
-                if entity.label_ in self.types:
-                    total_found +=1
-                    entities[i][entity.label_].append(entity)
-            entities,total_email = self.search_email(doc,i,entities)
-            total_found += total_email
-            i+=1
-
-
-        self.nlp.max_length = 1000000
-        return entities if total_found&gt;0  else None
-
-    def _search_email(self, doc, idx, entities):
-        total_found_email = 0
-        for token in doc:
-            if token.like_email:
-                total_found_email += 1
-                entities[idx][&#39;EMAIL&#39;].append(token)
-                print(token)
-        return entities,total_found_email
-
-
-
-
-
-
-
-class KeywordDetector():
-    def __init__(self,vocabulary_manager=None) -&gt; None:
-        super().__init__()
-        self.nlp = NlpSingleton.get_instance()
-        self.ss = SnowballStemmer(language=&#39;english&#39;)
-        self.manager = vocabulary_manager
-
-
-    def extract_keyword(self,text):
-        result =defaultdict(list)
-
-        for key, keywords in keywords_map.items():
-            for keyword in keywords:
-                if re.search(r&#34;\b&#34; + keyword + r&#34;\b&#34;, text, re.I):
-                    result[key].append( keyword)
-                else:
-                    keyword_stem = self.ss.stem(keyword)
-                    tokens = simple_word_tokenization(text)
-                    for token in tokens:
-                        if self.ss.stem(token) == keyword_stem:
-                            result[key].append(keyword)
-        return result
-
-    def is_keyword(self,text):
-
-        res = self.extract_keyword(text)
-        return len(res)&gt;0
-
-    def extract_possible_keywords(self,text):
-        possible_kw = self.manager.detect_possible_keywords(text)
-        keyword,category,best_confidence = possible_kw[0] if len(possible_kw)&gt;0 else (None,None,0)
-        if (category == &#39;negative_page&#39; and best_confidence&gt; 0.7) or (category != &#39;negative_page&#39; and best_confidence&gt;0.5):
-            return {category:[keyword]}
-        return {}
-
-
-    def is_possible_keyword(self,text,check_exact=True):
-        if check_exact and self.is_keyword(text):
-            return True
-        res = self.extract_possible_keywords(text)
-        return len(res)&gt;0</code></pre>
-</details>
 </section>
 <section>
 </section>
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="academic_crawler.heuristics.detectors.is_email"><code class="name flex">
-<span>def <span class="ident">is_email</span></span>(<span>text)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_email(text):
-    r = re.compile(r&#34;^\S+@\S+\.\S+$&#34;)
-    if r.search(text):
-        return True
-    return False</code></pre>
-</details>
-</dd>
-</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector"><code class="flex name class">
-<span>class <span class="ident">AcademicAbbreviationDetector</span></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AcademicAbbreviationDetector():
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.degrees = [&#39;Bc.&#39;, &#39;Mgr.&#39;, &#39;Ing.&#39;, &#34;Ph.D.&#34;, &#39;CSc.&#39;, &#39;RNDR.&#39;, &#39;MUDR.&#39;, &#34;PhDr.&#34;]
-        self.degrees_lower = [x.lower() for x in self.degrees]
-
-    def is_academic_degree(self, text: str):
-        r = re.compile(text, re.I)
-        for degree in self.degrees:
-            res = r.search(degree)
-            if res:
-                return True
-        return False
-
-    def is_degree_in_text(self, text):
-        for degree in self.degrees:
-            r = re.compile(degree, re.I)
-            res = r.search(text)
-            if res:
-                return True
-        return False</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_academic_degree"><code class="name flex">
-<span>def <span class="ident">is_academic_degree</span></span>(<span>self, text: str)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_academic_degree(self, text: str):
-    r = re.compile(text, re.I)
-    for degree in self.degrees:
-        res = r.search(degree)
-        if res:
-            return True
-    return False</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_degree_in_text"><code class="name flex">
-<span>def <span class="ident">is_degree_in_text</span></span>(<span>self, text)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_degree_in_text(self, text):
-    for degree in self.degrees:
-        r = re.compile(degree, re.I)
-        res = r.search(text)
-        if res:
-            return True
-    return False</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
 <dt id="academic_crawler.heuristics.detectors.KeywordDetector"><code class="flex name class">
 <span>class <span class="ident">KeywordDetector</span></span>
 <span>(</span><span>vocabulary_manager=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class KeywordDetector():
-    def __init__(self,vocabulary_manager=None) -&gt; None:
-        super().__init__()
-        self.nlp = NlpSingleton.get_instance()
-        self.ss = SnowballStemmer(language=&#39;english&#39;)
-        self.manager = vocabulary_manager
-
-
-    def extract_keyword(self,text):
-        result =defaultdict(list)
-
-        for key, keywords in keywords_map.items():
-            for keyword in keywords:
-                if re.search(r&#34;\b&#34; + keyword + r&#34;\b&#34;, text, re.I):
-                    result[key].append( keyword)
-                else:
-                    keyword_stem = self.ss.stem(keyword)
-                    tokens = simple_word_tokenization(text)
-                    for token in tokens:
-                        if self.ss.stem(token) == keyword_stem:
-                            result[key].append(keyword)
-        return result
-
-    def is_keyword(self,text):
-
-        res = self.extract_keyword(text)
-        return len(res)&gt;0
-
-    def extract_possible_keywords(self,text):
-        possible_kw = self.manager.detect_possible_keywords(text)
-        keyword,category,best_confidence = possible_kw[0] if len(possible_kw)&gt;0 else (None,None,0)
-        if (category == &#39;negative_page&#39; and best_confidence&gt; 0.7) or (category != &#39;negative_page&#39; and best_confidence&gt;0.5):
-            return {category:[keyword]}
-        return {}
-
-
-    def is_possible_keyword(self,text,check_exact=True):
-        if check_exact and self.is_keyword(text):
-            return True
-        res = self.extract_possible_keywords(text)
-        return len(res)&gt;0</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.heuristics.detectors.KeywordDetector.extract_keyword"><code class="name flex">
@@ -323,73 +45,24 @@ class KeywordDetector():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_keyword(self,text):
-    result =defaultdict(list)
-
-    for key, keywords in keywords_map.items():
-        for keyword in keywords:
-            if re.search(r&#34;\b&#34; + keyword + r&#34;\b&#34;, text, re.I):
-                result[key].append( keyword)
-            else:
-                keyword_stem = self.ss.stem(keyword)
-                tokens = simple_word_tokenization(text)
-                for token in tokens:
-                    if self.ss.stem(token) == keyword_stem:
-                        result[key].append(keyword)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.detectors.KeywordDetector.extract_possible_keywords"><code class="name flex">
 <span>def <span class="ident">extract_possible_keywords</span></span>(<span>self, text)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_possible_keywords(self,text):
-    possible_kw = self.manager.detect_possible_keywords(text)
-    keyword,category,best_confidence = possible_kw[0] if len(possible_kw)&gt;0 else (None,None,0)
-    if (category == &#39;negative_page&#39; and best_confidence&gt; 0.7) or (category != &#39;negative_page&#39; and best_confidence&gt;0.5):
-        return {category:[keyword]}
-    return {}</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.detectors.KeywordDetector.is_keyword"><code class="name flex">
 <span>def <span class="ident">is_keyword</span></span>(<span>self, text)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_keyword(self,text):
-
-    res = self.extract_keyword(text)
-    return len(res)&gt;0</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.detectors.KeywordDetector.is_possible_keyword"><code class="name flex">
 <span>def <span class="ident">is_possible_keyword</span></span>(<span>self, text, check_exact=True)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_possible_keyword(self,text,check_exact=True):
-    if check_exact and self.is_keyword(text):
-        return True
-    res = self.extract_possible_keywords(text)
-    return len(res)&gt;0</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -407,20 +80,8 @@ class KeywordDetector():
 <li><code><a title="academic_crawler.heuristics" href="index.html">academic_crawler.heuristics</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="academic_crawler.heuristics.detectors.is_email" href="#academic_crawler.heuristics.detectors.is_email">is_email</a></code></li>
-</ul>
-</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li>
-<h4><code><a title="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector" href="#academic_crawler.heuristics.detectors.AcademicAbbreviationDetector">AcademicAbbreviationDetector</a></code></h4>
-<ul class="">
-<li><code><a title="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_academic_degree" href="#academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_academic_degree">is_academic_degree</a></code></li>
-<li><code><a title="academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_degree_in_text" href="#academic_crawler.heuristics.detectors.AcademicAbbreviationDetector.is_degree_in_text">is_degree_in_text</a></code></li>
-</ul>
-</li>
 <li>
 <h4><code><a title="academic_crawler.heuristics.detectors.KeywordDetector" href="#academic_crawler.heuristics.detectors.KeywordDetector">KeywordDetector</a></code></h4>
 <ul class="">

@@ -22,38 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.loaders</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import json
-
-import jsonlines
-
-from academic_crawler.scrapers.templates import Organization
-
-def load_json_config(path):
-    with open(path ,&#34;r&#34;) as file:
-        data = json.load(file)
-        domain = data[&#39;domain_config&#39;]
-        subsidiaries = data[&#39;subsidiaries&#39;]
-        return domain,subsidiaries
-
-def load_json_orgs(path):
-    with open(path ,&#34;r&#34;) as file:
-        data = json.load(file)
-        return data
-
-
-
-
-def read_jsonlines_file(path):
-    result = []
-    with jsonlines.open(path) as reader:
-        for obj in reader:
-            result.append(obj)
-    return result</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -67,49 +35,18 @@ def read_jsonlines_file(path):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_json_config(path):
-    with open(path ,&#34;r&#34;) as file:
-        data = json.load(file)
-        domain = data[&#39;domain_config&#39;]
-        subsidiaries = data[&#39;subsidiaries&#39;]
-        return domain,subsidiaries</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.loaders.load_json_orgs"><code class="name flex">
 <span>def <span class="ident">load_json_orgs</span></span>(<span>path)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_json_orgs(path):
-    with open(path ,&#34;r&#34;) as file:
-        data = json.load(file)
-        return data</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.loaders.read_jsonlines_file"><code class="name flex">
 <span>def <span class="ident">read_jsonlines_file</span></span>(<span>path)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def read_jsonlines_file(path):
-    result = []
-    with jsonlines.open(path) as reader:
-        for obj in reader:
-            result.append(obj)
-    return result</code></pre>
-</details>
 </dd>
 </dl>
 </section>

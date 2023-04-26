@@ -22,73 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.operations</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import namedtuple
-from academic_crawler.config.enums import OperationStatus, OperationType
-from dataclasses import dataclass
-import logging
-from functools import wraps
-
-
-@dataclass
-class OperationMessage:
-    type: OperationType
-    status: OperationStatus
-    has_information_data: bool
-
-
-@dataclass
-class OperationResult:
-    data: dict
-    message: OperationMessage
-
-#OperationResult = namedtuple(&#34;OperationResult&#34;, [&#39;data&#39;, &#39;message&#39;])
-#OperationMessage = namedtuple(&#34;OperationMessage&#34;, [&#39;type&#39;, &#39;status&#39;, &#39;has_information_data&#39;])
-
-
-def op_success(result: OperationResult):
-    return result.message.status == OperationStatus.SUCCESS
-
-
-def op_failed(result: OperationResult):
-    return result.message.status == OperationStatus.FAILED
-
-def get_op_status(expression,is_list=False):
-    if is_list and not expression:
-        return OperationStatus.EMPTY_RESULT
-    return OperationStatus.SUCCESS if expression else OperationStatus.FAILED
-
-
-def make_operation_message(type=None, status=None, has_information_data=False):
-    return OperationMessage(type=type, status=status, has_information_data=has_information_data)
-
-def create_operation_result(func) -&gt;OperationResult:
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        f_result = func(*args, **kwargs)
-        if len(f_result) == 2:
-            data, type_ = f_result
-            if isinstance(data,type_.output_type):
-                status = get_op_status(True)
-                if type_.output_type is list:
-                    status = get_op_status(len(data)&gt;0,is_list=True)
-            else:
-                status = get_op_status(False)
-            has_information = data is not None
-            message = OperationMessage(type_, status, has_information)
-            logging.info(f&#34;Operation {type_} finished with status {status} and data {data}&#34;)
-            return OperationResult(data, message)
-        if len(f_result) == 3:
-            data, type_, status = func(*args, **kwargs)
-            has_information = data is not None
-            message = OperationMessage(type_, status, has_information)
-            logging.info(f&#34;Operation {type_} finished with status {status} and data {data}&#34;)
-            return OperationResult(data, message)
-    return wrap</code></pre>
-</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -117,88 +50,30 @@ def create_operation_result(func) -&gt;OperationResult:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def create_operation_result(func) -&gt;OperationResult:
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        f_result = func(*args, **kwargs)
-        if len(f_result) == 2:
-            data, type_ = f_result
-            if isinstance(data,type_.output_type):
-                status = get_op_status(True)
-                if type_.output_type is list:
-                    status = get_op_status(len(data)&gt;0,is_list=True)
-            else:
-                status = get_op_status(False)
-            has_information = data is not None
-            message = OperationMessage(type_, status, has_information)
-            logging.info(f&#34;Operation {type_} finished with status {status} and data {data}&#34;)
-            return OperationResult(data, message)
-        if len(f_result) == 3:
-            data, type_, status = func(*args, **kwargs)
-            has_information = data is not None
-            message = OperationMessage(type_, status, has_information)
-            logging.info(f&#34;Operation {type_} finished with status {status} and data {data}&#34;)
-            return OperationResult(data, message)
-    return wrap</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.get_op_status"><code class="name flex">
 <span>def <span class="ident">get_op_status</span></span>(<span>expression, is_list=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_op_status(expression,is_list=False):
-    if is_list and not expression:
-        return OperationStatus.EMPTY_RESULT
-    return OperationStatus.SUCCESS if expression else OperationStatus.FAILED</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.make_operation_message"><code class="name flex">
 <span>def <span class="ident">make_operation_message</span></span>(<span>type=None, status=None, has_information_data=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def make_operation_message(type=None, status=None, has_information_data=False):
-    return OperationMessage(type=type, status=status, has_information_data=has_information_data)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.op_failed"><code class="name flex">
 <span>def <span class="ident">op_failed</span></span>(<span>result: <a title="academic_crawler.scrapers.operations.OperationResult" href="#academic_crawler.scrapers.operations.OperationResult">OperationResult</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def op_failed(result: OperationResult):
-    return result.message.status == OperationStatus.FAILED</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.op_success"><code class="name flex">
 <span>def <span class="ident">op_success</span></span>(<span>result: <a title="academic_crawler.scrapers.operations.OperationResult" href="#academic_crawler.scrapers.operations.OperationResult">OperationResult</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def op_success(result: OperationResult):
-    return result.message.status == OperationStatus.SUCCESS</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -211,16 +86,6 @@ def create_operation_result(func) -&gt;OperationResult:
 </code></dt>
 <dd>
 <div class="desc"><p>OperationMessage(type: academic_crawler.config.enums.OperationType, status: academic_crawler.config.enums.OperationStatus, has_information_data: bool)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@dataclass
-class OperationMessage:
-    type: OperationType
-    status: OperationStatus
-    has_information_data: bool</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.scrapers.operations.OperationMessage.has_information_data"><code class="name">var <span class="ident">has_information_data</span> : bool</code></dt>
@@ -243,15 +108,6 @@ class OperationMessage:
 </code></dt>
 <dd>
 <div class="desc"><p>OperationResult(data: dict, message: academic_crawler.scrapers.operations.OperationMessage)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@dataclass
-class OperationResult:
-    data: dict
-    message: OperationMessage</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.scrapers.operations.OperationResult.data"><code class="name">var <span class="ident">data</span> : dict</code></dt>

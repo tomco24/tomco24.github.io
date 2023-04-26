@@ -22,91 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.dom</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import enum
-
-
-class ElementCategory(enum.Enum):
-    CONTENT_SECTIONING = 1
-    DEMARCATING_EDITS = 2
-    DOCUMENT_METADATA = 3
-    EMBEDDED_CONTENT = 4
-    FORMS = 5
-    IMAGE_AND_MULTIMEDIA = 6
-    INLINE_TEXT_SEMANTICS = 7
-    INTERACTIVE_ELEMENTS = 8
-    MAIN_ROOT = 9
-    OBSOLETE_AND_DEPRECATED_ELEMENTS = 10
-    SVG_AND_MATHML = 11
-    SCRIPTING = 12
-    SECTIONING_ROOT = 13
-    TABLE_CONTENT = 14
-    TEXT_CONTENT = 15
-    WEB_COMPONENTS = 16
-
-elements_categories ={
-    ElementCategory.CONTENT_SECTIONING: [&#39;address&#39;, &#39;article&#39;, &#39;aside&#39;, &#39;div&#39;,&#39;footer&#39;, &#39;header&#39;, &#39;h1&#39;, &#39;h2&#39;, &#39;h3&#39;, &#39;h4&#39;, &#39;h5&#39;, &#39;h6&#39;, &#39;main&#39;, &#39;nav&#39;, &#39;section&#39;,&#39;dl&#39;, &#39;table&#39;],
-    ElementCategory.DEMARCATING_EDITS: [&#39;del&#39;, &#39;ins&#39;],
-    ElementCategory.DOCUMENT_METADATA: [&#39;base&#39;, &#39;head&#39;, &#39;link&#39;, &#39;meta&#39;, &#39;style&#39;, &#39;title&#39;],
-    ElementCategory.EMBEDDED_CONTENT: [&#39;embed&#39;, &#39;iframe&#39;, &#39;object&#39;, &#39;picture&#39;, &#39;portal&#39;, &#39;source&#39;],
-    ElementCategory.FORMS: [&#39;button&#39;, &#39;datalist&#39;, &#39;fieldset&#39;, &#39;form&#39;, &#39;input&#39;, &#39;label&#39;, &#39;legend&#39;, &#39;meter&#39;, &#39;optgroup&#39;, &#39;option&#39;, &#39;output&#39;, &#39;progress&#39;, &#39;select&#39;, &#39;textarea&#39;],
-    ElementCategory.IMAGE_AND_MULTIMEDIA: [&#39;area&#39;, &#39;audio&#39;, &#39;img&#39;, &#39;map&#39;, &#39;track&#39;, &#39;video&#39;],
-    ElementCategory.INLINE_TEXT_SEMANTICS: [&#39;a&#39;, &#39;abbr&#39;, &#39;b&#39;, &#39;bdi&#39;, &#39;bdo&#39;, &#39;br&#39;, &#39;cite&#39;, &#39;code&#39;, &#39;data&#39;, &#39;dfn&#39;, &#39;em&#39;, &#39;i&#39;, &#39;kbd&#39;, &#39;mark&#39;, &#39;q&#39;, &#39;rp&#39;, &#39;rt&#39;, &#39;ruby&#39;, &#39;s&#39;, &#39;samp&#39;, &#39;small&#39;, &#39;span&#39;, &#39;strong&#39;, &#39;sub&#39;, &#39;sup&#39;, &#39;time&#39;, &#39;u&#39;, &#39;var&#39;, &#39;wbr&#39;],
-    ElementCategory.INTERACTIVE_ELEMENTS: [&#39;details&#39;, &#39;dialog&#39;, &#39;summary&#39;],
-    ElementCategory.MAIN_ROOT: [&#39;html&#39;],
-    ElementCategory.OBSOLETE_AND_DEPRECATED_ELEMENTS: [&#39;acronym&#39;, &#39;applet&#39;, &#39;bgsound&#39;, &#39;big&#39;, &#39;blink&#39;, &#39;center&#39;, &#39;content&#39;, &#39;dir&#39;, &#39;font&#39;, &#39;frame&#39;, &#39;frameset&#39;, &#39;image&#39;, &#39;keygen&#39;, &#39;marquee&#39;, &#39;menuitem&#39;, &#39;nobr&#39;, &#39;noembed&#39;, &#39;noframes&#39;, &#39;param&#39;, &#39;plaintext&#39;, &#39;rb&#39;, &#39;rtc&#39;, &#39;shadow&#39;, &#39;spacer&#39;, &#39;strike&#39;, &#39;tt&#39;, &#39;xmp&#39;],
-    ElementCategory.SVG_AND_MATHML: [&#39;svg&#39;, &#39;math&#39;],
-    ElementCategory.SCRIPTING: [&#39;canvas&#39;, &#39;noscript&#39;, &#39;script&#39;],
-    ElementCategory.SECTIONING_ROOT: [&#39;body&#39;],
-    ElementCategory.TABLE_CONTENT: [&#39;caption&#39;, &#39;col&#39;, &#39;colgroup&#39;, &#39;tbody&#39;, &#39;td&#39;, &#39;tfoot&#39;, &#39;th&#39;, &#39;thead&#39;, &#39;tr&#39;,&#39;dd&#39;, &#39;dt&#39;],
-    ElementCategory.TEXT_CONTENT: [&#39;blockquote&#39;, &#39;figcaption&#39;, &#39;figure&#39;, &#39;hr&#39;, &#39;li&#39;, &#39;menu&#39;, &#39;ol&#39;, &#39;p&#39;, &#39;pre&#39;, &#39;ul&#39;],
-    ElementCategory.WEB_COMPONENTS: [&#39;slot&#39;, &#39;template&#39;]
-}
-
-class ElementCategoryHelper:
-    def __init__(self):
-        self.elements_categories = elements_categories
-
-
-    def get_category(self,tag):
-        general_category = self.get_general_category(tag.name)
-        if self.is_textual(general_category):
-            return general_category,&#39;text&#39;
-        if self.is_main_section(tag,general_category):
-            return general_category,&#39;main&#39;
-        if self.is_nav_section(tag,general_category):
-            return general_category,&#39;nav&#39;
-        return general_category,&#39;other&#39;
-
-    def get_general_category(self, tag_name):
-        for category, tags in self.elements_categories.items():
-            if tag_name in tags:
-                return category
-        return None
-
-    def is_main_section(self,tag,category:ElementCategory):
-        if category == ElementCategory.CONTENT_SECTIONING \
-                and (tag.name == &#39;main&#39; or tag.get(&#39;role&#39;,None)  == &#39;main&#39;):
-            return True
-        return False
-
-    def is_nav_section(self,tag,category:ElementCategory):
-        if category == ElementCategory.CONTENT_SECTIONING \
-                and (tag.name == &#39;nav&#39; or tag.get(&#39;role&#39;,None)  == &#39;navigation&#39;):
-            return True
-        return False
-
-    def is_textual(self,category:ElementCategory):
-        if category == ElementCategory.TEXT_CONTENT:
-            return True
-        if category == ElementCategory.INLINE_TEXT_SEMANTICS:
-            return True
-        if category == ElementCategory.TABLE_CONTENT:
-            return True</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -123,28 +38,6 @@ class ElementCategoryHelper:
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ElementCategory(enum.Enum):
-    CONTENT_SECTIONING = 1
-    DEMARCATING_EDITS = 2
-    DOCUMENT_METADATA = 3
-    EMBEDDED_CONTENT = 4
-    FORMS = 5
-    IMAGE_AND_MULTIMEDIA = 6
-    INLINE_TEXT_SEMANTICS = 7
-    INTERACTIVE_ELEMENTS = 8
-    MAIN_ROOT = 9
-    OBSOLETE_AND_DEPRECATED_ELEMENTS = 10
-    SVG_AND_MATHML = 11
-    SCRIPTING = 12
-    SECTIONING_ROOT = 13
-    TABLE_CONTENT = 14
-    TEXT_CONTENT = 15
-    WEB_COMPONENTS = 16</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -221,139 +114,42 @@ class ElementCategoryHelper:
 <span>class <span class="ident">ElementCategoryHelper</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ElementCategoryHelper:
-    def __init__(self):
-        self.elements_categories = elements_categories
-
-
-    def get_category(self,tag):
-        general_category = self.get_general_category(tag.name)
-        if self.is_textual(general_category):
-            return general_category,&#39;text&#39;
-        if self.is_main_section(tag,general_category):
-            return general_category,&#39;main&#39;
-        if self.is_nav_section(tag,general_category):
-            return general_category,&#39;nav&#39;
-        return general_category,&#39;other&#39;
-
-    def get_general_category(self, tag_name):
-        for category, tags in self.elements_categories.items():
-            if tag_name in tags:
-                return category
-        return None
-
-    def is_main_section(self,tag,category:ElementCategory):
-        if category == ElementCategory.CONTENT_SECTIONING \
-                and (tag.name == &#39;main&#39; or tag.get(&#39;role&#39;,None)  == &#39;main&#39;):
-            return True
-        return False
-
-    def is_nav_section(self,tag,category:ElementCategory):
-        if category == ElementCategory.CONTENT_SECTIONING \
-                and (tag.name == &#39;nav&#39; or tag.get(&#39;role&#39;,None)  == &#39;navigation&#39;):
-            return True
-        return False
-
-    def is_textual(self,category:ElementCategory):
-        if category == ElementCategory.TEXT_CONTENT:
-            return True
-        if category == ElementCategory.INLINE_TEXT_SEMANTICS:
-            return True
-        if category == ElementCategory.TABLE_CONTENT:
-            return True</code></pre>
-</details>
+<div class="desc"><p>Helper class for element categories</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.helpers.dom.ElementCategoryHelper.get_category"><code class="name flex">
-<span>def <span class="ident">get_category</span></span>(<span>self, tag)</span>
+<span>def <span class="ident">get_category</span></span>(<span>self, tag) ‑> (<enum '<a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>'>, <class 'str'>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_category(self,tag):
-    general_category = self.get_general_category(tag.name)
-    if self.is_textual(general_category):
-        return general_category,&#39;text&#39;
-    if self.is_main_section(tag,general_category):
-        return general_category,&#39;main&#39;
-    if self.is_nav_section(tag,general_category):
-        return general_category,&#39;nav&#39;
-    return general_category,&#39;other&#39;</code></pre>
-</details>
+<div class="desc"><p>Get the category of the tag</p>
+<h2 id="args">Args</h2>
+<p>tag:</p></div>
 </dd>
 <dt id="academic_crawler.helpers.dom.ElementCategoryHelper.get_general_category"><code class="name flex">
-<span>def <span class="ident">get_general_category</span></span>(<span>self, tag_name)</span>
+<span>def <span class="ident">get_general_category</span></span>(<span>self, tag_name) ‑> <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_general_category(self, tag_name):
-    for category, tags in self.elements_categories.items():
-        if tag_name in tags:
-            return category
-    return None</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.dom.ElementCategoryHelper.is_main_section"><code class="name flex">
-<span>def <span class="ident">is_main_section</span></span>(<span>self, tag, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>)</span>
+<span>def <span class="ident">is_main_section</span></span>(<span>self, tag, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_main_section(self,tag,category:ElementCategory):
-    if category == ElementCategory.CONTENT_SECTIONING \
-            and (tag.name == &#39;main&#39; or tag.get(&#39;role&#39;,None)  == &#39;main&#39;):
-        return True
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.dom.ElementCategoryHelper.is_nav_section"><code class="name flex">
-<span>def <span class="ident">is_nav_section</span></span>(<span>self, tag, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>)</span>
+<span>def <span class="ident">is_nav_section</span></span>(<span>self, tag, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_nav_section(self,tag,category:ElementCategory):
-    if category == ElementCategory.CONTENT_SECTIONING \
-            and (tag.name == &#39;nav&#39; or tag.get(&#39;role&#39;,None)  == &#39;navigation&#39;):
-        return True
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.dom.ElementCategoryHelper.is_textual"><code class="name flex">
-<span>def <span class="ident">is_textual</span></span>(<span>self, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>)</span>
+<span>def <span class="ident">is_textual</span></span>(<span>self, category: <a title="academic_crawler.helpers.dom.ElementCategory" href="#academic_crawler.helpers.dom.ElementCategory">ElementCategory</a>) ‑> bool</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_textual(self,category:ElementCategory):
-    if category == ElementCategory.TEXT_CONTENT:
-        return True
-    if category == ElementCategory.INLINE_TEXT_SEMANTICS:
-        return True
-    if category == ElementCategory.TABLE_CONTENT:
-        return True</code></pre>
-</details>
+<div class="desc"><p>Check if the category is textual, e.g. its holds text value</p>
+<h2 id="args">Args</h2>
+<p>category:</p></div>
 </dd>
 </dl>
 </dd>

@@ -22,94 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.strategies.people</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import defaultdict
-from pprint import pprint
-
-from ..operations import op_success
-
-from . import BaseScrapingStrategy
-from ..operations.people import extract_data_from_page, annotate_person_data
-from ...config.enums import OperationStatus
-from ...config.page_types import PAGE_TYPE
-from ...config.utils import get_relabeled_tree
-from ...heuristics.detectors import NERDetector
-from ...heuristics.tree import EntityNode
-from ...scrapers.operations.general import remove_not_tagged, save_graph, extract_data_from_links
-from ...scrapers.templates import Person
-
-
-class PeopleStrategy(BaseScrapingStrategy):
-    def __init__(self, input_data) -&gt; None:
-        super().__init__()
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.page_type:PAGE_TYPE = input_data.get(&#34;page_type&#34;)
-        #self.parent_org: input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-        self.organization = input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.detector = NERDetector({&#34;PERSON&#34;,&#34;ORG&#34;,&#34;EMAIL&#34;})
-
-    def run(self):
-        template_instances_dict = dict(partial=[], full=[], total=0)
-        tree = get_relabeled_tree(self.tree)
-        op_res = remove_not_tagged(tree, 0)
-        tree = op_res.data
-
-        #save_graph(op_res.data,&#39;cvut_graph.svg&#39;)
-        if self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
-            op_res = extract_data_from_links(tree, &#39;people&#39;)
-            if op_success(op_res):
-                template_instances_dict = self.extract_template_instances(op_res.data)
-                if template_instances_dict.get(&#34;total&#34;)&gt;0:
-                    return template_instances_dict
-        elif self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
-                res, template_instances_dict = self.extract_people_data(tree,template_instances_dict)
-                if res and template_instances_dict.get(&#34;total&#34;)&gt;0:
-                    return template_instances_dict
-
-        return None
-
-    def extract_people_data(self,tree,template_instances_dict):
-        op_res = extract_data_from_page(tree)
-        if op_success(op_res):
-            for item in op_res.data:
-                op_res = annotate_person_data(item, self.detector, self.organization)
-                if op_success(op_res):
-                    template_instances_dict[&#39;full&#39;].append(op_res.data)
-                    template_instances_dict[&#39;total&#39;] += 1
-            if template_instances_dict.get(&#34;total&#34;) &gt; 0:
-                return True,template_instances_dict
-        return False,template_instances_dict
-
-    def extract_sections(self) -&gt; tuple[EntityNode]:
-        pass
-
-    def parse_sections(self) -&gt; dict:
-        pass
-
-    def extract_template_instances(self,records:list[dict]) -&gt; list:
-        result = dict(partial=[],full=[],total=0)
-        total = 0
-        for record in records:
-            href = record.get(&#34;attributes&#34;).get(&#34;href&#34;, None)
-            if href:
-                url, type_ = self.organization.fix_url(href)
-                if type_ == &#34;external&#34;:
-                    continue
-                item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=url.url)
-                result[&#39;partial&#39;].append(item)
-                total +=1
-            else:
-                item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=&#34;&#34;)
-                result[&#39;full&#39;].append(item)
-
-        pprint(result)
-        result[&#39;total&#39;] = total
-        return result</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -127,78 +39,6 @@ class PeopleStrategy(BaseScrapingStrategy):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PeopleStrategy(BaseScrapingStrategy):
-    def __init__(self, input_data) -&gt; None:
-        super().__init__()
-        self.page_header = input_data.get(&#34;state&#34;).page_header
-        self.page_type:PAGE_TYPE = input_data.get(&#34;page_type&#34;)
-        #self.parent_org: input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.tree = self.page_header.get(&#34;tree&#34;)
-        self.organization = input_data.get(&#34;state&#34;).get_domain(&#34;organization&#34;)
-        self.detector = NERDetector({&#34;PERSON&#34;,&#34;ORG&#34;,&#34;EMAIL&#34;})
-
-    def run(self):
-        template_instances_dict = dict(partial=[], full=[], total=0)
-        tree = get_relabeled_tree(self.tree)
-        op_res = remove_not_tagged(tree, 0)
-        tree = op_res.data
-
-        #save_graph(op_res.data,&#39;cvut_graph.svg&#39;)
-        if self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
-            op_res = extract_data_from_links(tree, &#39;people&#39;)
-            if op_success(op_res):
-                template_instances_dict = self.extract_template_instances(op_res.data)
-                if template_instances_dict.get(&#34;total&#34;)&gt;0:
-                    return template_instances_dict
-        elif self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
-                res, template_instances_dict = self.extract_people_data(tree,template_instances_dict)
-                if res and template_instances_dict.get(&#34;total&#34;)&gt;0:
-                    return template_instances_dict
-
-        return None
-
-    def extract_people_data(self,tree,template_instances_dict):
-        op_res = extract_data_from_page(tree)
-        if op_success(op_res):
-            for item in op_res.data:
-                op_res = annotate_person_data(item, self.detector, self.organization)
-                if op_success(op_res):
-                    template_instances_dict[&#39;full&#39;].append(op_res.data)
-                    template_instances_dict[&#39;total&#39;] += 1
-            if template_instances_dict.get(&#34;total&#34;) &gt; 0:
-                return True,template_instances_dict
-        return False,template_instances_dict
-
-    def extract_sections(self) -&gt; tuple[EntityNode]:
-        pass
-
-    def parse_sections(self) -&gt; dict:
-        pass
-
-    def extract_template_instances(self,records:list[dict]) -&gt; list:
-        result = dict(partial=[],full=[],total=0)
-        total = 0
-        for record in records:
-            href = record.get(&#34;attributes&#34;).get(&#34;href&#34;, None)
-            if href:
-                url, type_ = self.organization.fix_url(href)
-                if type_ == &#34;external&#34;:
-                    continue
-                item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=url.url)
-                result[&#39;partial&#39;].append(item)
-                total +=1
-            else:
-                item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=&#34;&#34;)
-                result[&#39;full&#39;].append(item)
-
-        pprint(result)
-        result[&#39;total&#39;] = total
-        return result</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="academic_crawler.scrapers.strategies.BaseScrapingStrategy" href="index.html#academic_crawler.scrapers.strategies.BaseScrapingStrategy">BaseScrapingStrategy</a></li>
@@ -211,108 +51,30 @@ inheritance.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_people_data(self,tree,template_instances_dict):
-    op_res = extract_data_from_page(tree)
-    if op_success(op_res):
-        for item in op_res.data:
-            op_res = annotate_person_data(item, self.detector, self.organization)
-            if op_success(op_res):
-                template_instances_dict[&#39;full&#39;].append(op_res.data)
-                template_instances_dict[&#39;total&#39;] += 1
-        if template_instances_dict.get(&#34;total&#34;) &gt; 0:
-            return True,template_instances_dict
-    return False,template_instances_dict</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.people.PeopleStrategy.extract_sections"><code class="name flex">
 <span>def <span class="ident">extract_sections</span></span>(<span>self) ‑> tuple[<a title="academic_crawler.heuristics.tree.node.EntityNode" href="../../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.EntityNode">EntityNode</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_sections(self) -&gt; tuple[EntityNode]:
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.people.PeopleStrategy.extract_template_instances"><code class="name flex">
 <span>def <span class="ident">extract_template_instances</span></span>(<span>self, records: list[dict]) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_template_instances(self,records:list[dict]) -&gt; list:
-    result = dict(partial=[],full=[],total=0)
-    total = 0
-    for record in records:
-        href = record.get(&#34;attributes&#34;).get(&#34;href&#34;, None)
-        if href:
-            url, type_ = self.organization.fix_url(href)
-            if type_ == &#34;external&#34;:
-                continue
-            item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=url.url)
-            result[&#39;partial&#39;].append(item)
-            total +=1
-        else:
-            item = Person(name=record.get(&#34;value&#34;),organization=self.organization, url=&#34;&#34;)
-            result[&#39;full&#39;].append(item)
-
-    pprint(result)
-    result[&#39;total&#39;] = total
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.people.PeopleStrategy.parse_sections"><code class="name flex">
 <span>def <span class="ident">parse_sections</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_sections(self) -&gt; dict:
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.people.PeopleStrategy.run"><code class="name flex">
 <span>def <span class="ident">run</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run(self):
-    template_instances_dict = dict(partial=[], full=[], total=0)
-    tree = get_relabeled_tree(self.tree)
-    op_res = remove_not_tagged(tree, 0)
-    tree = op_res.data
-
-    #save_graph(op_res.data,&#39;cvut_graph.svg&#39;)
-    if self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA:
-        op_res = extract_data_from_links(tree, &#39;people&#39;)
-        if op_success(op_res):
-            template_instances_dict = self.extract_template_instances(op_res.data)
-            if template_instances_dict.get(&#34;total&#34;)&gt;0:
-                return template_instances_dict
-    elif self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA:
-            res, template_instances_dict = self.extract_people_data(tree,template_instances_dict)
-            if res and template_instances_dict.get(&#34;total&#34;)&gt;0:
-                return template_instances_dict
-
-    return None</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

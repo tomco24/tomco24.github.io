@@ -22,70 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_vocabulary.vocabulary</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from numba import jit
-import numpy as np
-from academic_crawler.config.singleton import NlpSingleton
-from academic_crawler.config.predefined import keywords_map
-from academic_crawler.ml.trf_vectors import Tensor2Attr
-from sentence_transformers import SentenceTransformer
-
-
-
-
-
-class KeyWordSet():
-
-    def __init__(self, name, keywords) -&gt; None:
-        super().__init__()
-        self.elements = tuple(sorted(keywords))
-        self.name = name
-        self.vector = None
-
-    def calculate_vector(self, nlp):
-        # TODO BETTER REPRESENTATION
-        # self.vector = nlp(&#34; &#34;.join(self.vocab)).vector
-        avg = [nlp(word).vector for word in self.elements]
-        avg = np.mean(avg, axis=0)
-        self.vector = avg
-class DomainVocabulary():
-
-    &#34;&#34;&#34; Class that represents the vocabulary of a domain. &#34;&#34;&#34;
-    def __init__(self,nlp):
-        self.nlp  = nlp
-        self.category_labels = (&#34;position&#34;, &#34;org_structure&#34;, &#34;people_page&#34;,&#39;negative_page&#39;)
-        self.categories = {
-            &#34;position&#34;: KeyWordSet(&#34;position&#34;, keywords_map[&#34;keywords_work_position&#34;]),
-            &#34;org_structure&#34;: KeyWordSet(&#34;org_structure&#34;, keywords_map[&#34;keywords_org_structure&#34;]),
-            &#34;people_page&#34;: KeyWordSet(&#34;people_page&#34;, keywords_map[&#34;keywords_people_page&#34;]),
-            &#34;negative_page&#34;: KeyWordSet(&#34;negative_page&#34;, keywords_map[&#34;keywords_negative_page&#34;]),
-        }
-        self.position = self.categories[&#34;position&#34;]
-        self.org_structure = self.categories[&#34;org_structure&#34;]
-        self.people_page = self.categories[&#34;people_page&#34;]
-        for category in self.categories.values():
-            category.calculate_vector(self.nlp)
-        self.keywords: KeyWordSet = self.get_full_vocab()
-        self.keywords.calculate_vector(self.nlp)
-
-    def get_full_vocab(self) -&gt; KeyWordSet:
-        return KeyWordSet(&#34;keywords&#34;,
-                          tuple(set(self.position.elements + self.org_structure.elements + self.people_page.elements)))
-
-    def add_term(self, term,category):
-        if term not in self.keywords.elements:
-            self.keywords.elements.append(term)
-        if term not in self.categories[category].elements:
-            self.categories[category].elements.append(term)
-
-    def rebuild_vectors(self):
-        for category in self.categories.values():
-            category.calculate_vector(self.nlp)
-        self.keywords.calculate_vector(self.nlp)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -102,45 +38,6 @@ class DomainVocabulary():
 </code></dt>
 <dd>
 <div class="desc"><p>Class that represents the vocabulary of a domain.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class DomainVocabulary():
-
-    &#34;&#34;&#34; Class that represents the vocabulary of a domain. &#34;&#34;&#34;
-    def __init__(self,nlp):
-        self.nlp  = nlp
-        self.category_labels = (&#34;position&#34;, &#34;org_structure&#34;, &#34;people_page&#34;,&#39;negative_page&#39;)
-        self.categories = {
-            &#34;position&#34;: KeyWordSet(&#34;position&#34;, keywords_map[&#34;keywords_work_position&#34;]),
-            &#34;org_structure&#34;: KeyWordSet(&#34;org_structure&#34;, keywords_map[&#34;keywords_org_structure&#34;]),
-            &#34;people_page&#34;: KeyWordSet(&#34;people_page&#34;, keywords_map[&#34;keywords_people_page&#34;]),
-            &#34;negative_page&#34;: KeyWordSet(&#34;negative_page&#34;, keywords_map[&#34;keywords_negative_page&#34;]),
-        }
-        self.position = self.categories[&#34;position&#34;]
-        self.org_structure = self.categories[&#34;org_structure&#34;]
-        self.people_page = self.categories[&#34;people_page&#34;]
-        for category in self.categories.values():
-            category.calculate_vector(self.nlp)
-        self.keywords: KeyWordSet = self.get_full_vocab()
-        self.keywords.calculate_vector(self.nlp)
-
-    def get_full_vocab(self) -&gt; KeyWordSet:
-        return KeyWordSet(&#34;keywords&#34;,
-                          tuple(set(self.position.elements + self.org_structure.elements + self.people_page.elements)))
-
-    def add_term(self, term,category):
-        if term not in self.keywords.elements:
-            self.keywords.elements.append(term)
-        if term not in self.categories[category].elements:
-            self.categories[category].elements.append(term)
-
-    def rebuild_vectors(self):
-        for category in self.categories.values():
-            category.calculate_vector(self.nlp)
-        self.keywords.calculate_vector(self.nlp)</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_vocabulary.vocabulary.DomainVocabulary.add_term"><code class="name flex">
@@ -148,45 +45,18 @@ class DomainVocabulary():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_term(self, term,category):
-    if term not in self.keywords.elements:
-        self.keywords.elements.append(term)
-    if term not in self.categories[category].elements:
-        self.categories[category].elements.append(term)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.vocabulary.DomainVocabulary.get_full_vocab"><code class="name flex">
 <span>def <span class="ident">get_full_vocab</span></span>(<span>self) ‑> <a title="academic_crawler.heuristics.page_vocabulary.vocabulary.KeyWordSet" href="#academic_crawler.heuristics.page_vocabulary.vocabulary.KeyWordSet">KeyWordSet</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_full_vocab(self) -&gt; KeyWordSet:
-    return KeyWordSet(&#34;keywords&#34;,
-                      tuple(set(self.position.elements + self.org_structure.elements + self.people_page.elements)))</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.vocabulary.DomainVocabulary.rebuild_vectors"><code class="name flex">
 <span>def <span class="ident">rebuild_vectors</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def rebuild_vectors(self):
-    for category in self.categories.values():
-        category.calculate_vector(self.nlp)
-    self.keywords.calculate_vector(self.nlp)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -196,25 +66,6 @@ class DomainVocabulary():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class KeyWordSet():
-
-    def __init__(self, name, keywords) -&gt; None:
-        super().__init__()
-        self.elements = tuple(sorted(keywords))
-        self.name = name
-        self.vector = None
-
-    def calculate_vector(self, nlp):
-        # TODO BETTER REPRESENTATION
-        # self.vector = nlp(&#34; &#34;.join(self.vocab)).vector
-        avg = [nlp(word).vector for word in self.elements]
-        avg = np.mean(avg, axis=0)
-        self.vector = avg</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_vocabulary.vocabulary.KeyWordSet.calculate_vector"><code class="name flex">
@@ -222,17 +73,6 @@ class DomainVocabulary():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calculate_vector(self, nlp):
-    # TODO BETTER REPRESENTATION
-    # self.vector = nlp(&#34; &#34;.join(self.vocab)).vector
-    avg = [nlp(word).vector for word in self.elements]
-    avg = np.mean(avg, axis=0)
-    self.vector = avg</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

@@ -22,25 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.strategies</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from abc import ABC,abstractmethod
-
-from academic_crawler.heuristics.tree import EntityNode
-class BaseScrapingStrategy(ABC):
-
-    @abstractmethod
-    def run(self):
-        pass
-
-
-
-    @abstractmethod
-    def extract_template_instances(self) -&gt; list:
-        pass</code></pre>
-</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -72,22 +53,6 @@ class BaseScrapingStrategy(ABC):
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
 inheritance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class BaseScrapingStrategy(ABC):
-
-    @abstractmethod
-    def run(self):
-        pass
-
-
-
-    @abstractmethod
-    def extract_template_instances(self) -&gt; list:
-        pass</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>abc.ABC</li>
@@ -105,28 +70,12 @@ inheritance.</p></div>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def extract_template_instances(self) -&gt; list:
-    pass</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.strategies.BaseScrapingStrategy.run"><code class="name flex">
 <span>def <span class="ident">run</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def run(self):
-    pass</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

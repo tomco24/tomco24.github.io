@@ -22,21 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_config.tag</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ConfTag:
-
-    def __init__(self,name,attrs:dict) -&gt; None:
-        super().__init__()
-        self.name = name
-        self.attrs = attrs
-        self.closing = True if name==&#39;text&#39; or name==&#39;href&#39; else False
-
-    def __eq__(self, other):
-        return self.name == other.name and self.attrs == other.attrs</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -53,21 +38,6 @@
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ConfTag:
-
-    def __init__(self,name,attrs:dict) -&gt; None:
-        super().__init__()
-        self.name = name
-        self.attrs = attrs
-        self.closing = True if name==&#39;text&#39; or name==&#39;href&#39; else False
-
-    def __eq__(self, other):
-        return self.name == other.name and self.attrs == other.attrs</code></pre>
-</details>
 </dd>
 </dl>
 </section>

@@ -22,115 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.spiders.academic_spider</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import defaultdict
-
-import bs4
-from scrapy.spiders import Rule, CrawlSpider
-from scrapy.linkextractors import LinkExtractor
-from abc import abstractmethod
-import requests
-from academic_crawler.config.state import ProgramState
-from academic_crawler.heuristics.detectors import KeywordDetector
-from academic_crawler.heuristics.links import LinkManager
-from academic_crawler.heuristics.tree import HTMLTreeGenerator, HTMLSematicTreeGenerator
-from scrapy.http.response.html import HtmlResponse
-
-from academic_crawler.scrapers.manager import ScrapingManager
-
-
-class AcademicSpider(CrawlSpider):
-    &#34;&#34;&#34;
-    Base class for all spiders from this component.
-    &#34;&#34;&#34;
-    def __init__(self, *a, **kw):
-        super().__init__(*a, **kw)
-
-        if kw.get(&#39;program_state&#39;,None) is None:
-            self.program_state = ProgramState.build_state(ProgramState.States.DISCOVERY,kw.get(&#39;organization&#39;))
-            self.controller = self.program_state.controller
-            self.controller.spider = self
-        else:
-            self.program_state:ProgramState = kw.get(&#34;program_state&#34;,None)
-            self.controller = kw.get(&#34;controller&#34;, None)
-            self.controller.spider = self
-        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
-        self.state_callback_map = {}
-        self.detectors = {
-            &#34;keyword_category&#34;:KeywordDetector(self.program_state.get(&#34;vocab_manager&#34;))
-        }
-        self.scraper = None
-        self.scraping_manager:&#34;ScrapingManager&#34; = ScrapingManager()
-        self.page_type_map = defaultdict(list)
-
-    @abstractmethod
-    def setup_state_callback_map(self):
-        pass
-
-    def get_state_callback(self):
-        return self.state_callback_map.get(self.controller.state)
-
-    def get_callback(self, state):
-        return self.state_callback_map.get(state)
-
-    def next_state(self,approval=True,page_type=None):
-        self.controller.approval = approval
-        self.controller.page_type = page_type
-        if self.controller.may_move():
-            self.controller.move()
-            self.controller.approval = False
-
-    def generate_page_header(self,response):
-        &#34;&#34;&#34;
-        Generates a page header from a response object.
-        :param response:
-        :param prune_tree:
-        :return:
-        &#34;&#34;&#34;
-        #TODO ADD control
-        soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
-        generator = HTMLSematicTreeGenerator()
-        tree = generator.build_page_tree(soup)
-        page_header = {
-            &#34;title&#34;: soup.find(&#39;title&#39;).text,
-            &#34;soup&#34;: soup,
-            &#34;tree&#34;: tree,
-            &#34;url&#34;:response.url,
-            &#34;response&#34;:response,
-        }
-        self.program_state.page_header = page_header
-        return page_header
-
-    def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
-        &#34;&#34;&#34;
-        Returns a list of LinkManager objects from a response object.
-        :param response:
-        :param previous_history:
-        :param home_manager:
-        :return:
-        &#34;&#34;&#34;
-        managers = []
-        for link in self.link_extractor.extract_links(response):
-            if link.url == response.url:
-                continue
-            manager = LinkManager(link, previous_history, )
-            if home_manager and not home_manager.is_sub_link(manager):
-                continue
-            managers += manager,
-        return managers
-    def get_scrapy_response_from_manager(self,manager):
-        request_object = requests.get(manager.link.url)
-        response = HtmlResponse(url=manager.link.url, body=request_object.content)
-        return response
-
-    def get_scrapy_response_from_url(self,url):
-        request_object = requests.get(url)
-        response = HtmlResponse(url=url, body=request_object.content)
-        return response</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -147,99 +38,6 @@ class AcademicSpider(CrawlSpider):
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for all spiders from this component.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AcademicSpider(CrawlSpider):
-    &#34;&#34;&#34;
-    Base class for all spiders from this component.
-    &#34;&#34;&#34;
-    def __init__(self, *a, **kw):
-        super().__init__(*a, **kw)
-
-        if kw.get(&#39;program_state&#39;,None) is None:
-            self.program_state = ProgramState.build_state(ProgramState.States.DISCOVERY,kw.get(&#39;organization&#39;))
-            self.controller = self.program_state.controller
-            self.controller.spider = self
-        else:
-            self.program_state:ProgramState = kw.get(&#34;program_state&#34;,None)
-            self.controller = kw.get(&#34;controller&#34;, None)
-            self.controller.spider = self
-        self.link_extractor = LinkExtractor(allow_domains=self.allowed_domains, unique=True)#, allow=url_patterns)
-        self.state_callback_map = {}
-        self.detectors = {
-            &#34;keyword_category&#34;:KeywordDetector(self.program_state.get(&#34;vocab_manager&#34;))
-        }
-        self.scraper = None
-        self.scraping_manager:&#34;ScrapingManager&#34; = ScrapingManager()
-        self.page_type_map = defaultdict(list)
-
-    @abstractmethod
-    def setup_state_callback_map(self):
-        pass
-
-    def get_state_callback(self):
-        return self.state_callback_map.get(self.controller.state)
-
-    def get_callback(self, state):
-        return self.state_callback_map.get(state)
-
-    def next_state(self,approval=True,page_type=None):
-        self.controller.approval = approval
-        self.controller.page_type = page_type
-        if self.controller.may_move():
-            self.controller.move()
-            self.controller.approval = False
-
-    def generate_page_header(self,response):
-        &#34;&#34;&#34;
-        Generates a page header from a response object.
-        :param response:
-        :param prune_tree:
-        :return:
-        &#34;&#34;&#34;
-        #TODO ADD control
-        soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
-        generator = HTMLSematicTreeGenerator()
-        tree = generator.build_page_tree(soup)
-        page_header = {
-            &#34;title&#34;: soup.find(&#39;title&#39;).text,
-            &#34;soup&#34;: soup,
-            &#34;tree&#34;: tree,
-            &#34;url&#34;:response.url,
-            &#34;response&#34;:response,
-        }
-        self.program_state.page_header = page_header
-        return page_header
-
-    def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
-        &#34;&#34;&#34;
-        Returns a list of LinkManager objects from a response object.
-        :param response:
-        :param previous_history:
-        :param home_manager:
-        :return:
-        &#34;&#34;&#34;
-        managers = []
-        for link in self.link_extractor.extract_links(response):
-            if link.url == response.url:
-                continue
-            manager = LinkManager(link, previous_history, )
-            if home_manager and not home_manager.is_sub_link(manager):
-                continue
-            managers += manager,
-        return managers
-    def get_scrapy_response_from_manager(self,manager):
-        request_object = requests.get(manager.link.url)
-        response = HtmlResponse(url=manager.link.url, body=request_object.content)
-        return response
-
-    def get_scrapy_response_from_url(self,url):
-        request_object = requests.get(url)
-        response = HtmlResponse(url=url, body=request_object.content)
-        return response</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scrapy.spiders.crawl.CrawlSpider</li>
@@ -250,7 +48,6 @@ class AcademicSpider(CrawlSpider):
 <ul class="hlist">
 <li><a title="academic_crawler.spiders.organization_spider.OrganizationSpider" href="organization_spider.html#academic_crawler.spiders.organization_spider.OrganizationSpider">OrganizationSpider</a></li>
 <li><a title="academic_crawler.spiders.people_spider.PeopleSpider" href="people_spider.html#academic_crawler.spiders.people_spider.PeopleSpider">PeopleSpider</a></li>
-<li><a title="academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt" href="people_spider_alternative.html#academic_crawler.spiders.people_spider_alternative.PeopleSpiderAlt">PeopleSpiderAlt</a></li>
 </ul>
 <h3>Class variables</h3>
 <dl>
@@ -269,44 +66,12 @@ class AcademicSpider(CrawlSpider):
 :param response:
 :param prune_tree:
 :return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def generate_page_header(self,response):
-    &#34;&#34;&#34;
-    Generates a page header from a response object.
-    :param response:
-    :param prune_tree:
-    :return:
-    &#34;&#34;&#34;
-    #TODO ADD control
-    soup = bs4.BeautifulSoup(response.text, &#39;lxml&#39;)
-    generator = HTMLSematicTreeGenerator()
-    tree = generator.build_page_tree(soup)
-    page_header = {
-        &#34;title&#34;: soup.find(&#39;title&#39;).text,
-        &#34;soup&#34;: soup,
-        &#34;tree&#34;: tree,
-        &#34;url&#34;:response.url,
-        &#34;response&#34;:response,
-    }
-    self.program_state.page_header = page_header
-    return page_header</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_callback"><code class="name flex">
 <span>def <span class="ident">get_callback</span></span>(<span>self, state)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_callback(self, state):
-    return self.state_callback_map.get(state)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_page_links"><code class="name flex">
 <span>def <span class="ident">get_page_links</span></span>(<span>self, response, previous_history, home_manager=None) ‑> list[<a title="academic_crawler.heuristics.links.LinkManager" href="../heuristics/links.html#academic_crawler.heuristics.links.LinkManager">LinkManager</a>]</span>
@@ -317,102 +82,36 @@ class AcademicSpider(CrawlSpider):
 :param previous_history:
 :param home_manager:
 :return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_page_links(self,response,previous_history,home_manager=None)-&gt; list[LinkManager]:
-    &#34;&#34;&#34;
-    Returns a list of LinkManager objects from a response object.
-    :param response:
-    :param previous_history:
-    :param home_manager:
-    :return:
-    &#34;&#34;&#34;
-    managers = []
-    for link in self.link_extractor.extract_links(response):
-        if link.url == response.url:
-            continue
-        manager = LinkManager(link, previous_history, )
-        if home_manager and not home_manager.is_sub_link(manager):
-            continue
-        managers += manager,
-    return managers</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_manager"><code class="name flex">
 <span>def <span class="ident">get_scrapy_response_from_manager</span></span>(<span>self, manager)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_scrapy_response_from_manager(self,manager):
-    request_object = requests.get(manager.link.url)
-    response = HtmlResponse(url=manager.link.url, body=request_object.content)
-    return response</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_scrapy_response_from_url"><code class="name flex">
 <span>def <span class="ident">get_scrapy_response_from_url</span></span>(<span>self, url)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_scrapy_response_from_url(self,url):
-    request_object = requests.get(url)
-    response = HtmlResponse(url=url, body=request_object.content)
-    return response</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.get_state_callback"><code class="name flex">
 <span>def <span class="ident">get_state_callback</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_state_callback(self):
-    return self.state_callback_map.get(self.controller.state)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.next_state"><code class="name flex">
 <span>def <span class="ident">next_state</span></span>(<span>self, approval=True, page_type=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def next_state(self,approval=True,page_type=None):
-    self.controller.approval = approval
-    self.controller.page_type = page_type
-    if self.controller.may_move():
-        self.controller.move()
-        self.controller.approval = False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.spiders.academic_spider.AcademicSpider.setup_state_callback_map"><code class="name flex">
 <span>def <span class="ident">setup_state_callback_map</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def setup_state_callback_map(self):
-    pass</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

@@ -22,74 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.state</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import enum
-
-from academic_crawler.config.page_types import PAGE_TYPE
-from academic_crawler.heuristics.page_vocabulary import OrgVocabularyManager
-from academic_crawler.scrapers.templates import Organization
-from academic_crawler.controllers.organization import build_state_machine as build_org_state_machine
-from academic_crawler.controllers.people import build_state_machine as build_people_state_machine
-
-class ProgramState():
-    class States(enum.Enum):
-        DISCOVERY = 0
-        SCRAPING = 1
-        POST_PROCESS = 3
-
-    state_attributes = {
-        States.DISCOVERY:{
-            &#34;to_exclude&#34;: [PAGE_TYPE.PAGE_SINGLE_PERSON,PAGE_TYPE.PAGE_PEOPLE_DATA, PAGE_TYPE.PAGE_PEOPLE_NO_DATA],
-            &#34;controller_build&#34;: build_org_state_machine,
-        },
-        States.SCRAPING:{
-            &#34;current_ORG&#34;:None,
-            &#34;to_exclude&#34;:[],
-            &#34;controller_build&#34;: build_people_state_machine,
-        },
-        States.POST_PROCESS:{
-
-        }
-    }
-
-    def __init__(self, state: States, domain_specific: dict) -&gt; None:
-        super().__init__()
-        self.state_dict = ProgramState.state_attributes[state]
-        self.domain_specific = domain_specific
-        self.page_header:dict = {}
-        self.controller = None
-        if state == ProgramState.States.SCRAPING:
-            self.set_state_attributes(&#39;vocab_manager&#39;,OrgVocabularyManager())
-    def set_page_header(self,page_header):
-        self.page_header = page_header
-
-    def set_state_attributes(self,key,value):
-        self.state_dict[key] = value
-    def get(self,key):
-        return self.state_dict.get(key,None)
-    
-    def get_domain(self,key):
-        return self.domain_specific.get(key,None)
-    def get_page(self, key):
-        return self.page_header.get(key,None)
-
-    def change_state(self,state:States):
-        self.state_dict = ProgramState.state_attributes[state]
-
-
-    @staticmethod
-    def build_state(state: States,organization_dict:dict):
-        domain_specific = {
-            &#34;organization&#34;:Organization(**organization_dict)
-        }
-
-        program_state = ProgramState(state,domain_specific)
-        program_state.controller = program_state.state_dict[&#39;controller_build&#39;]()
-        return program_state</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -106,66 +38,6 @@ class ProgramState():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ProgramState():
-    class States(enum.Enum):
-        DISCOVERY = 0
-        SCRAPING = 1
-        POST_PROCESS = 3
-
-    state_attributes = {
-        States.DISCOVERY:{
-            &#34;to_exclude&#34;: [PAGE_TYPE.PAGE_SINGLE_PERSON,PAGE_TYPE.PAGE_PEOPLE_DATA, PAGE_TYPE.PAGE_PEOPLE_NO_DATA],
-            &#34;controller_build&#34;: build_org_state_machine,
-        },
-        States.SCRAPING:{
-            &#34;current_ORG&#34;:None,
-            &#34;to_exclude&#34;:[],
-            &#34;controller_build&#34;: build_people_state_machine,
-        },
-        States.POST_PROCESS:{
-
-        }
-    }
-
-    def __init__(self, state: States, domain_specific: dict) -&gt; None:
-        super().__init__()
-        self.state_dict = ProgramState.state_attributes[state]
-        self.domain_specific = domain_specific
-        self.page_header:dict = {}
-        self.controller = None
-        if state == ProgramState.States.SCRAPING:
-            self.set_state_attributes(&#39;vocab_manager&#39;,OrgVocabularyManager())
-    def set_page_header(self,page_header):
-        self.page_header = page_header
-
-    def set_state_attributes(self,key,value):
-        self.state_dict[key] = value
-    def get(self,key):
-        return self.state_dict.get(key,None)
-    
-    def get_domain(self,key):
-        return self.domain_specific.get(key,None)
-    def get_page(self, key):
-        return self.page_header.get(key,None)
-
-    def change_state(self,state:States):
-        self.state_dict = ProgramState.state_attributes[state]
-
-
-    @staticmethod
-    def build_state(state: States,organization_dict:dict):
-        domain_specific = {
-            &#34;organization&#34;:Organization(**organization_dict)
-        }
-
-        program_state = ProgramState(state,domain_specific)
-        program_state.controller = program_state.state_dict[&#39;controller_build&#39;]()
-        return program_state</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.config.state.ProgramState.States"><code class="name">var <span class="ident">States</span></code></dt>
@@ -184,20 +56,6 @@ class ProgramState():
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def build_state(state: States,organization_dict:dict):
-    domain_specific = {
-        &#34;organization&#34;:Organization(**organization_dict)
-    }
-
-    program_state = ProgramState(state,domain_specific)
-    program_state.controller = program_state.state_dict[&#39;controller_build&#39;]()
-    return program_state</code></pre>
-</details>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -207,78 +65,36 @@ def build_state(state: States,organization_dict:dict):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def change_state(self,state:States):
-    self.state_dict = ProgramState.state_attributes[state]</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.state.ProgramState.get"><code class="name flex">
 <span>def <span class="ident">get</span></span>(<span>self, key)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get(self,key):
-    return self.state_dict.get(key,None)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.state.ProgramState.get_domain"><code class="name flex">
 <span>def <span class="ident">get_domain</span></span>(<span>self, key)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_domain(self,key):
-    return self.domain_specific.get(key,None)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.state.ProgramState.get_page"><code class="name flex">
 <span>def <span class="ident">get_page</span></span>(<span>self, key)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_page(self, key):
-    return self.page_header.get(key,None)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.state.ProgramState.set_page_header"><code class="name flex">
 <span>def <span class="ident">set_page_header</span></span>(<span>self, page_header)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_page_header(self,page_header):
-    self.page_header = page_header</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.state.ProgramState.set_state_attributes"><code class="name flex">
 <span>def <span class="ident">set_state_attributes</span></span>(<span>self, key, value)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_state_attributes(self,key,value):
-    self.state_dict[key] = value</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

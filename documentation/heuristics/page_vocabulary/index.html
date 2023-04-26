@@ -22,69 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_vocabulary</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from typing import Union, Any
-
-from spacy import Language
-
-from academic_crawler.config.predefined import keywords_map
-from academic_crawler.config.singleton import NlpSingleton
-from academic_crawler.config.utils import get_noun_phrases_from_text
-from academic_crawler.heuristics.page_vocabulary.similarity import VocabSimilarityManager
-from academic_crawler.heuristics.page_vocabulary.vocabulary import DomainVocabulary
-
-class OrgVocabularyManager(object):
-    nlp: Union[Language, Any]
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.nlp = NlpSingleton.get_instance(embeddings=True)
-        self.vocabulary = DomainVocabulary(self.nlp)
-        self.similarity_manager = VocabSimilarityManager(self.vocabulary)
-        self.candidates_keyword= set()
-
-
-
-    def add_keyword_candidate(self,keyword,category):
-        self.candidates_keyword.add((keyword,category))
-
-
-    def insert_candidates_into_vocabulary(self):
-        for keyword,category in self.candidates_keyword:
-            self.vocabulary.add_term(keyword,category)
-        self.vocabulary.rebuild_vectors()
-        self.candidates_keyword = set()
-
-
-    def detect_possible_keywords(self,text) -&gt; list[tuple[str,str,float]]:
-        doc = self.nlp(text)
-        result = []
-        noun_phrases = get_noun_phrases_from_text(doc)
-        for noun_phrase in noun_phrases:
-            category,confidence = self.similarity_manager.get_keyword_category(noun_phrase)
-            if category:
-                self.add_keyword_candidate(noun_phrase,category)
-                result.append((noun_phrase,category,confidence))
-        result = sorted(result,key=lambda x:x[2],reverse=True)
-        return result
-
-
-    def get_noun_phrases_rating(self,noun_phrases,category=None):
-        ratings = []
-        for noun_phrase in noun_phrases:
-            rating_category = self.similarity_manager.get_categories_similarity(noun_phrase)
-            #max_category = self.similarity_manager.get_max_category(rating_category)
-            #max_category = category
-            if category:
-                category_rankings = self.similarity_manager.get_category_top_n_similar(noun_phrase,category)
-                top_match = category_rankings[0][1]
-                ratings.append((noun_phrase,top_match))
-        ratings = sorted(ratings,key=lambda x:x[1],reverse=True)
-        return ratings</code></pre>
-</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -111,59 +48,6 @@ class OrgVocabularyManager(object):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OrgVocabularyManager(object):
-    nlp: Union[Language, Any]
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.nlp = NlpSingleton.get_instance(embeddings=True)
-        self.vocabulary = DomainVocabulary(self.nlp)
-        self.similarity_manager = VocabSimilarityManager(self.vocabulary)
-        self.candidates_keyword= set()
-
-
-
-    def add_keyword_candidate(self,keyword,category):
-        self.candidates_keyword.add((keyword,category))
-
-
-    def insert_candidates_into_vocabulary(self):
-        for keyword,category in self.candidates_keyword:
-            self.vocabulary.add_term(keyword,category)
-        self.vocabulary.rebuild_vectors()
-        self.candidates_keyword = set()
-
-
-    def detect_possible_keywords(self,text) -&gt; list[tuple[str,str,float]]:
-        doc = self.nlp(text)
-        result = []
-        noun_phrases = get_noun_phrases_from_text(doc)
-        for noun_phrase in noun_phrases:
-            category,confidence = self.similarity_manager.get_keyword_category(noun_phrase)
-            if category:
-                self.add_keyword_candidate(noun_phrase,category)
-                result.append((noun_phrase,category,confidence))
-        result = sorted(result,key=lambda x:x[2],reverse=True)
-        return result
-
-
-    def get_noun_phrases_rating(self,noun_phrases,category=None):
-        ratings = []
-        for noun_phrase in noun_phrases:
-            rating_category = self.similarity_manager.get_categories_similarity(noun_phrase)
-            #max_category = self.similarity_manager.get_max_category(rating_category)
-            #max_category = category
-            if category:
-                category_rankings = self.similarity_manager.get_category_top_n_similar(noun_phrase,category)
-                top_match = category_rankings[0][1]
-                ratings.append((noun_phrase,top_match))
-        ratings = sorted(ratings,key=lambda x:x[1],reverse=True)
-        return ratings</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_vocabulary.OrgVocabularyManager.nlp"><code class="name">var <span class="ident">nlp</span> : Union[spacy.language.Language, Any]</code></dt>
@@ -178,74 +62,24 @@ class OrgVocabularyManager(object):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_keyword_candidate(self,keyword,category):
-    self.candidates_keyword.add((keyword,category))</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.OrgVocabularyManager.detect_possible_keywords"><code class="name flex">
 <span>def <span class="ident">detect_possible_keywords</span></span>(<span>self, text) ‑> list[tuple[str, str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def detect_possible_keywords(self,text) -&gt; list[tuple[str,str,float]]:
-    doc = self.nlp(text)
-    result = []
-    noun_phrases = get_noun_phrases_from_text(doc)
-    for noun_phrase in noun_phrases:
-        category,confidence = self.similarity_manager.get_keyword_category(noun_phrase)
-        if category:
-            self.add_keyword_candidate(noun_phrase,category)
-            result.append((noun_phrase,category,confidence))
-    result = sorted(result,key=lambda x:x[2],reverse=True)
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.OrgVocabularyManager.get_noun_phrases_rating"><code class="name flex">
-<span>def <span class="ident">get_noun_phrases_rating</span></span>(<span>self, noun_phrases, category=None)</span>
+<span>def <span class="ident">get_noun_phrases_rating</span></span>(<span>self, noun_phrases, category=None) ‑> list[tuple[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_noun_phrases_rating(self,noun_phrases,category=None):
-    ratings = []
-    for noun_phrase in noun_phrases:
-        rating_category = self.similarity_manager.get_categories_similarity(noun_phrase)
-        #max_category = self.similarity_manager.get_max_category(rating_category)
-        #max_category = category
-        if category:
-            category_rankings = self.similarity_manager.get_category_top_n_similar(noun_phrase,category)
-            top_match = category_rankings[0][1]
-            ratings.append((noun_phrase,top_match))
-    ratings = sorted(ratings,key=lambda x:x[1],reverse=True)
-    return ratings</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_vocabulary.OrgVocabularyManager.insert_candidates_into_vocabulary"><code class="name flex">
 <span>def <span class="ident">insert_candidates_into_vocabulary</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def insert_candidates_into_vocabulary(self):
-    for keyword,category in self.candidates_keyword:
-        self.vocabulary.add_term(keyword,category)
-    self.vocabulary.rebuild_vectors()
-    self.candidates_keyword = set()</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

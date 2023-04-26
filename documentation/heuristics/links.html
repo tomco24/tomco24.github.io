@@ -22,153 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.links</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import re
-from urllib.parse import urlparse
-import academic_crawler.config.utils as utils
-from furl import furl
-
-
-class LinkManager:
-    def __init__(self, link, history=None) -&gt; None:
-        super().__init__()
-        self.link = link
-        self.url = furl(link.url)
-        self.referer_text = utils.clean_text(link.text)
-
-        self.path = utils.parse_path(self.url.path)
-        self.history = history
-        self.kw_flag = None
-        self.name_flag = None
-        self.confidence_dict = None
-        self.confidence_flags = {}
-        self.url_rating = self.get_url_rating()
-        self.page_type = None
-        self.page_header = None
-        self.response = None
-
-    def __hash__(self) -&gt; int:
-        return hash(self.link.url)
-
-    def keyword_entity_match(self,detector,entity):
-        result = []
-        result_text = detector.extract_keyword(self.referer_text).get(entity,None)
-        if result_text:
-            result.append((&#39;referer_text&#39;,result_text))
-        #TODO ADD url keyword_category match
-        return result
-
-    def contains_keyword(self,detector,category):
-        result_text = detector.extract_possible_keywords(self.referer_text).get(category,tuple())
-        if len(result_text)&gt;0:
-            return True
-        #TODO ADD url keyword_category match
-        return False
-
-
-
-
-    def get_referer_text_tokens(self):
-        return utils.simple_word_tokenization(self.referer_text)
-    def check_if_name_in_text_old(self):
-        text = self.link.text
-        splits = str(text).split()
-        is_upper = [x[0].isupper() for x in splits]
-        # print(text, &#34;---&#34;,is_upper)
-        return sum(is_upper) &gt;= 2  # TODO ADD NAME FLAG
-
-    def check_if_name_in_text(self, ncw):
-        result = ncw.get_name_confidence(self.link.text)
-        if result[&#39;confidence_name&#39;] &gt; 0:
-            return True
-        else:
-            return False
-
-    def check_if_keyword_match(self, kcw):
-        keyword_confidence_res = kcw.get_link_confidence(self.link.url)
-        if keyword_confidence_res[&#39;confidence_keyword&#39;] &gt; 0:
-            self.kw_flag = True
-            return True
-        else:
-            self.kw_flag = False
-            return False
-
-    def set_confidence_flag(self, values, labels):
-        if len(values) != len(labels):
-            return False
-        for i in range(len(values)):
-            self.confidence_flags[labels[i]] = values[i]
-
-    def get_referer_text(self):
-        # if len(self.history) == 0:
-        # return &#34;&#34;
-        # text = self.history[-1].text
-        # text = text.lower()
-        return self.referer_text
-
-    def should_explore(self):
-        if self.confidence_flags[&#39;name&#39;] and self.confidence_flags[&#39;keyword_category&#39;] is False:
-            return True
-        return False
-
-    def __repr__(self) -&gt; str:
-        return &#39;( &#39; + self.referer_text + &#34;,&#34; + self.link.url + &#34; )&#34;
-
-    def get_url_rating(self):
-        url = self.url
-        fragment = 1 if url.fragment else 0
-        return str(url.path).count(&#39;/&#39;) + str(url.query).count(&#39;&amp;&#39;) + fragment
-
-    def is_sub_link(self,other: &#39;LinkManager&#39;):
-        other_url = str(other.url.path)
-        if other_url.startswith(str(self.url.path)):
-            return True
-        return False
-
-class UrlPatternMatcher:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.patterns = set([])
-        self.has_patterns = False
-
-    @staticmethod
-    def get_regex_from_start_url(urls):
-        result = []
-        for url in urls:
-            url_ = furl(url)
-            segments = url_.path.segments
-            if len(segments) &gt; 0:
-                escaped = re.escape(url_.pathstr)
-                pattern = r&#34;.*{}.*$&#34;.format(escaped)
-                result.append(pattern)
-        return result
-
-    def extract_pattern_url(self, url):
-        url = furl(url)
-        segments = url.path.segments
-        query = url.query.params
-        if query:
-            pattern = url.remove(args=query)
-        else:
-            pattern = url.remove(path=segments[-1])
-        return pattern
-
-    def add_pattern(self, url):
-        pattern = self.extract_pattern_url(url).url
-        if pattern not in self.patterns:
-            self.patterns.add(pattern)
-            self.has_patterns = True
-            return True
-        return False
-
-    def match_patterns(self, url):
-        pattern = self.extract_pattern_url(url).url
-        return pattern in self.patterns</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -185,106 +38,6 @@ class UrlPatternMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class LinkManager:
-    def __init__(self, link, history=None) -&gt; None:
-        super().__init__()
-        self.link = link
-        self.url = furl(link.url)
-        self.referer_text = utils.clean_text(link.text)
-
-        self.path = utils.parse_path(self.url.path)
-        self.history = history
-        self.kw_flag = None
-        self.name_flag = None
-        self.confidence_dict = None
-        self.confidence_flags = {}
-        self.url_rating = self.get_url_rating()
-        self.page_type = None
-        self.page_header = None
-        self.response = None
-
-    def __hash__(self) -&gt; int:
-        return hash(self.link.url)
-
-    def keyword_entity_match(self,detector,entity):
-        result = []
-        result_text = detector.extract_keyword(self.referer_text).get(entity,None)
-        if result_text:
-            result.append((&#39;referer_text&#39;,result_text))
-        #TODO ADD url keyword_category match
-        return result
-
-    def contains_keyword(self,detector,category):
-        result_text = detector.extract_possible_keywords(self.referer_text).get(category,tuple())
-        if len(result_text)&gt;0:
-            return True
-        #TODO ADD url keyword_category match
-        return False
-
-
-
-
-    def get_referer_text_tokens(self):
-        return utils.simple_word_tokenization(self.referer_text)
-    def check_if_name_in_text_old(self):
-        text = self.link.text
-        splits = str(text).split()
-        is_upper = [x[0].isupper() for x in splits]
-        # print(text, &#34;---&#34;,is_upper)
-        return sum(is_upper) &gt;= 2  # TODO ADD NAME FLAG
-
-    def check_if_name_in_text(self, ncw):
-        result = ncw.get_name_confidence(self.link.text)
-        if result[&#39;confidence_name&#39;] &gt; 0:
-            return True
-        else:
-            return False
-
-    def check_if_keyword_match(self, kcw):
-        keyword_confidence_res = kcw.get_link_confidence(self.link.url)
-        if keyword_confidence_res[&#39;confidence_keyword&#39;] &gt; 0:
-            self.kw_flag = True
-            return True
-        else:
-            self.kw_flag = False
-            return False
-
-    def set_confidence_flag(self, values, labels):
-        if len(values) != len(labels):
-            return False
-        for i in range(len(values)):
-            self.confidence_flags[labels[i]] = values[i]
-
-    def get_referer_text(self):
-        # if len(self.history) == 0:
-        # return &#34;&#34;
-        # text = self.history[-1].text
-        # text = text.lower()
-        return self.referer_text
-
-    def should_explore(self):
-        if self.confidence_flags[&#39;name&#39;] and self.confidence_flags[&#39;keyword_category&#39;] is False:
-            return True
-        return False
-
-    def __repr__(self) -&gt; str:
-        return &#39;( &#39; + self.referer_text + &#34;,&#34; + self.link.url + &#34; )&#34;
-
-    def get_url_rating(self):
-        url = self.url
-        fragment = 1 if url.fragment else 0
-        return str(url.path).count(&#39;/&#39;) + str(url.query).count(&#39;&amp;&#39;) + fragment
-
-    def is_sub_link(self,other: &#39;LinkManager&#39;):
-        other_url = str(other.url.path)
-        if other_url.startswith(str(self.url.path)):
-            return True
-        return False</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.heuristics.links.LinkManager.check_if_keyword_match"><code class="name flex">
@@ -292,311 +45,66 @@ class UrlPatternMatcher:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_if_keyword_match(self, kcw):
-    keyword_confidence_res = kcw.get_link_confidence(self.link.url)
-    if keyword_confidence_res[&#39;confidence_keyword&#39;] &gt; 0:
-        self.kw_flag = True
-        return True
-    else:
-        self.kw_flag = False
-        return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.check_if_name_in_text"><code class="name flex">
 <span>def <span class="ident">check_if_name_in_text</span></span>(<span>self, ncw)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_if_name_in_text(self, ncw):
-    result = ncw.get_name_confidence(self.link.text)
-    if result[&#39;confidence_name&#39;] &gt; 0:
-        return True
-    else:
-        return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.check_if_name_in_text_old"><code class="name flex">
 <span>def <span class="ident">check_if_name_in_text_old</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_if_name_in_text_old(self):
-    text = self.link.text
-    splits = str(text).split()
-    is_upper = [x[0].isupper() for x in splits]
-    # print(text, &#34;---&#34;,is_upper)
-    return sum(is_upper) &gt;= 2  # TODO ADD NAME FLAG</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.contains_keyword"><code class="name flex">
 <span>def <span class="ident">contains_keyword</span></span>(<span>self, detector, category)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def contains_keyword(self,detector,category):
-    result_text = detector.extract_possible_keywords(self.referer_text).get(category,tuple())
-    if len(result_text)&gt;0:
-        return True
-    #TODO ADD url keyword_category match
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.get_referer_text"><code class="name flex">
 <span>def <span class="ident">get_referer_text</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_referer_text(self):
-    # if len(self.history) == 0:
-    # return &#34;&#34;
-    # text = self.history[-1].text
-    # text = text.lower()
-    return self.referer_text</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.get_referer_text_tokens"><code class="name flex">
 <span>def <span class="ident">get_referer_text_tokens</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_referer_text_tokens(self):
-    return utils.simple_word_tokenization(self.referer_text)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.get_url_rating"><code class="name flex">
 <span>def <span class="ident">get_url_rating</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_url_rating(self):
-    url = self.url
-    fragment = 1 if url.fragment else 0
-    return str(url.path).count(&#39;/&#39;) + str(url.query).count(&#39;&amp;&#39;) + fragment</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.is_sub_link"><code class="name flex">
 <span>def <span class="ident">is_sub_link</span></span>(<span>self, other: <a title="academic_crawler.heuristics.links.LinkManager" href="#academic_crawler.heuristics.links.LinkManager">LinkManager</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_sub_link(self,other: &#39;LinkManager&#39;):
-    other_url = str(other.url.path)
-    if other_url.startswith(str(self.url.path)):
-        return True
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.keyword_entity_match"><code class="name flex">
 <span>def <span class="ident">keyword_entity_match</span></span>(<span>self, detector, entity)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def keyword_entity_match(self,detector,entity):
-    result = []
-    result_text = detector.extract_keyword(self.referer_text).get(entity,None)
-    if result_text:
-        result.append((&#39;referer_text&#39;,result_text))
-    #TODO ADD url keyword_category match
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.set_confidence_flag"><code class="name flex">
 <span>def <span class="ident">set_confidence_flag</span></span>(<span>self, values, labels)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_confidence_flag(self, values, labels):
-    if len(values) != len(labels):
-        return False
-    for i in range(len(values)):
-        self.confidence_flags[labels[i]] = values[i]</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.links.LinkManager.should_explore"><code class="name flex">
 <span>def <span class="ident">should_explore</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def should_explore(self):
-    if self.confidence_flags[&#39;name&#39;] and self.confidence_flags[&#39;keyword_category&#39;] is False:
-        return True
-    return False</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-<dt id="academic_crawler.heuristics.links.UrlPatternMatcher"><code class="flex name class">
-<span>class <span class="ident">UrlPatternMatcher</span></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class UrlPatternMatcher:
-
-    def __init__(self) -&gt; None:
-        super().__init__()
-        self.patterns = set([])
-        self.has_patterns = False
-
-    @staticmethod
-    def get_regex_from_start_url(urls):
-        result = []
-        for url in urls:
-            url_ = furl(url)
-            segments = url_.path.segments
-            if len(segments) &gt; 0:
-                escaped = re.escape(url_.pathstr)
-                pattern = r&#34;.*{}.*$&#34;.format(escaped)
-                result.append(pattern)
-        return result
-
-    def extract_pattern_url(self, url):
-        url = furl(url)
-        segments = url.path.segments
-        query = url.query.params
-        if query:
-            pattern = url.remove(args=query)
-        else:
-            pattern = url.remove(path=segments[-1])
-        return pattern
-
-    def add_pattern(self, url):
-        pattern = self.extract_pattern_url(url).url
-        if pattern not in self.patterns:
-            self.patterns.add(pattern)
-            self.has_patterns = True
-            return True
-        return False
-
-    def match_patterns(self, url):
-        pattern = self.extract_pattern_url(url).url
-        return pattern in self.patterns</code></pre>
-</details>
-<h3>Static methods</h3>
-<dl>
-<dt id="academic_crawler.heuristics.links.UrlPatternMatcher.get_regex_from_start_url"><code class="name flex">
-<span>def <span class="ident">get_regex_from_start_url</span></span>(<span>urls)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def get_regex_from_start_url(urls):
-    result = []
-    for url in urls:
-        url_ = furl(url)
-        segments = url_.path.segments
-        if len(segments) &gt; 0:
-            escaped = re.escape(url_.pathstr)
-            pattern = r&#34;.*{}.*$&#34;.format(escaped)
-            result.append(pattern)
-    return result</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="academic_crawler.heuristics.links.UrlPatternMatcher.add_pattern"><code class="name flex">
-<span>def <span class="ident">add_pattern</span></span>(<span>self, url)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_pattern(self, url):
-    pattern = self.extract_pattern_url(url).url
-    if pattern not in self.patterns:
-        self.patterns.add(pattern)
-        self.has_patterns = True
-        return True
-    return False</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.heuristics.links.UrlPatternMatcher.extract_pattern_url"><code class="name flex">
-<span>def <span class="ident">extract_pattern_url</span></span>(<span>self, url)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_pattern_url(self, url):
-    url = furl(url)
-    segments = url.path.segments
-    query = url.query.params
-    if query:
-        pattern = url.remove(args=query)
-    else:
-        pattern = url.remove(path=segments[-1])
-    return pattern</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.heuristics.links.UrlPatternMatcher.match_patterns"><code class="name flex">
-<span>def <span class="ident">match_patterns</span></span>(<span>self, url)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def match_patterns(self, url):
-    pattern = self.extract_pattern_url(url).url
-    return pattern in self.patterns</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -630,15 +138,6 @@ def get_regex_from_start_url(urls):
 <li><code><a title="academic_crawler.heuristics.links.LinkManager.keyword_entity_match" href="#academic_crawler.heuristics.links.LinkManager.keyword_entity_match">keyword_entity_match</a></code></li>
 <li><code><a title="academic_crawler.heuristics.links.LinkManager.set_confidence_flag" href="#academic_crawler.heuristics.links.LinkManager.set_confidence_flag">set_confidence_flag</a></code></li>
 <li><code><a title="academic_crawler.heuristics.links.LinkManager.should_explore" href="#academic_crawler.heuristics.links.LinkManager.should_explore">should_explore</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="academic_crawler.heuristics.links.UrlPatternMatcher" href="#academic_crawler.heuristics.links.UrlPatternMatcher">UrlPatternMatcher</a></code></h4>
-<ul class="">
-<li><code><a title="academic_crawler.heuristics.links.UrlPatternMatcher.add_pattern" href="#academic_crawler.heuristics.links.UrlPatternMatcher.add_pattern">add_pattern</a></code></li>
-<li><code><a title="academic_crawler.heuristics.links.UrlPatternMatcher.extract_pattern_url" href="#academic_crawler.heuristics.links.UrlPatternMatcher.extract_pattern_url">extract_pattern_url</a></code></li>
-<li><code><a title="academic_crawler.heuristics.links.UrlPatternMatcher.get_regex_from_start_url" href="#academic_crawler.heuristics.links.UrlPatternMatcher.get_regex_from_start_url">get_regex_from_start_url</a></code></li>
-<li><code><a title="academic_crawler.heuristics.links.UrlPatternMatcher.match_patterns" href="#academic_crawler.heuristics.links.UrlPatternMatcher.match_patterns">match_patterns</a></code></li>
 </ul>
 </li>
 </ul>

@@ -22,71 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.scrapers.operations.org_structure</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from . import create_operation_result
-from . import OperationType,OperationStatus
-import networkx as nx
-from academic_crawler.config.utils import get_tree_data_node, find_with_regex, node_has_links_in_children
-from ...helpers.node_data import NodeDataExtractionHelper
-from ...heuristics.tree import EntityNode
-
-&#34;&#34;&#34;
-section ={
-    
-}
-&#34;&#34;&#34;
-
-link_structure_elements_set = {&#34;ul&#34;,&#34;table&#34;,&#34;dl&#34;}
-@create_operation_result
-def identify_sections(G:nx.DiGraph):
-
-    successors = tuple(G.successors(0))
-    sections = []
-    for successor in successors:
-        res = is_section(G,successor,tuple(G.successors(successor)))
-        sections +=res
-    sections =list(filter(lambda x: x is not None,sections))
-    return sections,OperationType.IDENTIFY_SECTIONS
-
-
-
-def is_section(G,previous_node,successors):
-    result  = []
-    if len(successors)&gt;1:
-        data_nodes = [get_tree_data_node(G,sibling) for sibling in successors]
-        res = has_section_features(G,data_nodes,previous_node)
-        if res:
-            result += [previous_node]
-        else:
-            for successor in successors:
-                result += is_section(G, successor, tuple(G.successors(successor)))
-    else:
-        if len(successors)&gt;0:
-            next_successors = tuple(G.successors(successors[0]))
-            result += is_section(G,successors[0],next_successors)
-        else:
-            return [None]
-    return result
-
-
-def has_section_features(G, data_nodes:list[EntityNode], parent):
-    def has_heading(node:EntityNode):
-        if find_with_regex(node.label,r&#34;^h[1-6]&#34;):
-            return True
-        return False
-
-    def has_link_structure_element(node:EntityNode):
-        if node.label in link_structure_elements_set and node_has_links_in_children(G, node.id):
-            return True
-        return False
-
-    heading_condition = any((has_heading(_) for _ in data_nodes))
-    link_structure_element = any((has_link_structure_element(_) for _ in data_nodes))
-    return all([heading_condition,link_structure_element])</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -100,74 +35,18 @@ def has_section_features(G, data_nodes:list[EntityNode], parent):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def has_section_features(G, data_nodes:list[EntityNode], parent):
-    def has_heading(node:EntityNode):
-        if find_with_regex(node.label,r&#34;^h[1-6]&#34;):
-            return True
-        return False
-
-    def has_link_structure_element(node:EntityNode):
-        if node.label in link_structure_elements_set and node_has_links_in_children(G, node.id):
-            return True
-        return False
-
-    heading_condition = any((has_heading(_) for _ in data_nodes))
-    link_structure_element = any((has_link_structure_element(_) for _ in data_nodes))
-    return all([heading_condition,link_structure_element])</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.org_structure.identify_sections"><code class="name flex">
 <span>def <span class="ident">identify_sections</span></span>(<span>G: networkx.classes.digraph.DiGraph)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@create_operation_result
-def identify_sections(G:nx.DiGraph):
-
-    successors = tuple(G.successors(0))
-    sections = []
-    for successor in successors:
-        res = is_section(G,successor,tuple(G.successors(successor)))
-        sections +=res
-    sections =list(filter(lambda x: x is not None,sections))
-    return sections,OperationType.IDENTIFY_SECTIONS</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.scrapers.operations.org_structure.is_section"><code class="name flex">
 <span>def <span class="ident">is_section</span></span>(<span>G, previous_node, successors)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_section(G,previous_node,successors):
-    result  = []
-    if len(successors)&gt;1:
-        data_nodes = [get_tree_data_node(G,sibling) for sibling in successors]
-        res = has_section_features(G,data_nodes,previous_node)
-        if res:
-            result += [previous_node]
-        else:
-            for successor in successors:
-                result += is_section(G, successor, tuple(G.successors(successor)))
-    else:
-        if len(successors)&gt;0:
-            next_successors = tuple(G.successors(successors[0]))
-            result += is_section(G,successors[0],next_successors)
-        else:
-            return [None]
-    return result</code></pre>
-</details>
 </dd>
 </dl>
 </section>

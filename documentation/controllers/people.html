@@ -22,87 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.controllers.people</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import enum
-from transitions import Machine
-from transitions.extensions import GraphMachine
-
-from academic_crawler.config.page_types import PAGE_TYPE
-
-
-class StatesPeople(enum.Enum):
-    START = 0
-    PARSE_HOME = 1
-    FIX_URL = 2
-    PARSE_CANDIDATES = 3
-    SCRAPE_CANDIDATES = 4
-    SCRAPE_PAGE_PPL = 5
-    SCRAPE_PAGE_DEPARTMENTS = 6
-    SCRAPE_PPL_DATA = 7
-    SCRAPE_PPL_NO_DATA = 8
-    SCRAPE_SINGLE_PERSON = 9
-    END = 10
-    UPDATE_ORGANIZATION = 11
-
-
-
-class PeopleController:
-    def __init__(self):
-        super().__init__()
-        self.spider = None
-        self.approval = False
-        self.page_type = None
-    def has_approval(self):
-        return self.approval
-
-    def is_people_no_data(self):
-        return self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA
-    def is_people_data(self):
-        return self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA
-
-    def is_departments(self):
-        return self.page_type == PAGE_TYPE.PAGE_ORGANIZATIONS
-
-
-
-
-def build_state_machine():
-    controller = PeopleController()
-    machine = GraphMachine(controller, StatesPeople,transitions=[], initial=StatesPeople.START,show_conditions=True)
-    machine.add_transition(&#34;move&#34;, StatesPeople.START, StatesPeople.PARSE_HOME)
-
-    machine.add_transition(&#34;move&#34;, StatesPeople.PARSE_HOME, StatesPeople.FIX_URL,unless=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;, StatesPeople.PARSE_HOME, StatesPeople.SCRAPE_CANDIDATES,conditions=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_CANDIDATES,StatesPeople.SCRAPE_PAGE_PPL,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_PPL,StatesPeople.SCRAPE_PPL_DATA,conditions=[&#39;is_people_data&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_PPL,StatesPeople.SCRAPE_PPL_NO_DATA,conditions=[&#39;is_people_no_data&#39;])
-
-    #machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_NO_DATA,StatesPeople.SCRAPE_CANDIDATES,unless=[&#39;has_approval&#39;])
-    #machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_DATA,StatesPeople.SCRAPE_CANDIDATES,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_NO_DATA,StatesPeople.SCRAPE_SINGLE_PERSON)
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_DATA,StatesPeople.SCRAPE_SINGLE_PERSON,)
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_SINGLE_PERSON,StatesPeople.UPDATE_ORGANIZATION,conditions=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_CANDIDATES,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,StatesPeople.UPDATE_ORGANIZATION,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,StatesPeople.PARSE_HOME,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.UPDATE_ORGANIZATION,StatesPeople.SCRAPE_PAGE_PPL,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.UPDATE_ORGANIZATION,StatesPeople.UPDATE_ORGANIZATION,unless=[&#39;has_approval&#39;])
-
-    controller.get_graph().draw(&#39;my_state_diagram.png&#39;, prog=&#39;dot&#39;)
-    return controller
-
-if __name__ == &#39;__main__&#39;:
-    build_state_machine()</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -116,41 +35,6 @@ if __name__ == &#39;__main__&#39;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def build_state_machine():
-    controller = PeopleController()
-    machine = GraphMachine(controller, StatesPeople,transitions=[], initial=StatesPeople.START,show_conditions=True)
-    machine.add_transition(&#34;move&#34;, StatesPeople.START, StatesPeople.PARSE_HOME)
-
-    machine.add_transition(&#34;move&#34;, StatesPeople.PARSE_HOME, StatesPeople.FIX_URL,unless=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;, StatesPeople.PARSE_HOME, StatesPeople.SCRAPE_CANDIDATES,conditions=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_CANDIDATES,StatesPeople.SCRAPE_PAGE_PPL,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_PPL,StatesPeople.SCRAPE_PPL_DATA,conditions=[&#39;is_people_data&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_PPL,StatesPeople.SCRAPE_PPL_NO_DATA,conditions=[&#39;is_people_no_data&#39;])
-
-    #machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_NO_DATA,StatesPeople.SCRAPE_CANDIDATES,unless=[&#39;has_approval&#39;])
-    #machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_DATA,StatesPeople.SCRAPE_CANDIDATES,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_NO_DATA,StatesPeople.SCRAPE_SINGLE_PERSON)
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PPL_DATA,StatesPeople.SCRAPE_SINGLE_PERSON,)
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_SINGLE_PERSON,StatesPeople.UPDATE_ORGANIZATION,conditions=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_CANDIDATES,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,StatesPeople.UPDATE_ORGANIZATION,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.SCRAPE_PAGE_DEPARTMENTS,StatesPeople.PARSE_HOME,unless=[&#39;has_approval&#39;])
-
-    machine.add_transition(&#34;move&#34;,StatesPeople.UPDATE_ORGANIZATION,StatesPeople.SCRAPE_PAGE_PPL,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesPeople.UPDATE_ORGANIZATION,StatesPeople.UPDATE_ORGANIZATION,unless=[&#39;has_approval&#39;])
-
-    controller.get_graph().draw(&#39;my_state_diagram.png&#39;, prog=&#39;dot&#39;)
-    return controller</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -162,27 +46,6 @@ if __name__ == &#39;__main__&#39;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PeopleController:
-    def __init__(self):
-        super().__init__()
-        self.spider = None
-        self.approval = False
-        self.page_type = None
-    def has_approval(self):
-        return self.approval
-
-    def is_people_no_data(self):
-        return self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA
-    def is_people_data(self):
-        return self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA
-
-    def is_departments(self):
-        return self.page_type == PAGE_TYPE.PAGE_ORGANIZATIONS</code></pre>
-</details>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.controllers.people.PeopleController.has_approval"><code class="name flex">
@@ -190,52 +53,24 @@ if __name__ == &#39;__main__&#39;:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def has_approval(self):
-    return self.approval</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.controllers.people.PeopleController.is_departments"><code class="name flex">
 <span>def <span class="ident">is_departments</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_departments(self):
-    return self.page_type == PAGE_TYPE.PAGE_ORGANIZATIONS</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.controllers.people.PeopleController.is_people_data"><code class="name flex">
 <span>def <span class="ident">is_people_data</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_people_data(self):
-    return self.page_type == PAGE_TYPE.PAGE_PEOPLE_DATA</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.controllers.people.PeopleController.is_people_no_data"><code class="name flex">
 <span>def <span class="ident">is_people_no_data</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_people_no_data(self):
-    return self.page_type == PAGE_TYPE.PAGE_PEOPLE_NO_DATA</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -245,24 +80,6 @@ if __name__ == &#39;__main__&#39;:
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class StatesPeople(enum.Enum):
-    START = 0
-    PARSE_HOME = 1
-    FIX_URL = 2
-    PARSE_CANDIDATES = 3
-    SCRAPE_CANDIDATES = 4
-    SCRAPE_PAGE_PPL = 5
-    SCRAPE_PAGE_DEPARTMENTS = 6
-    SCRAPE_PPL_DATA = 7
-    SCRAPE_PPL_NO_DATA = 8
-    SCRAPE_SINGLE_PERSON = 9
-    END = 10
-    UPDATE_ORGANIZATION = 11</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>

@@ -22,31 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.history</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from collections import namedtuple
-
-LinkHistoryRecord = namedtuple(&#39;LinkHistoryRecord&#39;, [&#39;text&#39;, &#39;url&#39;])
-
-
-class LinkHistory:
-    def __init__(self, previous=None, text=None, link=None) -&gt; None:
-        super().__init__()
-        if previous is None:
-            self.records = []
-        else:
-            history_record = LinkHistoryRecord(text, link)
-            self.records = list(previous)
-            self.records.append(history_record)
-
-    def get_text_records(self):
-        res = []
-        for record in self.records:
-            res.append(record.text)
-        return res</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -62,27 +37,7 @@ class LinkHistory:
 <span>(</span><span>previous=None, text=None, link=None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class LinkHistory:
-    def __init__(self, previous=None, text=None, link=None) -&gt; None:
-        super().__init__()
-        if previous is None:
-            self.records = []
-        else:
-            history_record = LinkHistoryRecord(text, link)
-            self.records = list(previous)
-            self.records.append(history_record)
-
-    def get_text_records(self):
-        res = []
-        for record in self.records:
-            res.append(record.text)
-        return res</code></pre>
-</details>
+<div class="desc"><p>A class to represent a history of LinkManager (not used)</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.config.history.LinkHistory.get_text_records"><code class="name flex">
@@ -90,16 +45,6 @@ class LinkHistory:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_text_records(self):
-    res = []
-    for record in self.records:
-        res.append(record.text)
-    return res</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

@@ -22,294 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.page_types</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from abc import ABC,abstractmethod
-from enum import Enum
-
-
-page_type_default_dict= {
-    &#34;num_names_page&#34;: 0,
-    &#34;num_name_nodes&#34;: 0,
-    &#34;has_names_in_links&#34;: False,
-    &#34;has_siblings_in_links_name&#34;:False,
-    &#34;has_pagination&#34;: False,
-    &#34;has_other_ners&#34;: False,
-    &#34;has_links&#34;: False,
-    &#34;has_picture_tags&#34;: False,
-    &#34;has_name_in_heading&#34;: False,
-    &#34;has_email&#34;: False,
-    &#34;has_keyword_position_match&#34;: False,
-    &#34;has_keyword_org_match&#34;:False,
-    &#34;num_orgs_page&#34;: 0,
-    &#34;num_org_nodes&#34;: 0,
-    &#34;has_siblings_in_links_org&#34;: False,
-    &#34;has_orgs_in_links&#34;: False,
-    &#34;has_name_in_title&#34;:False,
-    &#34;has_org_in_title&#34;:False,
-    &#34;has_keyword_title_org_match&#34;:False,
-    &#34;num_ners_page&#34;: 0,
-    &#34;num_leaf_nodes&#34;:0,
-    &#34;ners&#34;:[]
-}
-
-class PAGE_TYPE(Enum):
-    PAGE_PEOPLE_DATA = 1
-    PAGE_PEOPLE_NO_DATA = 2
-    PAGE_SINGLE_PERSON = 3
-    PAGE_ORGANIZATIONS = 4
-    PAGE_GENERAL = 5
-
-
-
-class PageTypeMatcher:
-
-
-    page_dict: dict
-
-    DEFAULT_DICT = page_type_default_dict
-    NER_THRESHOLD_NAME = 5
-    NER_THRESHOLD_DEPARTMENT = 3
-
-    def __init__(self,to_exclude=[]) -&gt; None:
-        super().__init__()
-        self.page_dict = dict(PageTypeMatcher.DEFAULT_DICT)
-        self.last_score = 0
-        self.to_exclude = to_exclude
-
-        self.separations = {
-            PAGE_TYPE.PAGE_PEOPLE_DATA:((0,3),(3,None)),
-            PAGE_TYPE.PAGE_PEOPLE_NO_DATA:((0, 3),(None,None)),
-            PAGE_TYPE.PAGE_SINGLE_PERSON:((0,3),(3,None)),
-            PAGE_TYPE.PAGE_ORGANIZATIONS:((0, 4), (4, None)),
-        }
-    def update_page_dict(self,new_dict):
-        self.page_dict.update(new_dict)
-        self.condition_dictionary = {
-            PAGE_TYPE.PAGE_PEOPLE_DATA: (
-                self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME,
-                not self.page_dict.get(&#34;has_names_in_links&#34;),
-                not self.page_dict.get(&#34;has_siblings_in_links_name&#34;),
-                self.page_dict.get(&#34;has_email&#34;),
-                self.page_dict.get(&#34;has_keyword_position_match&#34;),
-                self.page_dict.get(&#34;has_pagination&#34;)
-            ),
-            PAGE_TYPE.PAGE_PEOPLE_NO_DATA: (
-                self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-                self.page_dict.get(&#34;has_names_in_links&#34;),
-                self.page_dict.get(&#34;num_org_nodes&#34;) &lt;= self.page_dict.get(&#34;num_name_nodes&#34;),
-
-            ),
-            PAGE_TYPE.PAGE_SINGLE_PERSON: (
-                self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-                self.page_dict.get(&#34;has_name_in_heading&#34;),
-                self.page_dict.get(&#34;has_name_in_title&#34;),
-                self.page_dict.get(&#34;has_email&#34;),
-                self.page_dict.get(&#34;has_keyword_position_match&#34;),
-            ),
-            PAGE_TYPE.PAGE_ORGANIZATIONS: (
-                self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-                self.page_dict.get(&#34;num_org_nodes&#34;) &gt; self.page_dict.get(&#34;num_name_nodes&#34;),
-                self.page_dict.get(&#34;has_siblings_in_links_org&#34;),
-                self.page_dict.get(&#34;has_keyword_org_match&#34;),
-                self.page_dict.get(&#34;pagination&#34;),
-            ),
-
-        }
-        self.exclude_page_types(self.to_exclude)
-
-    def exclude_page_types(self,to_exclude):
-        for key in to_exclude:
-            del self.condition_dictionary[key]
-            del self.separations[key]
-    def get_condition_score(self,conditions,weights=None):
-        result = 0
-        i = 0
-        for condition in conditions:
-            if condition:
-                result += 1
-            i +=1
-        result = result/len(conditions)
-        self.last_score = result
-        return result
-
-    def check_page_type(self,page_type:PAGE_TYPE,stage):
-        conditions = self.condition_dictionary.get(page_type)
-        separation = self.separations.get(page_type)
-        main,other = [conditions[start:end] for start,end in separation]
-        if stage == 1:
-            return self.get_condition_score(main)
-        elif stage ==2:
-            return self.get_condition_score(other)
-
-    def solve_page_type(self):
-        print(self.page_dict)
-        stage = 1
-        scores = []
-        if not self.has_enough_ner() or (not self.is_people_site() and not self.is_org_site()):
-            return PAGE_TYPE.PAGE_GENERAL
-        for page_type_ in self.separations.keys():
-            scores.append((page_type_,self.check_page_type(page_type_,stage)))
-        result = [item for item in scores if item[1]==1]
-        if len(result) == 1:
-            return result[0][0]
-        elif len(result)&gt;1:
-            stage = 2
-            other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in result]
-            return max(other_scores,key=lambda x:x[1])[0]
-        elif len(result) ==0:
-            return PAGE_TYPE.PAGE_GENERAL
-            stage = 2
-            other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in scores]
-            max_item = max(other_scores,key=lambda x:x[1])
-            if max_item[1] &gt; 1:
-                return max_item[0]
-            else:
-                return PAGE_TYPE.PAGE_GENERAL
-
-
-
-
-
-
-
-
-
-    def match_page_type_old(self):
-        if self.check_page_people_data():
-            return PAGE_TYPE.PAGE_PEOPLE_DATA
-        elif self.check_page_people_no_data():
-            return PAGE_TYPE.PAGE_PEOPLE_NO_DATA
-        elif self.check_page_single_person():
-            return PAGE_TYPE.PAGE_SINGLE_PERSON
-        elif self.check_page_departments():
-            return PAGE_TYPE.PAGE_ORGANIZATIONS
-        elif self.check_general_page():
-            return PAGE_TYPE.PAGE_GENERAL
-        else:
-            return None
-    def match_page_type(self):
-        result =[]
-
-        if self.is_org_site():
-            if self.check_page_departments():
-                return PAGE_TYPE.PAGE_ORGANIZATIONS
-        elif self.is_people_site():
-            if self.check_page_people_data():
-                result.append((PAGE_TYPE.PAGE_PEOPLE_DATA,self.last_score))
-            if self.check_page_people_no_data():
-                result.append((PAGE_TYPE.PAGE_PEOPLE_NO_DATA,self.last_score))
-        elif self.check_page_single_person():
-            result.append((PAGE_TYPE.PAGE_SINGLE_PERSON,self.last_score))
-        else:
-            if self.check_general_page():
-                result.append((PAGE_TYPE.PAGE_GENERAL, self.last_score))
-
-        if len(result)&gt;0:
-            return max(result,key=lambda x:x[1])[0]
-        return None
-    def check_page_people_data(self):
-        conditions =(
-            self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-            self.page_dict.get(&#34;has_names_in_links&#34;),
-            self.page_dict.get(&#34;has_sibling_links_name&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-            self.page_dict.get(&#34;has_pagination&#34;)
-        )
-        main = (0,2)
-        additional = (3,5)
-        score = self.get_condition_score(conditions,(10,10,10,8,5,2))
-        return score&gt;.67
-
-
-
-    def check_page_people_no_data(self):
-        conditions = (self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-                      self.page_dict.get(&#34;has_names_in_links&#34;),
-                      self.page_dict.get(&#34;has_sibling_links_name&#34;))
-        score = self.get_condition_score(conditions,(10,10,10))
-        return score &gt; 0.5
-
-    # Implementation for PAGE_PEOPLE_NO_DATA page type
-
-    def check_page_single_person(self):
-        conditions = (
-            self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-            self.page_dict.get(&#34;has_name_in_heading&#34;),
-            self.page_dict.get(&#34;has_name_in_title&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-
-        )
-        score = self.get_condition_score(conditions,(5,10,10,5,6))
-        return score &gt;0
-
-    # Implementation for PAGE_SINGLE_PERSON page type
-
-    def check_page_departments(self):
-        conditions = (
-            self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-            self.page_dict.get(&#34;has_sibling_links_org&#34;),
-            self.page_dict.get(&#34;has_keyword_org_match&#34;),
-            self.page_dict.get(&#34;pagination&#34;),
-        )
-        score = self.get_condition_score(conditions,(10,9,8,3))
-        return score &gt;0
-
-        # Implementation for PAGE_DEPARTMENTS page type
-
-    def check_general_page(self):
-        conditions = (
-            self.page_dict.get(&#34;num_names_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_NAME,
-            self.page_dict.get(&#34;num_orgs_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-        )
-        score = self.get_condition_score(conditions,(10,10))
-        return score&gt;0
-
-    def has_enough_ner(self):
-        if self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME or self.page_dict.get(&#34;num_orgs_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_DEPARTMENT:
-            return True
-        return False
-    def is_people_site(self):
-        if self.page_dict.get(&#34;num_orgs_page&#34;) == 0:
-            ratio = self.page_dict.get(&#34;num_name_nodes&#34;)
-        else:
-            ratio = self.page_dict.get(&#34;num_name_nodes&#34;)/max(self.page_dict.get(&#34;num_org_nodes&#34;,1),1)
-        return ratio&gt;=1 and  self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME
-
-    def is_org_site(self):
-        if self.page_dict.get(&#34;num_names_page&#34;) == 0:
-            ratio = self.page_dict.get(&#34;num_org_nodes&#34;)
-        else:
-            ratio = self.page_dict.get(&#34;num_org_nodes&#34;)/max(self.page_dict.get(&#34;num_name_nodes&#34;,1),1)
-        return ratio &gt;=1 and self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT
-
-
-
-
-# Implementation for GENERAL_PAGE page type
-
-
-
-
-class PageType:
-    def __init__(self, type_name, entities:list, conditions=None) -&gt; None:
-        super().__init__()
-        self.type_name = type_name
-        self.entities = []
-        self.conditions = conditions
-
-    def get_condition_socre(self):
-        result = []
-        for condition in self.conditions:
-            result.append(self.check_condition(condition))
-
-    def check_condition(self, condition):
-        return condition</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -326,17 +38,6 @@ class PageType:
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PAGE_TYPE(Enum):
-    PAGE_PEOPLE_DATA = 1
-    PAGE_PEOPLE_NO_DATA = 2
-    PAGE_SINGLE_PERSON = 3
-    PAGE_ORGANIZATIONS = 4
-    PAGE_GENERAL = 5</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -365,296 +66,12 @@ class PageType:
 </dd>
 </dl>
 </dd>
-<dt id="academic_crawler.config.page_types.PageType"><code class="flex name class">
-<span>class <span class="ident">PageType</span></span>
-<span>(</span><span>type_name, entities: list, conditions=None)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PageType:
-    def __init__(self, type_name, entities:list, conditions=None) -&gt; None:
-        super().__init__()
-        self.type_name = type_name
-        self.entities = []
-        self.conditions = conditions
-
-    def get_condition_socre(self):
-        result = []
-        for condition in self.conditions:
-            result.append(self.check_condition(condition))
-
-    def check_condition(self, condition):
-        return condition</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="academic_crawler.config.page_types.PageType.check_condition"><code class="name flex">
-<span>def <span class="ident">check_condition</span></span>(<span>self, condition)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_condition(self, condition):
-    return condition</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageType.get_condition_socre"><code class="name flex">
-<span>def <span class="ident">get_condition_socre</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_condition_socre(self):
-    result = []
-    for condition in self.conditions:
-        result.append(self.check_condition(condition))</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher"><code class="flex name class">
 <span>class <span class="ident">PageTypeMatcher</span></span>
 <span>(</span><span>to_exclude=[])</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PageTypeMatcher:
-
-
-    page_dict: dict
-
-    DEFAULT_DICT = page_type_default_dict
-    NER_THRESHOLD_NAME = 5
-    NER_THRESHOLD_DEPARTMENT = 3
-
-    def __init__(self,to_exclude=[]) -&gt; None:
-        super().__init__()
-        self.page_dict = dict(PageTypeMatcher.DEFAULT_DICT)
-        self.last_score = 0
-        self.to_exclude = to_exclude
-
-        self.separations = {
-            PAGE_TYPE.PAGE_PEOPLE_DATA:((0,3),(3,None)),
-            PAGE_TYPE.PAGE_PEOPLE_NO_DATA:((0, 3),(None,None)),
-            PAGE_TYPE.PAGE_SINGLE_PERSON:((0,3),(3,None)),
-            PAGE_TYPE.PAGE_ORGANIZATIONS:((0, 4), (4, None)),
-        }
-    def update_page_dict(self,new_dict):
-        self.page_dict.update(new_dict)
-        self.condition_dictionary = {
-            PAGE_TYPE.PAGE_PEOPLE_DATA: (
-                self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME,
-                not self.page_dict.get(&#34;has_names_in_links&#34;),
-                not self.page_dict.get(&#34;has_siblings_in_links_name&#34;),
-                self.page_dict.get(&#34;has_email&#34;),
-                self.page_dict.get(&#34;has_keyword_position_match&#34;),
-                self.page_dict.get(&#34;has_pagination&#34;)
-            ),
-            PAGE_TYPE.PAGE_PEOPLE_NO_DATA: (
-                self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-                self.page_dict.get(&#34;has_names_in_links&#34;),
-                self.page_dict.get(&#34;num_org_nodes&#34;) &lt;= self.page_dict.get(&#34;num_name_nodes&#34;),
-
-            ),
-            PAGE_TYPE.PAGE_SINGLE_PERSON: (
-                self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-                self.page_dict.get(&#34;has_name_in_heading&#34;),
-                self.page_dict.get(&#34;has_name_in_title&#34;),
-                self.page_dict.get(&#34;has_email&#34;),
-                self.page_dict.get(&#34;has_keyword_position_match&#34;),
-            ),
-            PAGE_TYPE.PAGE_ORGANIZATIONS: (
-                self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-                self.page_dict.get(&#34;num_org_nodes&#34;) &gt; self.page_dict.get(&#34;num_name_nodes&#34;),
-                self.page_dict.get(&#34;has_siblings_in_links_org&#34;),
-                self.page_dict.get(&#34;has_keyword_org_match&#34;),
-                self.page_dict.get(&#34;pagination&#34;),
-            ),
-
-        }
-        self.exclude_page_types(self.to_exclude)
-
-    def exclude_page_types(self,to_exclude):
-        for key in to_exclude:
-            del self.condition_dictionary[key]
-            del self.separations[key]
-    def get_condition_score(self,conditions,weights=None):
-        result = 0
-        i = 0
-        for condition in conditions:
-            if condition:
-                result += 1
-            i +=1
-        result = result/len(conditions)
-        self.last_score = result
-        return result
-
-    def check_page_type(self,page_type:PAGE_TYPE,stage):
-        conditions = self.condition_dictionary.get(page_type)
-        separation = self.separations.get(page_type)
-        main,other = [conditions[start:end] for start,end in separation]
-        if stage == 1:
-            return self.get_condition_score(main)
-        elif stage ==2:
-            return self.get_condition_score(other)
-
-    def solve_page_type(self):
-        print(self.page_dict)
-        stage = 1
-        scores = []
-        if not self.has_enough_ner() or (not self.is_people_site() and not self.is_org_site()):
-            return PAGE_TYPE.PAGE_GENERAL
-        for page_type_ in self.separations.keys():
-            scores.append((page_type_,self.check_page_type(page_type_,stage)))
-        result = [item for item in scores if item[1]==1]
-        if len(result) == 1:
-            return result[0][0]
-        elif len(result)&gt;1:
-            stage = 2
-            other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in result]
-            return max(other_scores,key=lambda x:x[1])[0]
-        elif len(result) ==0:
-            return PAGE_TYPE.PAGE_GENERAL
-            stage = 2
-            other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in scores]
-            max_item = max(other_scores,key=lambda x:x[1])
-            if max_item[1] &gt; 1:
-                return max_item[0]
-            else:
-                return PAGE_TYPE.PAGE_GENERAL
-
-
-
-
-
-
-
-
-
-    def match_page_type_old(self):
-        if self.check_page_people_data():
-            return PAGE_TYPE.PAGE_PEOPLE_DATA
-        elif self.check_page_people_no_data():
-            return PAGE_TYPE.PAGE_PEOPLE_NO_DATA
-        elif self.check_page_single_person():
-            return PAGE_TYPE.PAGE_SINGLE_PERSON
-        elif self.check_page_departments():
-            return PAGE_TYPE.PAGE_ORGANIZATIONS
-        elif self.check_general_page():
-            return PAGE_TYPE.PAGE_GENERAL
-        else:
-            return None
-    def match_page_type(self):
-        result =[]
-
-        if self.is_org_site():
-            if self.check_page_departments():
-                return PAGE_TYPE.PAGE_ORGANIZATIONS
-        elif self.is_people_site():
-            if self.check_page_people_data():
-                result.append((PAGE_TYPE.PAGE_PEOPLE_DATA,self.last_score))
-            if self.check_page_people_no_data():
-                result.append((PAGE_TYPE.PAGE_PEOPLE_NO_DATA,self.last_score))
-        elif self.check_page_single_person():
-            result.append((PAGE_TYPE.PAGE_SINGLE_PERSON,self.last_score))
-        else:
-            if self.check_general_page():
-                result.append((PAGE_TYPE.PAGE_GENERAL, self.last_score))
-
-        if len(result)&gt;0:
-            return max(result,key=lambda x:x[1])[0]
-        return None
-    def check_page_people_data(self):
-        conditions =(
-            self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-            self.page_dict.get(&#34;has_names_in_links&#34;),
-            self.page_dict.get(&#34;has_sibling_links_name&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-            self.page_dict.get(&#34;has_pagination&#34;)
-        )
-        main = (0,2)
-        additional = (3,5)
-        score = self.get_condition_score(conditions,(10,10,10,8,5,2))
-        return score&gt;.67
-
-
-
-    def check_page_people_no_data(self):
-        conditions = (self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-                      self.page_dict.get(&#34;has_names_in_links&#34;),
-                      self.page_dict.get(&#34;has_sibling_links_name&#34;))
-        score = self.get_condition_score(conditions,(10,10,10))
-        return score &gt; 0.5
-
-    # Implementation for PAGE_PEOPLE_NO_DATA page type
-
-    def check_page_single_person(self):
-        conditions = (
-            self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-            self.page_dict.get(&#34;has_name_in_heading&#34;),
-            self.page_dict.get(&#34;has_name_in_title&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-
-        )
-        score = self.get_condition_score(conditions,(5,10,10,5,6))
-        return score &gt;0
-
-    # Implementation for PAGE_SINGLE_PERSON page type
-
-    def check_page_departments(self):
-        conditions = (
-            self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-            self.page_dict.get(&#34;has_sibling_links_org&#34;),
-            self.page_dict.get(&#34;has_keyword_org_match&#34;),
-            self.page_dict.get(&#34;pagination&#34;),
-        )
-        score = self.get_condition_score(conditions,(10,9,8,3))
-        return score &gt;0
-
-        # Implementation for PAGE_DEPARTMENTS page type
-
-    def check_general_page(self):
-        conditions = (
-            self.page_dict.get(&#34;num_names_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_NAME,
-            self.page_dict.get(&#34;num_orgs_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-        )
-        score = self.get_condition_score(conditions,(10,10))
-        return score&gt;0
-
-    def has_enough_ner(self):
-        if self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME or self.page_dict.get(&#34;num_orgs_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_DEPARTMENT:
-            return True
-        return False
-    def is_people_site(self):
-        if self.page_dict.get(&#34;num_orgs_page&#34;) == 0:
-            ratio = self.page_dict.get(&#34;num_name_nodes&#34;)
-        else:
-            ratio = self.page_dict.get(&#34;num_name_nodes&#34;)/max(self.page_dict.get(&#34;num_org_nodes&#34;,1),1)
-        return ratio&gt;=1 and  self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME
-
-    def is_org_site(self):
-        if self.page_dict.get(&#34;num_names_page&#34;) == 0:
-            ratio = self.page_dict.get(&#34;num_org_nodes&#34;)
-        else:
-            ratio = self.page_dict.get(&#34;num_org_nodes&#34;)/max(self.page_dict.get(&#34;num_name_nodes&#34;,1),1)
-        return ratio &gt;=1 and self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.DEFAULT_DICT"><code class="name">var <span class="ident">DEFAULT_DICT</span></code></dt>
@@ -676,347 +93,53 @@ class PageType:
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.check_general_page"><code class="name flex">
-<span>def <span class="ident">check_general_page</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_general_page(self):
-    conditions = (
-        self.page_dict.get(&#34;num_names_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_NAME,
-        self.page_dict.get(&#34;num_orgs_page&#34;) &lt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-    )
-    score = self.get_condition_score(conditions,(10,10))
-    return score&gt;0</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_departments"><code class="name flex">
-<span>def <span class="ident">check_page_departments</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_page_departments(self):
-    conditions = (
-        self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-        self.page_dict.get(&#34;has_sibling_links_org&#34;),
-        self.page_dict.get(&#34;has_keyword_org_match&#34;),
-        self.page_dict.get(&#34;pagination&#34;),
-    )
-    score = self.get_condition_score(conditions,(10,9,8,3))
-    return score &gt;0
-
-    # Implementation for PAGE_DEPARTMENTS page type</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_people_data"><code class="name flex">
-<span>def <span class="ident">check_page_people_data</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_page_people_data(self):
-    conditions =(
-        self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-        self.page_dict.get(&#34;has_names_in_links&#34;),
-        self.page_dict.get(&#34;has_sibling_links_name&#34;),
-        self.page_dict.get(&#34;has_email&#34;),
-        self.page_dict.get(&#34;has_keyword_position_match&#34;),
-        self.page_dict.get(&#34;has_pagination&#34;)
-    )
-    main = (0,2)
-    additional = (3,5)
-    score = self.get_condition_score(conditions,(10,10,10,8,5,2))
-    return score&gt;.67</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_people_no_data"><code class="name flex">
-<span>def <span class="ident">check_page_people_no_data</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_page_people_no_data(self):
-    conditions = (self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-                  self.page_dict.get(&#34;has_names_in_links&#34;),
-                  self.page_dict.get(&#34;has_sibling_links_name&#34;))
-    score = self.get_condition_score(conditions,(10,10,10))
-    return score &gt; 0.5</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_single_person"><code class="name flex">
-<span>def <span class="ident">check_page_single_person</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_page_single_person(self):
-    conditions = (
-        self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-        self.page_dict.get(&#34;has_name_in_heading&#34;),
-        self.page_dict.get(&#34;has_name_in_title&#34;),
-        self.page_dict.get(&#34;has_email&#34;),
-        self.page_dict.get(&#34;has_keyword_position_match&#34;),
-
-    )
-    score = self.get_condition_score(conditions,(5,10,10,5,6))
-    return score &gt;0</code></pre>
-</details>
-</dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_type"><code class="name flex">
 <span>def <span class="ident">check_page_type</span></span>(<span>self, page_type: <a title="academic_crawler.config.page_types.PAGE_TYPE" href="#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a>, stage)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def check_page_type(self,page_type:PAGE_TYPE,stage):
-    conditions = self.condition_dictionary.get(page_type)
-    separation = self.separations.get(page_type)
-    main,other = [conditions[start:end] for start,end in separation]
-    if stage == 1:
-        return self.get_condition_score(main)
-    elif stage ==2:
-        return self.get_condition_score(other)</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.exclude_page_types"><code class="name flex">
 <span>def <span class="ident">exclude_page_types</span></span>(<span>self, to_exclude)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def exclude_page_types(self,to_exclude):
-    for key in to_exclude:
-        del self.condition_dictionary[key]
-        del self.separations[key]</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.get_condition_score"><code class="name flex">
 <span>def <span class="ident">get_condition_score</span></span>(<span>self, conditions, weights=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_condition_score(self,conditions,weights=None):
-    result = 0
-    i = 0
-    for condition in conditions:
-        if condition:
-            result += 1
-        i +=1
-    result = result/len(conditions)
-    self.last_score = result
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.has_enough_ner"><code class="name flex">
 <span>def <span class="ident">has_enough_ner</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def has_enough_ner(self):
-    if self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME or self.page_dict.get(&#34;num_orgs_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_DEPARTMENT:
-        return True
-    return False</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.is_org_site"><code class="name flex">
 <span>def <span class="ident">is_org_site</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_org_site(self):
-    if self.page_dict.get(&#34;num_names_page&#34;) == 0:
-        ratio = self.page_dict.get(&#34;num_org_nodes&#34;)
-    else:
-        ratio = self.page_dict.get(&#34;num_org_nodes&#34;)/max(self.page_dict.get(&#34;num_name_nodes&#34;,1),1)
-    return ratio &gt;=1 and self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.is_people_site"><code class="name flex">
 <span>def <span class="ident">is_people_site</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_people_site(self):
-    if self.page_dict.get(&#34;num_orgs_page&#34;) == 0:
-        ratio = self.page_dict.get(&#34;num_name_nodes&#34;)
-    else:
-        ratio = self.page_dict.get(&#34;num_name_nodes&#34;)/max(self.page_dict.get(&#34;num_org_nodes&#34;,1),1)
-    return ratio&gt;=1 and  self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.match_page_type"><code class="name flex">
-<span>def <span class="ident">match_page_type</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def match_page_type(self):
-    result =[]
-
-    if self.is_org_site():
-        if self.check_page_departments():
-            return PAGE_TYPE.PAGE_ORGANIZATIONS
-    elif self.is_people_site():
-        if self.check_page_people_data():
-            result.append((PAGE_TYPE.PAGE_PEOPLE_DATA,self.last_score))
-        if self.check_page_people_no_data():
-            result.append((PAGE_TYPE.PAGE_PEOPLE_NO_DATA,self.last_score))
-    elif self.check_page_single_person():
-        result.append((PAGE_TYPE.PAGE_SINGLE_PERSON,self.last_score))
-    else:
-        if self.check_general_page():
-            result.append((PAGE_TYPE.PAGE_GENERAL, self.last_score))
-
-    if len(result)&gt;0:
-        return max(result,key=lambda x:x[1])[0]
-    return None</code></pre>
-</details>
-</dd>
-<dt id="academic_crawler.config.page_types.PageTypeMatcher.match_page_type_old"><code class="name flex">
-<span>def <span class="ident">match_page_type_old</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def match_page_type_old(self):
-    if self.check_page_people_data():
-        return PAGE_TYPE.PAGE_PEOPLE_DATA
-    elif self.check_page_people_no_data():
-        return PAGE_TYPE.PAGE_PEOPLE_NO_DATA
-    elif self.check_page_single_person():
-        return PAGE_TYPE.PAGE_SINGLE_PERSON
-    elif self.check_page_departments():
-        return PAGE_TYPE.PAGE_ORGANIZATIONS
-    elif self.check_general_page():
-        return PAGE_TYPE.PAGE_GENERAL
-    else:
-        return None</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.solve_page_type"><code class="name flex">
 <span>def <span class="ident">solve_page_type</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def solve_page_type(self):
-    print(self.page_dict)
-    stage = 1
-    scores = []
-    if not self.has_enough_ner() or (not self.is_people_site() and not self.is_org_site()):
-        return PAGE_TYPE.PAGE_GENERAL
-    for page_type_ in self.separations.keys():
-        scores.append((page_type_,self.check_page_type(page_type_,stage)))
-    result = [item for item in scores if item[1]==1]
-    if len(result) == 1:
-        return result[0][0]
-    elif len(result)&gt;1:
-        stage = 2
-        other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in result]
-        return max(other_scores,key=lambda x:x[1])[0]
-    elif len(result) ==0:
-        return PAGE_TYPE.PAGE_GENERAL
-        stage = 2
-        other_scores = [(item[0],item[1] + self.check_page_type(item[0],stage)) for item in scores]
-        max_item = max(other_scores,key=lambda x:x[1])
-        if max_item[1] &gt; 1:
-            return max_item[0]
-        else:
-            return PAGE_TYPE.PAGE_GENERAL</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.update_page_dict"><code class="name flex">
 <span>def <span class="ident">update_page_dict</span></span>(<span>self, new_dict)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_page_dict(self,new_dict):
-    self.page_dict.update(new_dict)
-    self.condition_dictionary = {
-        PAGE_TYPE.PAGE_PEOPLE_DATA: (
-            self.page_dict.get(&#34;num_names_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_NAME,
-            not self.page_dict.get(&#34;has_names_in_links&#34;),
-            not self.page_dict.get(&#34;has_siblings_in_links_name&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-            self.page_dict.get(&#34;has_pagination&#34;)
-        ),
-        PAGE_TYPE.PAGE_PEOPLE_NO_DATA: (
-            self.page_dict.get(&#34;num_names_page&#34;) &gt;= PageTypeMatcher.NER_THRESHOLD_NAME,
-            self.page_dict.get(&#34;has_names_in_links&#34;),
-            self.page_dict.get(&#34;num_org_nodes&#34;) &lt;= self.page_dict.get(&#34;num_name_nodes&#34;),
-
-        ),
-        PAGE_TYPE.PAGE_SINGLE_PERSON: (
-            self.page_dict.get(&#34;num_names_page&#34;) &lt;= PageTypeMatcher.NER_THRESHOLD_NAME - 1,
-            self.page_dict.get(&#34;has_name_in_heading&#34;),
-            self.page_dict.get(&#34;has_name_in_title&#34;),
-            self.page_dict.get(&#34;has_email&#34;),
-            self.page_dict.get(&#34;has_keyword_position_match&#34;),
-        ),
-        PAGE_TYPE.PAGE_ORGANIZATIONS: (
-            self.page_dict.get(&#34;num_orgs_page&#34;) &gt; PageTypeMatcher.NER_THRESHOLD_DEPARTMENT,
-            self.page_dict.get(&#34;num_org_nodes&#34;) &gt; self.page_dict.get(&#34;num_name_nodes&#34;),
-            self.page_dict.get(&#34;has_siblings_in_links_org&#34;),
-            self.page_dict.get(&#34;has_keyword_org_match&#34;),
-            self.page_dict.get(&#34;pagination&#34;),
-        ),
-
-    }
-    self.exclude_page_types(self.to_exclude)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -1047,31 +170,17 @@ class PageType:
 </ul>
 </li>
 <li>
-<h4><code><a title="academic_crawler.config.page_types.PageType" href="#academic_crawler.config.page_types.PageType">PageType</a></code></h4>
-<ul class="">
-<li><code><a title="academic_crawler.config.page_types.PageType.check_condition" href="#academic_crawler.config.page_types.PageType.check_condition">check_condition</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageType.get_condition_socre" href="#academic_crawler.config.page_types.PageType.get_condition_socre">get_condition_socre</a></code></li>
-</ul>
-</li>
-<li>
 <h4><code><a title="academic_crawler.config.page_types.PageTypeMatcher" href="#academic_crawler.config.page_types.PageTypeMatcher">PageTypeMatcher</a></code></h4>
 <ul class="">
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.DEFAULT_DICT" href="#academic_crawler.config.page_types.PageTypeMatcher.DEFAULT_DICT">DEFAULT_DICT</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.NER_THRESHOLD_DEPARTMENT" href="#academic_crawler.config.page_types.PageTypeMatcher.NER_THRESHOLD_DEPARTMENT">NER_THRESHOLD_DEPARTMENT</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.NER_THRESHOLD_NAME" href="#academic_crawler.config.page_types.PageTypeMatcher.NER_THRESHOLD_NAME">NER_THRESHOLD_NAME</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_general_page" href="#academic_crawler.config.page_types.PageTypeMatcher.check_general_page">check_general_page</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_page_departments" href="#academic_crawler.config.page_types.PageTypeMatcher.check_page_departments">check_page_departments</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_page_people_data" href="#academic_crawler.config.page_types.PageTypeMatcher.check_page_people_data">check_page_people_data</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_page_people_no_data" href="#academic_crawler.config.page_types.PageTypeMatcher.check_page_people_no_data">check_page_people_no_data</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_page_single_person" href="#academic_crawler.config.page_types.PageTypeMatcher.check_page_single_person">check_page_single_person</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.check_page_type" href="#academic_crawler.config.page_types.PageTypeMatcher.check_page_type">check_page_type</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.exclude_page_types" href="#academic_crawler.config.page_types.PageTypeMatcher.exclude_page_types">exclude_page_types</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.get_condition_score" href="#academic_crawler.config.page_types.PageTypeMatcher.get_condition_score">get_condition_score</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.has_enough_ner" href="#academic_crawler.config.page_types.PageTypeMatcher.has_enough_ner">has_enough_ner</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.is_org_site" href="#academic_crawler.config.page_types.PageTypeMatcher.is_org_site">is_org_site</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.is_people_site" href="#academic_crawler.config.page_types.PageTypeMatcher.is_people_site">is_people_site</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.match_page_type" href="#academic_crawler.config.page_types.PageTypeMatcher.match_page_type">match_page_type</a></code></li>
-<li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.match_page_type_old" href="#academic_crawler.config.page_types.PageTypeMatcher.match_page_type_old">match_page_type_old</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.page_dict" href="#academic_crawler.config.page_types.PageTypeMatcher.page_dict">page_dict</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.solve_page_type" href="#academic_crawler.config.page_types.PageTypeMatcher.solve_page_type">solve_page_type</a></code></li>
 <li><code><a title="academic_crawler.config.page_types.PageTypeMatcher.update_page_dict" href="#academic_crawler.config.page_types.PageTypeMatcher.update_page_dict">update_page_dict</a></code></li>

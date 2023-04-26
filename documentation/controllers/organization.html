@@ -22,64 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.controllers.organization</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">import enum
-from academic_crawler.config.domain import DomainConfiguration,SubsidiaryConfiguration
-from transitions import Machine
-
-class StatesOrganization(enum.Enum):
-    START = 0
-    PARSE_HOME_LINKS = 1
-    DETECT_KEYWORDS = 2
-    PARSE_CANDIDATES = 3
-    PARSING_ALL = 4
-    FAILED = 5
-    RESOLVE_CANDIDATES = 6
-    BUILD_ORG_STRUCTURE = 7
-
-
-class OrganizationController:
-
-    def __init__(self, state=None) -&gt; None:
-        super().__init__()
-        if state is None: # TODO REMOVE THIS
-            config = dict()
-        self.state = state
-        self.spider = None
-        self.approval = False
-
-    def has_entity_match(self):
-        return self.state.get(&#34;has_entity_match&#34;)
-
-    def has_approval(self):
-        return self.approval
-
-
-def build_state_machine(config={}):
-    controller = OrganizationController(config)
-    machine = Machine(controller, StatesOrganization,transitions=[], initial=StatesOrganization.START) #after_state_change=&#34;state_change&#34;
-    machine.add_transition(&#34;move&#34;, StatesOrganization.START, StatesOrganization.PARSE_HOME_LINKS)
-    machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.PARSE_CANDIDATES,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.PARSING_ALL,unless=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesOrganization.PARSE_CANDIDATES,StatesOrganization.RESOLVE_CANDIDATES)
-    machine.add_transition(&#34;move&#34;,StatesOrganization.RESOLVE_CANDIDATES,StatesOrganization.BUILD_ORG_STRUCTURE)
-    #machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.DETECT_KEYWORDS)
-    machine.add_transition(&#34;move&#34;, StatesOrganization.DETECT_KEYWORDS, StatesOrganization.PARSE_CANDIDATES, conditions=[&#34;has_entitity_match&#34;])
-    machine.add_transition(&#34;move&#34;,StatesOrganization.DETECT_KEYWORDS,StatesOrganization.FAILED,unless=[&#34;has_entitity_match&#34;]) # NO MATCHED KEYWORDS OR ENTITIES
-    machine.add_transition(&#34;move&#34;,StatesOrganization.FAILED,StatesOrganization.PARSING_ALL,conditions=[])
-
-
-    return controller
-
-    #machine.add_transition(&#34;move&#34;,States.FILTER_LINKS,States.SCRAPE_PERSON_PAGE)
-
-
-
-    return machine,controller</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -93,32 +35,6 @@ def build_state_machine(config={}):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def build_state_machine(config={}):
-    controller = OrganizationController(config)
-    machine = Machine(controller, StatesOrganization,transitions=[], initial=StatesOrganization.START) #after_state_change=&#34;state_change&#34;
-    machine.add_transition(&#34;move&#34;, StatesOrganization.START, StatesOrganization.PARSE_HOME_LINKS)
-    machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.PARSE_CANDIDATES,conditions=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.PARSING_ALL,unless=[&#39;has_approval&#39;])
-    machine.add_transition(&#34;move&#34;,StatesOrganization.PARSE_CANDIDATES,StatesOrganization.RESOLVE_CANDIDATES)
-    machine.add_transition(&#34;move&#34;,StatesOrganization.RESOLVE_CANDIDATES,StatesOrganization.BUILD_ORG_STRUCTURE)
-    #machine.add_transition(&#34;move&#34;, StatesOrganization.PARSE_HOME_LINKS, StatesOrganization.DETECT_KEYWORDS)
-    machine.add_transition(&#34;move&#34;, StatesOrganization.DETECT_KEYWORDS, StatesOrganization.PARSE_CANDIDATES, conditions=[&#34;has_entitity_match&#34;])
-    machine.add_transition(&#34;move&#34;,StatesOrganization.DETECT_KEYWORDS,StatesOrganization.FAILED,unless=[&#34;has_entitity_match&#34;]) # NO MATCHED KEYWORDS OR ENTITIES
-    machine.add_transition(&#34;move&#34;,StatesOrganization.FAILED,StatesOrganization.PARSING_ALL,conditions=[])
-
-
-    return controller
-
-    #machine.add_transition(&#34;move&#34;,States.FILTER_LINKS,States.SCRAPE_PERSON_PAGE)
-
-
-
-    return machine,controller</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -130,27 +46,7 @@ def build_state_machine(config={}):
 <span>(</span><span>state=None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OrganizationController:
-
-    def __init__(self, state=None) -&gt; None:
-        super().__init__()
-        if state is None: # TODO REMOVE THIS
-            config = dict()
-        self.state = state
-        self.spider = None
-        self.approval = False
-
-    def has_entity_match(self):
-        return self.state.get(&#34;has_entity_match&#34;)
-
-    def has_approval(self):
-        return self.approval</code></pre>
-</details>
+<div class="desc"><p>Controller of OrganizationSpider spider</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.controllers.organization.OrganizationController.has_approval"><code class="name flex">
@@ -158,26 +54,12 @@ def build_state_machine(config={}):
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def has_approval(self):
-    return self.approval</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.controllers.organization.OrganizationController.has_entity_match"><code class="name flex">
 <span>def <span class="ident">has_entity_match</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def has_entity_match(self):
-    return self.state.get(&#34;has_entity_match&#34;)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -187,20 +69,6 @@ def build_state_machine(config={}):
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class StatesOrganization(enum.Enum):
-    START = 0
-    PARSE_HOME_LINKS = 1
-    DETECT_KEYWORDS = 2
-    PARSE_CANDIDATES = 3
-    PARSING_ALL = 4
-    FAILED = 5
-    RESOLVE_CANDIDATES = 6
-    BUILD_ORG_STRUCTURE = 7</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>

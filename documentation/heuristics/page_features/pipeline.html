@@ -22,44 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_features.pipeline</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from typing import List, Any
-from . import AbstractPageFeatureExtractor
-from .ner_features import NERPageFeatureExtractor
-from .keyword_features import KeywordPageFeatureExtractor
-from academic_crawler.config.page_types import PageTypeMatcher,PAGE_TYPE
-
-
-class PageFeaturesPipeline:
-    extractors: list[AbstractPageFeatureExtractor]
-
-    def __init__(self,state) -&gt; None:
-        super().__init__()
-        self.extractors = [
-            NERPageFeatureExtractor(state,{&#34;PERSON&#34;,&#34;ORG&#34;,&#34;EMAIL&#34;}),
-            KeywordPageFeatureExtractor(state)
-        ]
-        self.state = state
-
-
-    def add(self,extractor):
-        self.extractors.append(extractor)
-        return self
-
-    def execute(self) -&gt;PAGE_TYPE:
-        matcher = PageTypeMatcher(to_exclude=self.state.get(&#34;to_exclude&#34;))
-        page_features_dict = dict()
-        for extractor in self.extractors:
-
-            features = extractor.extract_features()
-            page_features_dict.update(features)
-        matcher.update_page_dict(page_features_dict)
-        self.state.page_header[&#39;features&#39;] = matcher.page_dict
-        return matcher.solve_page_type()</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -76,37 +38,6 @@ class PageFeaturesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PageFeaturesPipeline:
-    extractors: list[AbstractPageFeatureExtractor]
-
-    def __init__(self,state) -&gt; None:
-        super().__init__()
-        self.extractors = [
-            NERPageFeatureExtractor(state,{&#34;PERSON&#34;,&#34;ORG&#34;,&#34;EMAIL&#34;}),
-            KeywordPageFeatureExtractor(state)
-        ]
-        self.state = state
-
-
-    def add(self,extractor):
-        self.extractors.append(extractor)
-        return self
-
-    def execute(self) -&gt;PAGE_TYPE:
-        matcher = PageTypeMatcher(to_exclude=self.state.get(&#34;to_exclude&#34;))
-        page_features_dict = dict()
-        for extractor in self.extractors:
-
-            features = extractor.extract_features()
-            page_features_dict.update(features)
-        matcher.update_page_dict(page_features_dict)
-        self.state.page_header[&#39;features&#39;] = matcher.page_dict
-        return matcher.solve_page_type()</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_features.pipeline.PageFeaturesPipeline.extractors"><code class="name">var <span class="ident">extractors</span> : list[<a title="academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor" href="index.html#academic_crawler.heuristics.page_features.AbstractPageFeatureExtractor">AbstractPageFeatureExtractor</a>]</code></dt>
@@ -121,35 +52,12 @@ class PageFeaturesPipeline:
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add(self,extractor):
-    self.extractors.append(extractor)
-    return self</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.heuristics.page_features.pipeline.PageFeaturesPipeline.execute"><code class="name flex">
 <span>def <span class="ident">execute</span></span>(<span>self) ‑> <a title="academic_crawler.config.page_types.PAGE_TYPE" href="../../config/page_types.html#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def execute(self) -&gt;PAGE_TYPE:
-    matcher = PageTypeMatcher(to_exclude=self.state.get(&#34;to_exclude&#34;))
-    page_features_dict = dict()
-    for extractor in self.extractors:
-
-        features = extractor.extract_features()
-        page_features_dict.update(features)
-    matcher.update_page_dict(page_features_dict)
-    self.state.page_header[&#39;features&#39;] = matcher.page_dict
-    return matcher.solve_page_type()</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

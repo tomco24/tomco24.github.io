@@ -22,65 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.config.enums</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from enum import Enum
-
-
-class OperationType(Enum):
-
-
-
-
-    def __new__(cls, *args, **kwds):
-        value = len(cls.__members__) + 1
-        obj = object.__new__(cls)
-        obj._value_ = value
-        return obj
-
-    def __init__(self, a):
-        self.output_type = a
-    &#34;&#34;&#34;
-    FIND_NAME_FROM_REFERER = 1
-    FIND_STRUCTURES = 2
-    PROCESS_STRUCTURES = 3
-    PROCESS_STRUCTURE_PARENT = 4
-    PROCESS_STRUCTURE_CHILD = 5
-    FIND_NAME_FROM_TITLE = 6
-    EXTRACT_NAME_USING_NLP = 7
-    EXTRACT_ORG_USING_NLP = 8
-    FIND_AFFILIATION_KEYWORD = 9
-    &#34;&#34;&#34;
-
-    IDENTIFY_SECTIONS = list
-    REMOVE_NOT_TAGGED = object
-    EXTRACT_DATA_FROM_PAGE_PEOPLE = list
-    EXTRACT_DATA_FROM_LINKS_PEOPLE = list
-    EXTRACT_DATA_FROM_LINKS_ORG_STRUCTURE = list
-    CONFIRM_NAME_ON_SINGLE_PAGE = list
-    EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE = object
-    FILTER_AFFILIATION_CANDIDATES = list
-    EXTRACT_PERSON_DATA_FROM_TREE = list
-    ANNOTATE_PERSON_DATA = object
-
-
-
-
-
-class OperationStatus(Enum):
-    SUCCESS = 1
-    FAILED = 2
-    EMPTY_RESULT = 3
-
-
-class PositionType(Enum):
-    PROFESSOR = 1
-    RESEARCHER = 2
-    STUDENT = 3
-    OTHER = 4</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -97,15 +38,6 @@ class PositionType(Enum):
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OperationStatus(Enum):
-    SUCCESS = 1
-    FAILED = 2
-    EMPTY_RESULT = 3</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -132,46 +64,6 @@ class PositionType(Enum):
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class OperationType(Enum):
-
-
-
-
-    def __new__(cls, *args, **kwds):
-        value = len(cls.__members__) + 1
-        obj = object.__new__(cls)
-        obj._value_ = value
-        return obj
-
-    def __init__(self, a):
-        self.output_type = a
-    &#34;&#34;&#34;
-    FIND_NAME_FROM_REFERER = 1
-    FIND_STRUCTURES = 2
-    PROCESS_STRUCTURES = 3
-    PROCESS_STRUCTURE_PARENT = 4
-    PROCESS_STRUCTURE_CHILD = 5
-    FIND_NAME_FROM_TITLE = 6
-    EXTRACT_NAME_USING_NLP = 7
-    EXTRACT_ORG_USING_NLP = 8
-    FIND_AFFILIATION_KEYWORD = 9
-    &#34;&#34;&#34;
-
-    IDENTIFY_SECTIONS = list
-    REMOVE_NOT_TAGGED = object
-    EXTRACT_DATA_FROM_PAGE_PEOPLE = list
-    EXTRACT_DATA_FROM_LINKS_PEOPLE = list
-    EXTRACT_DATA_FROM_LINKS_ORG_STRUCTURE = list
-    CONFIRM_NAME_ON_SINGLE_PAGE = list
-    EXTRACT_AFFILIATION_CANDIDATES_FROM_SINGLE_PAGE = object
-    FILTER_AFFILIATION_CANDIDATES = list
-    EXTRACT_PERSON_DATA_FROM_TREE = list
-    ANNOTATE_PERSON_DATA = object</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -226,16 +118,6 @@ class PositionType(Enum):
 </code></dt>
 <dd>
 <div class="desc"><p>An enumeration.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PositionType(Enum):
-    PROFESSOR = 1
-    RESEARCHER = 2
-    STUDENT = 3
-    OTHER = 4</code></pre>
-</details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>

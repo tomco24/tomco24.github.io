@@ -22,31 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.heuristics.page_config.tag_entity_location</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from dataclasses import dataclass
-
-
-@dataclass
-class TagsLocationsPeople():
-    person_name:list
-    person_url:list
-
-@dataclass
-class TagsLocationsDepartments():
-    department_name:str
-    department_url:str
-
-
-@dataclass
-class TagsLocationsSinglePerson():
-
-    affiliation_container:object
-    affiliation_division:object
-    affiliation_position:object</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -63,15 +38,6 @@ class TagsLocationsSinglePerson():
 </code></dt>
 <dd>
 <div class="desc"><p>TagsLocationsDepartments(department_name: str, department_url: str)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@dataclass
-class TagsLocationsDepartments():
-    department_name:str
-    department_url:str</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_config.tag_entity_location.TagsLocationsDepartments.department_name"><code class="name">var <span class="ident">department_name</span> : str</code></dt>
@@ -90,15 +56,6 @@ class TagsLocationsDepartments():
 </code></dt>
 <dd>
 <div class="desc"><p>TagsLocationsPeople(person_name: list, person_url: list)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@dataclass
-class TagsLocationsPeople():
-    person_name:list
-    person_url:list</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_config.tag_entity_location.TagsLocationsPeople.person_name"><code class="name">var <span class="ident">person_name</span> : list</code></dt>
@@ -117,17 +74,6 @@ class TagsLocationsPeople():
 </code></dt>
 <dd>
 <div class="desc"><p>TagsLocationsSinglePerson(affiliation_container: object, affiliation_division: object, affiliation_position: object)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@dataclass
-class TagsLocationsSinglePerson():
-
-    affiliation_container:object
-    affiliation_division:object
-    affiliation_position:object</code></pre>
-</details>
 <h3>Class variables</h3>
 <dl>
 <dt id="academic_crawler.heuristics.page_config.tag_entity_location.TagsLocationsSinglePerson.affiliation_container"><code class="name">var <span class="ident">affiliation_container</span> : object</code></dt>

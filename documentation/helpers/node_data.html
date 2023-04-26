@@ -22,105 +22,6 @@
 <h1 class="title">Module <code>academic_crawler.helpers.node_data</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">from multipledispatch import dispatch
-from academic_crawler.config.page_types import PAGE_TYPE
-from academic_crawler.heuristics.tree import EntityNode, SemanticNode
-
-
-class NodeDataExtractionHelper:
-    &#34;&#34;&#34;
-    &#34;&#34;&#34;
-
-    def __init__(self, page_type=PAGE_TYPE.PAGE_ORGANIZATIONS) -&gt; None:
-        super().__init__()
-        self.page = page_type
-        self.tag_map ={
-
-        }
-
-    def valid_conditions(self,ner_record,keyword_rercord,ner_tag,keyword):
-        if ner_tag == &#34;PERSON&#34;:
-            return len(ner_record.get(ner_tag,())) &gt; 0
-        else:
-            return len(ner_record.get(ner_tag,())) &gt; 0 and len(keyword_rercord.get(keyword,())) &gt; 0
-
-    def extract_data_from_node(self, node:SemanticNode, ner_tag:str, keyword_category:str) -&gt; list[dict]:
-        &#34;&#34;&#34;
-        Extract data from a node and return a list of dictionaries
-        :param node: 
-        :param ner_tag: 
-        :param keyword_category:
-        :return: 
-        &#34;&#34;&#34;
-        results = []
-        not_matched_tags = []
-        if node.entity.ner_tag != ner_tag:
-            return []
-        for i in range(len(node.entity.values)):
-
-            ner_record = node.entity.entities[i]
-            keyword_record = node.entity.keywords[i]
-            if not self.valid_conditions(ner_record, keyword_record, ner_tag, keyword_category):
-                not_matched_tags.append(i)
-                continue
-
-            result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-            if result:
-                results.append(result)
-        max_tag_key = max(self.tag_map.keys(),key=lambda x: len(self.tag_map[x])) if len(self.tag_map)&gt;0 else None
-        if max_tag_key and len(not_matched_tags)&gt;0: # and len(not_matched_tags)&lt;=len(results):
-            for i in not_matched_tags:
-                tag = node.tags[i]
-                tag_key = node.get_full_tag_path(i)
-                keyword_record = node.entity.keywords[i]
-                if (tag_key == max_tag_key) and ((ner_tag==&#39;PERSON&#39;) or (len(keyword_record.get(keyword_category, ())) &gt; 0)):
-                    print(f&#34;{node.entity.values[i]} has keyword_category {keyword_record.get(keyword_category, ())}&#34;)
-                    result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-                    if result:
-                        results.append(result)
-        #TODO REMOVE NOT MAX TAG CATEGORY
-
-
-        #     for i in not_matched_tags:
-        #         result = self.extract_partial_data_from_tag(node, i)
-        #         results.append(result)
-        return results
-
-    def extract_partial_data_from_tag(self, node:SemanticNode, i, ner_tag, keyword_category) -&gt; dict:
-        &#34;&#34;&#34;
-        Extract data from a tag and return a dictionary with the data extracted
-        :param node: 
-        :param i: 
-        :param ner_tag: 
-        :param keyword_category:
-        :return: 
-        &#34;&#34;&#34;
-        result = {
-            &#34;ner&#34;: ner_tag,
-            &#34;keyword_category&#34;: keyword_category,
-            &#34;value&#34;: None,
-            &#34;attributes&#34;: {
-
-            },
-            &#34;node_id&#34;: node.id,
-            &#34;tag_id&#34;: i,
-            &#34;tag&#34;:node.label,
-        }
-        tag = node.tags[i]
-        self.tag_map.setdefault(node.get_full_tag_path(i),[]).append(tag)
-        text = node.entity.values[i]
-        result[&#39;value&#39;] = text
-        if len(text)&gt;50:
-            return None
-        link = node.get_value_link(i)
-        if link is not None:
-            result[&#39;attributes&#39;][&#39;href&#39;] = link
-        return result</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -136,101 +37,7 @@ class NodeDataExtractionHelper:
 <span>(</span><span>page_type=PAGE_TYPE.PAGE_ORGANIZATIONS)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class NodeDataExtractionHelper:
-    &#34;&#34;&#34;
-    &#34;&#34;&#34;
-
-    def __init__(self, page_type=PAGE_TYPE.PAGE_ORGANIZATIONS) -&gt; None:
-        super().__init__()
-        self.page = page_type
-        self.tag_map ={
-
-        }
-
-    def valid_conditions(self,ner_record,keyword_rercord,ner_tag,keyword):
-        if ner_tag == &#34;PERSON&#34;:
-            return len(ner_record.get(ner_tag,())) &gt; 0
-        else:
-            return len(ner_record.get(ner_tag,())) &gt; 0 and len(keyword_rercord.get(keyword,())) &gt; 0
-
-    def extract_data_from_node(self, node:SemanticNode, ner_tag:str, keyword_category:str) -&gt; list[dict]:
-        &#34;&#34;&#34;
-        Extract data from a node and return a list of dictionaries
-        :param node: 
-        :param ner_tag: 
-        :param keyword_category:
-        :return: 
-        &#34;&#34;&#34;
-        results = []
-        not_matched_tags = []
-        if node.entity.ner_tag != ner_tag:
-            return []
-        for i in range(len(node.entity.values)):
-
-            ner_record = node.entity.entities[i]
-            keyword_record = node.entity.keywords[i]
-            if not self.valid_conditions(ner_record, keyword_record, ner_tag, keyword_category):
-                not_matched_tags.append(i)
-                continue
-
-            result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-            if result:
-                results.append(result)
-        max_tag_key = max(self.tag_map.keys(),key=lambda x: len(self.tag_map[x])) if len(self.tag_map)&gt;0 else None
-        if max_tag_key and len(not_matched_tags)&gt;0: # and len(not_matched_tags)&lt;=len(results):
-            for i in not_matched_tags:
-                tag = node.tags[i]
-                tag_key = node.get_full_tag_path(i)
-                keyword_record = node.entity.keywords[i]
-                if (tag_key == max_tag_key) and ((ner_tag==&#39;PERSON&#39;) or (len(keyword_record.get(keyword_category, ())) &gt; 0)):
-                    print(f&#34;{node.entity.values[i]} has keyword_category {keyword_record.get(keyword_category, ())}&#34;)
-                    result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-                    if result:
-                        results.append(result)
-        #TODO REMOVE NOT MAX TAG CATEGORY
-
-
-        #     for i in not_matched_tags:
-        #         result = self.extract_partial_data_from_tag(node, i)
-        #         results.append(result)
-        return results
-
-    def extract_partial_data_from_tag(self, node:SemanticNode, i, ner_tag, keyword_category) -&gt; dict:
-        &#34;&#34;&#34;
-        Extract data from a tag and return a dictionary with the data extracted
-        :param node: 
-        :param i: 
-        :param ner_tag: 
-        :param keyword_category:
-        :return: 
-        &#34;&#34;&#34;
-        result = {
-            &#34;ner&#34;: ner_tag,
-            &#34;keyword_category&#34;: keyword_category,
-            &#34;value&#34;: None,
-            &#34;attributes&#34;: {
-
-            },
-            &#34;node_id&#34;: node.id,
-            &#34;tag_id&#34;: i,
-            &#34;tag&#34;:node.label,
-        }
-        tag = node.tags[i]
-        self.tag_map.setdefault(node.get_full_tag_path(i),[]).append(tag)
-        text = node.entity.values[i]
-        result[&#39;value&#39;] = text
-        if len(text)&gt;50:
-            return None
-        link = node.get_value_link(i)
-        if link is not None:
-            result[&#39;attributes&#39;][&#39;href&#39;] = link
-        return result</code></pre>
-</details>
+<div class="desc"><p>Helper class for extracting data from a compound node in a semantic tree</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.helpers.node_data.NodeDataExtractionHelper.extract_data_from_node"><code class="name flex">
@@ -242,52 +49,6 @@ class NodeDataExtractionHelper:
 :param ner_tag:
 :param keyword_category:
 :return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_data_from_node(self, node:SemanticNode, ner_tag:str, keyword_category:str) -&gt; list[dict]:
-    &#34;&#34;&#34;
-    Extract data from a node and return a list of dictionaries
-    :param node: 
-    :param ner_tag: 
-    :param keyword_category:
-    :return: 
-    &#34;&#34;&#34;
-    results = []
-    not_matched_tags = []
-    if node.entity.ner_tag != ner_tag:
-        return []
-    for i in range(len(node.entity.values)):
-
-        ner_record = node.entity.entities[i]
-        keyword_record = node.entity.keywords[i]
-        if not self.valid_conditions(ner_record, keyword_record, ner_tag, keyword_category):
-            not_matched_tags.append(i)
-            continue
-
-        result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-        if result:
-            results.append(result)
-    max_tag_key = max(self.tag_map.keys(),key=lambda x: len(self.tag_map[x])) if len(self.tag_map)&gt;0 else None
-    if max_tag_key and len(not_matched_tags)&gt;0: # and len(not_matched_tags)&lt;=len(results):
-        for i in not_matched_tags:
-            tag = node.tags[i]
-            tag_key = node.get_full_tag_path(i)
-            keyword_record = node.entity.keywords[i]
-            if (tag_key == max_tag_key) and ((ner_tag==&#39;PERSON&#39;) or (len(keyword_record.get(keyword_category, ())) &gt; 0)):
-                print(f&#34;{node.entity.values[i]} has keyword_category {keyword_record.get(keyword_category, ())}&#34;)
-                result = self.extract_partial_data_from_tag(node, i, ner_tag, keyword_category)
-                if result:
-                    results.append(result)
-    #TODO REMOVE NOT MAX TAG CATEGORY
-
-
-    #     for i in not_matched_tags:
-    #         result = self.extract_partial_data_from_tag(node, i)
-    #         results.append(result)
-    return results</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.node_data.NodeDataExtractionHelper.extract_partial_data_from_tag"><code class="name flex">
 <span>def <span class="ident">extract_partial_data_from_tag</span></span>(<span>self, node: <a title="academic_crawler.heuristics.tree.node.SemanticNode" href="../heuristics/tree/node.html#academic_crawler.heuristics.tree.node.SemanticNode">SemanticNode</a>, i, ner_tag, keyword_category) ‑> dict</span>
@@ -299,57 +60,12 @@ class NodeDataExtractionHelper:
 :param ner_tag:
 :param keyword_category:
 :return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_partial_data_from_tag(self, node:SemanticNode, i, ner_tag, keyword_category) -&gt; dict:
-    &#34;&#34;&#34;
-    Extract data from a tag and return a dictionary with the data extracted
-    :param node: 
-    :param i: 
-    :param ner_tag: 
-    :param keyword_category:
-    :return: 
-    &#34;&#34;&#34;
-    result = {
-        &#34;ner&#34;: ner_tag,
-        &#34;keyword_category&#34;: keyword_category,
-        &#34;value&#34;: None,
-        &#34;attributes&#34;: {
-
-        },
-        &#34;node_id&#34;: node.id,
-        &#34;tag_id&#34;: i,
-        &#34;tag&#34;:node.label,
-    }
-    tag = node.tags[i]
-    self.tag_map.setdefault(node.get_full_tag_path(i),[]).append(tag)
-    text = node.entity.values[i]
-    result[&#39;value&#39;] = text
-    if len(text)&gt;50:
-        return None
-    link = node.get_value_link(i)
-    if link is not None:
-        result[&#39;attributes&#39;][&#39;href&#39;] = link
-    return result</code></pre>
-</details>
 </dd>
 <dt id="academic_crawler.helpers.node_data.NodeDataExtractionHelper.valid_conditions"><code class="name flex">
-<span>def <span class="ident">valid_conditions</span></span>(<span>self, ner_record, keyword_rercord, ner_tag, keyword)</span>
+<span>def <span class="ident">valid_conditions</span></span>(<span>self, ner_record: dict, keyword_rercord: dict, ner_tag: str, keyword_category: str) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def valid_conditions(self,ner_record,keyword_rercord,ner_tag,keyword):
-    if ner_tag == &#34;PERSON&#34;:
-        return len(ner_record.get(ner_tag,())) &gt; 0
-    else:
-        return len(ner_record.get(ner_tag,())) &gt; 0 and len(keyword_rercord.get(keyword,())) &gt; 0</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
