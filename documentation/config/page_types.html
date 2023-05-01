@@ -94,7 +94,7 @@
 <h3>Methods</h3>
 <dl>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.check_page_type"><code class="name flex">
-<span>def <span class="ident">check_page_type</span></span>(<span>self, page_type: <a title="academic_crawler.config.page_types.PAGE_TYPE" href="#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a>, stage)</span>
+<span>def <span class="ident">check_page_type</span></span>(<span>self, page_type: <a title="academic_crawler.config.page_types.PAGE_TYPE" href="#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a>, stage: int) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -112,25 +112,27 @@
 <div class="desc"></div>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.has_enough_ner"><code class="name flex">
-<span>def <span class="ident">has_enough_ner</span></span>(<span>self)</span>
+<span>def <span class="ident">has_enough_ner</span></span>(<span>self) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.is_org_site"><code class="name flex">
-<span>def <span class="ident">is_org_site</span></span>(<span>self)</span>
+<span>def <span class="ident">is_org_site</span></span>(<span>self) ‑> bool</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Checks if the page has enough NER considered to be org page
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.is_people_site"><code class="name flex">
-<span>def <span class="ident">is_people_site</span></span>(<span>self)</span>
+<span>def <span class="ident">is_people_site</span></span>(<span>self) ‑> bool</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Checks if the page has enough NER considered to be people page
+Returns:</p></div>
 </dd>
 <dt id="academic_crawler.config.page_types.PageTypeMatcher.solve_page_type"><code class="name flex">
-<span>def <span class="ident">solve_page_type</span></span>(<span>self)</span>
+<span>def <span class="ident">solve_page_type</span></span>(<span>self) ‑> <a title="academic_crawler.config.page_types.PAGE_TYPE" href="#academic_crawler.config.page_types.PAGE_TYPE">PAGE_TYPE</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
